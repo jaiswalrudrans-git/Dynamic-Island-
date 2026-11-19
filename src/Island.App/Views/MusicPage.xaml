@@ -193,18 +193,17 @@
                 <Slider x:Name="Seek" Grid.Column="1" Minimum="0" Maximum="1" Margin="10,0"
                         Value="{Binding Fraction, Mode=OneWay}" IsEnabled="{Binding CanSeek}"
                         VerticalAlignment="Center" Focusable="False" AutomationProperties.Name="Playback position"
-                        IsMoveToPointEnabled="True"
-                        PreviewMouseLeftButtonDown="SeekStart" PreviewMouseMove="SeekMove"
-                        PreviewMouseLeftButtonUp="SeekEnd" LostMouseCapture="SeekLost">
+                        IsMoveToPointEnabled="True" Cursor="Hand">
                     <Slider.Template>
                         <ControlTemplate TargetType="Slider">
-                            <Grid Height="20" Background="Transparent">
+                            <Grid Height="20" Background="Transparent" Cursor="Hand">
                                 <Track x:Name="PART_Track" VerticalAlignment="Center">
                                     <Track.DecreaseRepeatButton>
-                                        <RepeatButton Style="{StaticResource SeekRail}" Background="{DynamicResource Theme.Accent}"/>
+                                        <RepeatButton Style="{StaticResource SeekRail}" Background="{DynamicResource Theme.Accent}"
+                                                      Command="Slider.DecreaseLarge"/>
                                     </Track.DecreaseRepeatButton>
                                     <Track.Thumb>
-                                        <Thumb Width="12" Height="12">
+                                        <Thumb Width="12" Height="12" Cursor="Hand">
                                             <Thumb.Template>
                                                 <ControlTemplate TargetType="Thumb">
                                                     <Ellipse Fill="{DynamicResource Theme.TextPrimary}"/>
@@ -213,7 +212,8 @@
                                         </Thumb>
                                     </Track.Thumb>
                                     <Track.IncreaseRepeatButton>
-                                        <RepeatButton Style="{StaticResource SeekRail}" Background="{DynamicResource Theme.BorderStrong}"/>
+                                        <RepeatButton Style="{StaticResource SeekRail}" Background="{DynamicResource Theme.BorderStrong}"
+                                                      Command="Slider.IncreaseLarge"/>
                                     </Track.IncreaseRepeatButton>
                                 </Track>
                             </Grid>

@@ -1,7 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using Island.App.Services;
@@ -15,9 +15,7 @@ public partial class MusicPage : UserControl
     private readonly MusicViewModel model;
     private readonly Action<string?> pin;
     private readonly Action<bool> menuState;
-    private PlayerChoice? seekingPlayer;
-    private string? seekingTitle;
-    private BindingBase? seekBinding;
+    private bool isDragging;
     private string lastLyric = "";
 
     internal MusicPage(MusicViewModel model, Action<string?> pin, Action<bool> menuState, Func<AppSettings> settings)
@@ -29,6 +27,15 @@ public partial class MusicPage : UserControl
         DataContext = model;
         Meter.Attach(model.Spectrum);
         foreach (Button button in TransportButtons.Children) PanelNavigation.AttachButtonMotion(button, settings);
+
+        Seek.AddHandler(PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(SeekPointerDown), true);
+        Seek.AddHandler(Thumb.DragStartedEvent, new DragStartedEventHandler(SeekDragStarted), true);
+        Seek.AddHandler(Thumb.DragCompletedEvent, new DragCompletedEventHandler(SeekDragCompleted), true);
+        Seek.AddHandler(PreviewMouseMoveEvent, new MouseEventHandler(SeekPointerMove), true);
+        Seek.AddHandler(PreviewMouseLeftButtonUpEvent, new MouseButtonEventHandler(SeekPointerUp), true);
+        Seek.LostMouseCapture += SeekLostCapture;
+        Seek.ValueChanged += SeekValueChanged;
+
         model.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName != nameof(MusicViewModel.CurrentLyric)) return;
@@ -43,7 +50,7 @@ public partial class MusicPage : UserControl
 
     private void ChoosePlayer(object sender, RoutedEventArgs e)
     {
-        var menu = new ContextMenu { PlacementTarget = (Button)sender, Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom };
+        var menu = new ContextMenu { PlacementTarget = (Button)sender, Placement = PlacementMode.Bottom };
         foreach (var player in model.Players)
         {
             var item = new MenuItem { Header = player.Label, ToolTip = player.Id, IsChecked = player == model.Selected };
@@ -66,49 +73,77 @@ public partial class MusicPage : UserControl
     private double PointerFraction(MouseEventArgs e) =>
         Math.Clamp((e.GetPosition(Seek).X - 6) / Math.Max(1, Seek.ActualWidth - 12), 0, 1);
 
-    private void SeekStart(object sender, MouseButtonEventArgs e)
+    private void SeekPointerDown(object sender, MouseButtonEventArgs e)
     {
-        if (!model.CanSeek || !Seek.CaptureMouse()) return;
-        seekingPlayer = model.Selected;
-        seekingTitle = model.Title;
-        seekBinding = BindingOperations.GetBindingBase(Seek, Slider.ValueProperty);
-        BindingOperations.ClearBinding(Seek, Slider.ValueProperty);
-        double frac = PointerFraction(e);
-        Seek.SetCurrentValue(Slider.ValueProperty, frac);
-        model.PreviewSeek(frac);
-        e.Handled = true;
-    }
-
-    private void SeekMove(object sender, MouseEventArgs e)
-    {
-        if (seekingPlayer != null)
+        if (!model.CanSeek) return;
+        isDragging = true;
+        model.BeginSeek();
+        var sliderTrack = Seek.Template?.FindName("PART_Track", Seek) as Track;
+        if (sliderTrack?.Thumb.IsMouseOver != true)
         {
+            Seek.CaptureMouse();
             double frac = PointerFraction(e);
-            Seek.SetCurrentValue(Slider.ValueProperty, frac);
+            Seek.Value = frac;
             model.PreviewSeek(frac);
         }
     }
 
-    private async void SeekEnd(object sender, MouseButtonEventArgs e)
+    private void SeekDragStarted(object sender, DragStartedEventArgs e)
     {
-        if (seekingPlayer == null) return;
-        double value = PointerFraction(e);
-        bool canSeek = model.CanSeek;
-        e.Handled = true;
-        if (canSeek)
-        {
-            await model.CommandAsync("Seek", value);
-        }
-        Seek.ReleaseMouseCapture();
+        if (!model.CanSeek) return;
+        isDragging = true;
+        model.BeginSeek();
     }
 
-    private void SeekLost(object sender, MouseEventArgs e)
+    private void SeekPointerMove(object sender, MouseEventArgs e)
     {
-        seekingPlayer = null;
-        if (seekBinding != null)
+        if (isDragging && Seek.IsMouseCaptured && Mouse.LeftButton == MouseButtonState.Pressed)
         {
-            Seek.SetBinding(Slider.ValueProperty, seekBinding);
-            seekBinding = null;
+            double frac = PointerFraction(e);
+            Seek.Value = frac;
+            model.PreviewSeek(frac);
         }
+    }
+
+    private void SeekValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (isDragging)
+        {
+            model.PreviewSeek(Seek.Value);
+        }
+    }
+
+    private void SeekDragCompleted(object sender, DragCompletedEventArgs e)
+    {
+        if (!isDragging) return;
+        if (e.Canceled)
+        {
+            isDragging = false;
+            model.EndSeekCancel();
+            return;
+        }
+        _ = CommitSeekAsync();
+    }
+
+    private void SeekPointerUp(object sender, MouseButtonEventArgs e)
+    {
+        if (isDragging) _ = CommitSeekAsync();
+    }
+
+    private void SeekLostCapture(object sender, MouseEventArgs e)
+    {
+        if (isDragging && !Seek.IsMouseCaptureWithin)
+        {
+            _ = CommitSeekAsync();
+        }
+    }
+
+    private async Task CommitSeekAsync()
+    {
+        if (!isDragging) return;
+        isDragging = false;
+        if (Seek.IsMouseCaptured) Seek.ReleaseMouseCapture();
+        if (!model.CanSeek) return;
+        await model.CommitSeekAsync(Seek.Value);
     }
 }

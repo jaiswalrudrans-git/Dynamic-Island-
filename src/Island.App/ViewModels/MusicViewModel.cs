@@ -66,7 +66,7 @@ internal sealed class MusicViewModel : ObservableObject, IDisposable
     public string PlayGlyph => Playing ? "\uE769" : "\uE768";
     public string PlayHint => Playing ? "Pause" : "Play";
     public bool HasTimeline => sessions.End > sessions.Start;
-    public bool CanSeek => !commandBusy && sessions.State?.Seek == true && sessions.MaxSeek > sessions.MinSeek && HasTimeline;
+    public bool CanSeek => sessions.State?.Seek == true && sessions.MaxSeek > sessions.MinSeek && HasTimeline;
     public double Fraction => HasTimeline ? Math.Clamp((position - sessions.Start) / (sessions.End - sessions.Start), 0, 1) : 0;
     public string Elapsed => HasTimeline ? Format(position - sessions.Start) : "";
     public string Duration => HasTimeline ? Format(sessions.End - sessions.Start) : "";
@@ -168,8 +168,20 @@ internal sealed class MusicViewModel : ObservableObject, IDisposable
         }
     }
 
+    private bool isSeeking;
+    public bool IsSeeking => isSeeking;
+
+    public void BeginSeek() => isSeeking = true;
+
+    public void EndSeekCancel()
+    {
+        isSeeking = false;
+        UpdatePosition();
+    }
+
     private void UpdatePosition()
     {
+        if (isSeeking) return;
         position = sessions.Position;
         OnPropertyChanged(nameof(Fraction));
         OnPropertyChanged(nameof(Elapsed));
@@ -186,8 +198,16 @@ internal sealed class MusicViewModel : ObservableObject, IDisposable
     public void PreviewSeek(double fraction)
     {
         if (!HasTimeline) return;
+        isSeeking = true;
         position = sessions.Start + Math.Clamp(fraction, 0, 1) * (sessions.End - sessions.Start);
+        OnPropertyChanged(nameof(Fraction));
         OnPropertyChanged(nameof(Elapsed));
+    }
+
+    public async Task CommitSeekAsync(double fraction)
+    {
+        isSeeking = false;
+        await CommandAsync("Seek", fraction);
     }
 
     public async Task CommandAsync(string action, double fraction = 0)
@@ -196,7 +216,11 @@ internal sealed class MusicViewModel : ObservableObject, IDisposable
         var original = Selected?.Session;
         commandBusy = true;
         commandError = "";
-        OnPropertyChanged(string.Empty);
+        OnPropertyChanged(nameof(CanToggle));
+        OnPropertyChanged(nameof(CanPrevious));
+        OnPropertyChanged(nameof(CanNext));
+        OnPropertyChanged(nameof(CanShuffle));
+        OnPropertyChanged(nameof(CanRepeat));
         try
         {
             double targetSeconds = sessions.Start + fraction * (sessions.End - sessions.Start);

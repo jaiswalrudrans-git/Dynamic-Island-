@@ -25,6 +25,8 @@ internal sealed class MediaSessions(Dispatcher dispatcher, Action<string> log) :
     private int lifetime;
     private bool starting, suspended = true;
     private Timeline timeline, reported;
+    private double? pendingSeekPosition;
+    private DateTimeOffset pendingSeekUntil;
     private readonly Dictionary<string, string> playerNames = new();
     public PlayerChoice[] Players { get; private set; } = [];
     public PlayerChoice? Selected => Players.FirstOrDefault(p => Equals(p.Session, session));
@@ -42,6 +44,20 @@ internal sealed class MediaSessions(Dispatcher dispatcher, Action<string> log) :
         get
         {
             if (End <= Start) return Start;
+            if (pendingSeekPosition.HasValue)
+            {
+                if (DateTimeOffset.UtcNow >= pendingSeekUntil)
+                {
+                    pendingSeekPosition = null;
+                }
+                else
+                {
+                    double elapsed = State is { Playing: true } seekPlayback
+                        ? Math.Max(0, (DateTimeOffset.UtcNow - timeline.Updated).TotalSeconds) * seekPlayback.Rate
+                        : 0;
+                    return Math.Clamp(pendingSeekPosition.Value + elapsed, Start, End);
+                }
+            }
             double position = timeline.Position;
             if (State is { Playing: true } playback && timeline.Updated.Year > 1970)
                 position += Math.Max(0, (DateTimeOffset.UtcNow - timeline.Updated).TotalSeconds) * playback.Rate;
@@ -188,6 +204,7 @@ internal sealed class MediaSessions(Dispatcher dispatcher, Action<string> log) :
             catch (Exception ex) { log($"Media session disconnected: {ex.HResult:X8}"); }
         }
         session = next;
+        pendingSeekPosition = null;
         State = null;
         timeline = reported = default;
         Track = null;
@@ -223,6 +240,26 @@ internal sealed class MediaSessions(Dispatcher dispatcher, Action<string> log) :
             var t = session?.GetTimelineProperties();
             var next = t == null ? default : new Timeline(t.StartTime.TotalSeconds, t.EndTime.TotalSeconds,
                 t.MinSeekTime.TotalSeconds, t.MaxSeekTime.TotalSeconds, t.Position.TotalSeconds, t.LastUpdatedTime);
+            if (pendingSeekPosition.HasValue)
+            {
+                if (DateTimeOffset.UtcNow >= pendingSeekUntil)
+                {
+                    pendingSeekPosition = null;
+                }
+                else
+                {
+                    double diff = Math.Abs(next.Position - pendingSeekPosition.Value);
+                    if (diff <= 1.5)
+                    {
+                        pendingSeekPosition = null;
+                    }
+                    else
+                    {
+                        // Player hasn't caught up to seek target yet; ignore pre-seek timeline event
+                        return;
+                    }
+                }
+            }
             if (next != reported) timeline = reported = next;
             else if (continuedPosition.HasValue)
                 timeline = next with { Position = continuedPosition.Value, Updated = DateTimeOffset.UtcNow };
@@ -289,6 +326,8 @@ internal sealed class MediaSessions(Dispatcher dispatcher, Action<string> log) :
                 if (action == "Seek")
                 {
                     double clamped = Math.Clamp(position, MinSeek, MaxSeek);
+                    pendingSeekPosition = clamped;
+                    pendingSeekUntil = DateTimeOffset.UtcNow.AddSeconds(3);
                     timeline = timeline with { Position = clamped, Updated = DateTimeOffset.UtcNow };
                 }
                 return true;
