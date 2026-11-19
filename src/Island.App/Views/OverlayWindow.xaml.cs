@@ -70,8 +70,9 @@ public partial class OverlayWindow : Window
                 QueuePlacement();
                 break;
             case 0x001E: // WM_TIMECHANGE
-            case 0x0218 when wParam == 18: // PBT_APMRESUMEAUTOMATIC
-                RefreshClock();
+            case 0x0218: // WM_POWERBROADCAST
+                if (wParam == 18) RefreshClock();
+                powerAlerts?.CheckPowerStatus();
                 break;
         }
         return 0;

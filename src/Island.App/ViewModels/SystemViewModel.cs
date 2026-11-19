@@ -169,6 +169,7 @@ public sealed class SystemViewModel : ObservableObject, IDisposable
     };
 
     public event Action? CollapsedStatChanged;
+    public event Action<SystemSnapshot>? SnapshotUpdated;
 
     public SystemViewModel(Dispatcher dispatcher, AppSettings config, Action<string>? log = null)
     {
@@ -206,6 +207,7 @@ public sealed class SystemViewModel : ObservableObject, IDisposable
     private void OnSnapshotUpdated(SystemSnapshot next)
     {
         if (disposed) return;
+        SnapshotUpdated?.Invoke(next);
         dispatcher.InvokeAsync(() =>
         {
             snapshot = next;

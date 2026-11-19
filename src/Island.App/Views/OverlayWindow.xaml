@@ -25,6 +25,25 @@
                 </ControlTemplate></Setter.Value>
             </Setter>
         </Style>
+        <BooleanToVisibilityConverter x:Key="Visible"/>
+        <Style x:Key="AlertProgressBar" TargetType="ProgressBar">
+            <Setter Property="Height" Value="4"/>
+            <Setter Property="Minimum" Value="0"/>
+            <Setter Property="Maximum" Value="1"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ProgressBar">
+                        <Border CornerRadius="2" Background="#26FFFFFF">
+                            <Grid x:Name="PART_Track">
+                                <Border x:Name="PART_Indicator" CornerRadius="2" HorizontalAlignment="Left"
+                                        Background="{DynamicResource Theme.Accent}"/>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
     <Grid>
         <Grid x:Name="ReducedBase" Width="130" Height="32" HorizontalAlignment="Center" VerticalAlignment="Top"
@@ -45,6 +64,18 @@
                 <Border.RenderTransform><TranslateTransform x:Name="EdgeOffset" Y="31"/></Border.RenderTransform>
             </Border>
             <Grid Height="32" VerticalAlignment="Top">
+            <Grid x:Name="CompactAlert" Width="230" HorizontalAlignment="Center" Visibility="Hidden" IsHitTestVisible="False">
+                <Grid.RenderTransform><TranslateTransform x:Name="AlertY"/></Grid.RenderTransform>
+                <DockPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="{Binding AlertGlyph}"
+                               FontSize="13" Foreground="{Binding AlertAccentBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Text="{Binding AlertTitle}" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold"
+                               Foreground="#F4F6FA" VerticalAlignment="Center"/>
+                    <ProgressBar Style="{StaticResource AlertProgressBar}" Value="{Binding AlertProgress}"
+                                 Width="48" Height="4" Margin="10,0,0,0" VerticalAlignment="Center"
+                                 Visibility="{Binding HasProgress, Converter={StaticResource Visible}}"/>
+                </DockPanel>
+            </Grid>
             <Grid x:Name="CompactMusic" Width="210" HorizontalAlignment="Center" Visibility="Hidden" IsHitTestVisible="False">
                 <Border Margin="-14,0" Opacity=".65"><Border.Background>
                     <RadialGradientBrush Center=".13,.5" GradientOrigin=".13,.5" RadiusX=".6" RadiusY="1.5">

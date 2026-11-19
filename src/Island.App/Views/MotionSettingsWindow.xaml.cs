@@ -25,6 +25,14 @@ public partial class MotionSettingsWindow : Window
         CollapsedStat.SelectedItem = current.CollapsedStat;
         ProcessSort.ItemsSource = new[] { "Cpu", "Memory" };
         ProcessSort.SelectedItem = current.SystemProcessSort;
+        AlertsEnabledCheck.IsChecked = current.AlertsEnabled;
+        AlertVolumeCheck.IsChecked = current.AlertVolumeOsdEnabled;
+        AlertBrightnessCheck.IsChecked = current.AlertBrightnessOsdEnabled;
+        AlertMicCheck.IsChecked = current.AlertMicOsdEnabled;
+        AlertBatteryCheck.IsChecked = current.AlertBatteryEnabled;
+        AlertTempCheck.IsChecked = current.AlertTemperatureEnabled;
+        AlertSoundCheck.IsChecked = current.AlertSoundEnabled;
+        AlertDurationSlider.Value = current.AlertDurationSeconds;
         MusicPreview.Click += (_, _) => save(s => s with { ShowMusicPreview = MusicPreview.IsChecked == true });
         Equalizer.Click += (_, _) => save(s => s with { MusicEqualizer = Equalizer.IsChecked == true });
         Lyrics.Click += (_, _) => save(s => s with { LyricsEnabled = Lyrics.IsChecked == true });
@@ -32,6 +40,13 @@ public partial class MotionSettingsWindow : Window
         PreviewText.SelectionChanged += (_, _) => save(s => s with { MusicPreviewText = (string)PreviewText.SelectedItem });
         CollapsedStat.SelectionChanged += (_, _) => save(s => s with { CollapsedStat = (string)CollapsedStat.SelectedItem });
         ProcessSort.SelectionChanged += (_, _) => save(s => s with { SystemProcessSort = (string)ProcessSort.SelectedItem });
+        AlertsEnabledCheck.Click += (_, _) => save(s => s with { AlertsEnabled = AlertsEnabledCheck.IsChecked == true });
+        AlertVolumeCheck.Click += (_, _) => save(s => s with { AlertVolumeOsdEnabled = AlertVolumeCheck.IsChecked == true });
+        AlertBrightnessCheck.Click += (_, _) => save(s => s with { AlertBrightnessOsdEnabled = AlertBrightnessCheck.IsChecked == true });
+        AlertMicCheck.Click += (_, _) => save(s => s with { AlertMicOsdEnabled = AlertMicCheck.IsChecked == true });
+        AlertBatteryCheck.Click += (_, _) => save(s => s with { AlertBatteryEnabled = AlertBatteryCheck.IsChecked == true });
+        AlertTempCheck.Click += (_, _) => save(s => s with { AlertTemperatureEnabled = AlertTempCheck.IsChecked == true });
+        AlertSoundCheck.Click += (_, _) => save(s => s with { AlertSoundEnabled = AlertSoundCheck.IsChecked == true });
         Reduced.Click += (_, _) => save(s => s with { ReduceMotion = Reduced.IsChecked == true });
         // Commit settled slider edits, including keyboard input, without writing on every drag pixel.
         void Bind(Slider slider, Func<AppSettings, AppSettings> edit)
@@ -42,5 +57,6 @@ public partial class MotionSettingsWindow : Window
         Bind(Speed, s => s with { AnimationSpeed = Speed.Value });
         Bind(Hover, s => s with { HoverDelayMs = (int)Hover.Value });
         Bind(Leave, s => s with { CollapseDelayMs = (int)Leave.Value });
+        Bind(AlertDurationSlider, s => s with { AlertDurationSeconds = (int)AlertDurationSlider.Value });
     }
 }

@@ -25,6 +25,18 @@ public sealed record AppSettings
     public string CollapsedStat { get; init; } = "None";
     public string SystemProcessSort { get; init; } = "Cpu";
     public int SystemGpuIndex { get; init; }
+    public bool AlertsEnabled { get; init; } = true;
+    public bool AlertBatteryEnabled { get; init; } = true;
+    public int AlertBatteryLowThreshold { get; init; } = 20;
+    public int AlertBatteryCriticalThreshold { get; init; } = 10;
+    public bool AlertChargerEnabled { get; init; } = true;
+    public bool AlertTemperatureEnabled { get; init; } = true;
+    public int AlertTemperatureThreshold { get; init; } = 85;
+    public bool AlertVolumeOsdEnabled { get; init; } = true;
+    public bool AlertBrightnessOsdEnabled { get; init; } = true;
+    public bool AlertMicOsdEnabled { get; init; } = true;
+    public bool AlertSoundEnabled { get; init; } = true;
+    public int AlertDurationSeconds { get; init; } = 4;
 
     [JsonExtensionData]
     public IDictionary<string, JsonElement>? AdditionalSettings { get; init; }
@@ -38,6 +50,10 @@ public sealed record AppSettings
         AnimationSpeed = double.IsFinite(AnimationSpeed) ? Math.Clamp(AnimationSpeed, 0.5, 2) : 1,
         CollapsedStat = CollapsedStat is "Cpu" or "Ram" or "Network" or "Battery" or "CpuRam" ? CollapsedStat : "None",
         SystemProcessSort = SystemProcessSort is "Memory" ? "Memory" : "Cpu",
-        SystemGpuIndex = Math.Max(0, SystemGpuIndex)
+        SystemGpuIndex = Math.Max(0, SystemGpuIndex),
+        AlertBatteryLowThreshold = Math.Clamp(AlertBatteryLowThreshold, 1, 50),
+        AlertBatteryCriticalThreshold = Math.Clamp(AlertBatteryCriticalThreshold, 1, 25),
+        AlertTemperatureThreshold = Math.Clamp(AlertTemperatureThreshold, 50, 115),
+        AlertDurationSeconds = Math.Clamp(AlertDurationSeconds, 1, 15)
     };
 }

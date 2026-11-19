@@ -1,5 +1,66 @@
 # Milestone progress
 
+## M5 complete · 2026-11-19
+
+### What works
+
+- **Queued Alerts & System OSD**:
+  - The collapsed notch dynamically intercepts and displays incoming system events and OSD changes:
+    - **Volume & Mute OSD**: Detects Windows master volume changes and mute toggles made anywhere in Windows (via Core Audio `IAudioEndpointVolume` callbacks), displaying volume percentage with a progress bar or mute glyph. High-frequency volume scrolling updates the active alert in-place without queue buildup.
+    - **Microphone Mute OSD**: Detects default communications capture device mute state changes, displaying "Mic Muted" or "Mic Unmuted" with appropriate warning/info styling.
+    - **Brightness OSD**: Monitors display brightness changes via WMI (`WmiMonitorBrightness`), showing a brightness percentage bar.
+    - **Battery & Charger Alerts**: Detects power status transitions (`WM_POWERBROADCAST` and `GetSystemPowerStatus`) — announces "Charging" when plugged in, "On Battery" when disconnected, "Battery 20%" warning on low battery, and "Battery 10% - Connect Charger" with critical styling and exclamation sound. Includes hysteresis to prevent alert spamming.
+    - **Temperature Warnings**: Monitors GPU and CPU temperatures against configurable thresholds (default 85°C) with cooldown to notify when hardware runs hot.
+  - **Notch Animation & Presentation**:
+    - Alerts drop into the collapsed notch with a smooth spring translation and slight overshoot.
+    - An alert expands the notch to ~230 DIPs and auto-dismisses after a configurable duration (default 4s, or 3s for fast OSD).
+    - Alerts prioritize above the music preview, compact stats, and clock. When the alert queue empties, the notch smoothly returns to the music preview (if playing), compact stat, or idle clock.
+    - Critical alerts preempt non-critical alerts immediately, pushing the interrupted alert back to the front of the queue to resume afterward.
+- **Alert Settings**:
+  - Motion & Alert settings window provides toggles for:
+    - Master alerts enable/disable
+    - Individual alert toggles (Volume, Brightness, Microphone, Battery/Charger, Temperature)
+    - Alert sound toggle
+    - Alert duration slider (1–10 seconds)
+
+### Verification
+
+- Release built on Windows x64 with zero warnings and zero errors.
+- All 48 tests passed in [Island.Tests](file:///D:/Island%202/tests/Island.Tests/), including FIFO queueing, in-place continuous OSD update deduplication, critical alert preemption and queue resumption, queue clearing, ViewModel alert property and color brush mapping, and settings normalization.
+- Self-tested on live Windows 11 hardware with active audio endpoints, microphone, dual GPUs, and battery power events. Verified zero unhandled exceptions on startup and execution.
+
+### Known limitations and remaining checks
+
+- External desktop monitors that lack DDC/CI or WMI support cannot report brightness changes via software APIs; Island handles this without throwing.
+- Sound playback respects Windows system sound settings and Island's `AlertSoundEnabled` setting.
+
+### What to test
+
+1. If an older Island instance is running, exit it via tray **Quit**. Start this build in PowerShell:
+
+   ~~~powershell
+   Set-Location 'D:\Island 2'
+   $env:DOTNET_ROOT = "$PWD\.tools\dotnet"
+   Start-Process "$PWD\src\Island.App\bin\Release\net8.0-windows10.0.19041.0\Island.App.exe"
+   ~~~
+
+2. **Volume & Mute OSD**:
+   - Press your keyboard's Volume Up / Volume Down keys or change the volume slider in the Windows taskbar.
+   - Watch the collapsed notch: it springs open to show the speaker glyph, volume percentage, and a mini progress bar, holds for 3 seconds, then collapses.
+   - Press the Mute key: verify the "Muted" badge appears.
+3. **Microphone OSD**:
+   - If your laptop has a microphone mute button or toggle in Windows Sound settings, toggle it. Verify the "Mic Muted" / "Mic Unmuted" alert appears.
+4. **Charger & Battery**:
+   - If on a laptop, plug or unplug the AC power adapter. The notch will spring open to display "Charging" or "On Battery".
+5. **Settings Configuration**:
+   - Open Settings (gear in header or double-click tray icon).
+   - Under **Alerts & OSD**, toggle individual alert types or adjust the duration slider.
+   - Verify that toggled-off alerts do not pop up and duration changes apply live.
+
+### Next milestone
+
+M6 adds Quick Controls (volume/brightness sliders, mic mute, Wi-Fi/BT toggles, DND), Focus sessions (Pomodoro, timers, stopwatch), and Tasks & Reminders. Waiting for the user's instruction to continue.
+
 ## M4 complete · 2026-11-19
 
 ### What works

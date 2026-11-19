@@ -127,7 +127,7 @@
                                 <TextBlock DockPanel.Dock="Right" Text="{Binding RamText}" FontSize="10" Foreground="#BBC8D8"
                                            Typography.NumeralAlignment="Tabular"/>
                             </DockPanel>
-                            <ProgressBar Style="{StaticResource MetricBar}" Value="{Binding RamPercent}"/>
+                            <ProgressBar Style="{StaticResource MetricBar}" Value="{Binding RamPercent, Mode=OneWay}"/>
                         </StackPanel>
                     </Grid>
                 </Grid>
@@ -156,7 +156,7 @@
                             <TextBlock DockPanel.Dock="Right" Text="{Binding VramText}" FontSize="10" Foreground="#BBC8D8"
                                        Typography.NumeralAlignment="Tabular"/>
                         </DockPanel>
-                        <ProgressBar Style="{StaticResource MetricBar}" Value="{Binding VramPercent}"/>
+                        <ProgressBar Style="{StaticResource MetricBar}" Value="{Binding VramPercent, Mode=OneWay}"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -246,7 +246,7 @@
                                         <TextBlock DockPanel.Dock="Right" Text="{Binding UsageText}" FontSize="9"
                                                    Foreground="#BBC8D8" Typography.NumeralAlignment="Tabular"/>
                                     </DockPanel>
-                                    <ProgressBar Style="{StaticResource MetricBar}" Value="{Binding Percent}" Height="4"/>
+                                    <ProgressBar Style="{StaticResource MetricBar}" Value="{Binding Percent, Mode=OneWay}" Height="4"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
