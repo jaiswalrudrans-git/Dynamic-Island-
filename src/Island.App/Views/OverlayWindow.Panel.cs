@@ -305,7 +305,7 @@ public partial class OverlayWindow
     {
         intent.Stop();
         if (Paused || suppressHover || menuOpen || motion.Expanded) return;
-        if (motion.Progress > 0) Expand(true);
+        if (motion.Progress > 0 || settings.Current.HoverDelayMs <= 15) Expand(true);
         else Schedule(true);
     }
 
@@ -320,7 +320,10 @@ public partial class OverlayWindow
     {
         intent.Stop();
         openingIntent = opening;
-        intent.Interval = TimeSpan.FromMilliseconds(opening ? settings.Current.HoverDelayMs : settings.Current.CollapseDelayMs);
+        int delay = opening
+            ? settings.Current.HoverDelayMs
+            : Math.Max(250, settings.Current.CollapseDelayMs);
+        intent.Interval = TimeSpan.FromMilliseconds(delay);
         intent.Start();
     }
 
@@ -436,8 +439,8 @@ public partial class OverlayWindow
         Body.Opacity = motion.BodyOpacity;
         HeaderY.Y = reduced ? 0 : 6 * (1 - Header.Opacity);
         BodyY.Y = reduced ? 0 : 6 * (1 - Body.Opacity);
-        Header.IsHitTestVisible = motion.Expanded && Header.Opacity > .6;
-        Body.IsHitTestVisible = motion.Expanded && Body.Opacity > .6;
+        Header.IsHitTestVisible = motion.Expanded && Header.Opacity > .15;
+        Body.IsHitTestVisible = motion.Expanded && Body.Opacity > .15;
     }
 
     private void StopFrames()

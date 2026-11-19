@@ -150,11 +150,10 @@ public partial class MotionSettingsWindow : Window
         AlertSoundCheck.Click += (_, _) => save(s => s with { AlertSoundEnabled = AlertSoundCheck.IsChecked == true });
         Reduced.Click += (_, _) => save(s => s with { ReduceMotion = Reduced.IsChecked == true });
 
-        // Commit settled slider edits
+        // Commit slider edits live
         void Bind(Slider slider, Func<AppSettings, AppSettings> edit)
         {
-            slider.ValueChanged += (_, _) => { if (!slider.IsMouseCaptureWithin) save(edit); };
-            slider.LostMouseCapture += (_, _) => save(edit);
+            slider.ValueChanged += (_, _) => save(edit);
         }
         Bind(UiScaleSlider, s => s with { UiScale = UiScaleSlider.Value });
         Bind(Speed, s => s with { AnimationSpeed = Speed.Value });

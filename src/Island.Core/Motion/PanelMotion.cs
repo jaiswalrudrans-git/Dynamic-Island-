@@ -9,8 +9,8 @@ public sealed class PanelMotion
 
     public bool Expanded { get; private set; }
     public double Progress => shape.Value;
-    public double HeaderOpacity => Math.Clamp(revealTime / .18, 0, 1);
-    public double BodyOpacity => Math.Clamp((revealTime - .03) / .18, 0, 1);
+    public double HeaderOpacity => Math.Clamp(revealTime / .13, 0, 1);
+    public double BodyOpacity => Math.Clamp((revealTime - .02) / .13, 0, 1);
 
     public void Target(bool expanded)
     {
@@ -32,9 +32,9 @@ public sealed class PanelMotion
             }
             else moving = shape.Advance(1, seconds);
 
-            if (Progress >= .6 || reduced)
-                revealTime = Math.Min(.21, revealTime + seconds * (reduced ? 2.1 : 1));
-            return moving || revealTime < .21;
+            if (Progress >= .25 || reduced)
+                revealTime = Math.Min(.16, revealTime + seconds * (reduced ? 2.1 : 1.3));
+            return moving || revealTime < .16;
         }
 
         // The content gets the first 120 ms. A partly revealed panel needs less lead time.

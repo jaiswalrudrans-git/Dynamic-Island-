@@ -72,10 +72,10 @@
         </Path>
 
         <!-- Dynamic Island Shell -->
-        <Grid x:Name="Shell" MouseEnter="EnterShell" MouseLeave="LeaveShell">
+        <Grid x:Name="Shell" Background="Transparent" MouseEnter="EnterShell" MouseLeave="LeaveShell">
             <!-- Dynamic Island Background Surface (Themed surface across the whole notch geometry) -->
-            <Border x:Name="CollapsedBackground" Background="{DynamicResource Theme.CollapsedSurface}" IsHitTestVisible="False"/>
-            <Border x:Name="IslandBackground" Background="{DynamicResource Theme.Surface}" IsHitTestVisible="False" Opacity="0"/>
+            <Border x:Name="CollapsedBackground" Background="{DynamicResource Theme.CollapsedSurface}"/>
+            <Border x:Name="IslandBackground" Background="{DynamicResource Theme.Surface}" Opacity="0"/>
 
             <!-- 1 px inner stroke white at 8% so the shape stays defined over dark backdrops -->
             <Path x:Name="InnerRim" Stroke="{DynamicResource Theme.InnerRim}" StrokeThickness="2" IsHitTestVisible="False"/>
