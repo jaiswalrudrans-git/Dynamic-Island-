@@ -38,11 +38,13 @@ public partial class OverlayWindow : Window
         OverlayDesktop.Configure(source.Handle);
         Place();
         if (Pinned) Expand(true);
+        else UpdateMusicDemand();
     }
 
     protected override void OnContentRendered(EventArgs e)
     {
         base.OnContentRendered(e);
+        if (source != null) OverlayDesktop.Configure(source.Handle, rendered: true);
         Place();
     }
 
@@ -81,6 +83,7 @@ public partial class OverlayWindow : Window
         RefreshClock();
         QueuePlacement();
         ApplyPanelSettings();
+        music.Configure(settings.Current);
     }
 
     private void QueuePlacement()

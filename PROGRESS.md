@@ -1,5 +1,46 @@
 # Milestone progress
 
+## M3 complete · 2026-11-19
+
+### What works
+
+- The Music tab follows Windows media sessions. It shows the player, title, artist, rounded artwork, cover-derived tint, elapsed time and a draggable seek bar. Play/pause, previous, next, shuffle and repeat follow the capabilities the selected player publishes.
+- Click the player name to switch sessions or pin a preferred app. A pin survives restart. If the preferred app goes away, Island falls back to an available session and can return when the app reappears.
+- Playing media widens the compact notch to about 260 × 32 DIPs. Music settings offer a centered clock, scrolling title or current lyric, artwork tint, compact preview and equalizer toggles. Pausing playback returns the notch to its idle clock.
+- A six-band spectrum uses actual WASAPI loopback samples from the default multimedia output. Capture runs while playing and a visible view requests the meter. The output-device notification refreshes capture when the default endpoint changes. Tray Pause releases capture and media subscriptions.
+- Synced lyrics come from LRCLIB using track metadata. The tab highlights the current line and scrolls to the next line using the player's timeline. Seeking updates the line. Lookups are cancelled when superseded, cached in memory, and requested only when a lyrics view needs them. Missing lyrics, instrumental tracks and service errors have distinct states.
+
+### Verification
+
+Release built on Windows x64 with zero warnings and zero errors. All 35 tests passed, including timestamp offsets, repeated timestamps, backward seeks, exact query encoding, cache reuse, missing lyrics and HTTP rate limiting.
+
+Ran the Release executable and rechecked foreground retention, fixed window bounds, transparent hit routing and display re-anchoring. A separate desktop run used an isolated profile and two temporary Windows media sessions. Verified selection and pinning, cover decoding and color extraction, compact playback, transport button acknowledgments, a pointer drag on the seek slider, repeat/shuffle changes, unavailable controls and fallback after a selected session disappeared. A low-volume 1 kHz test tone appeared in the expected loopback band. A public sample track returned a timed lyric from the live LRCLIB service. Tray Pause released the capture and sessions.
+
+### Known limitations and remaining checks
+
+A startup probe caught the transparent host receiving input before WPF submitted its first frame. Island now passes all input through until that frame is ready. Two immediate-launch probes passed after the fix.
+
+Music capabilities and timing depend on what each player publishes. The equalizer measures the combined default output, including sound from other apps. Pinning identifies a player by its Windows app ID across restarts. Browser tabs sharing one ID can be switched individually while they exist. Physical output-device changes, protected playback and compatibility with your particular players remain hands-on checks.
+
+### What to test
+
+1. If an older Island instance is still running, use its tray **Quit**. M3 uses a versioned Windows target for the SDK projections. Start this build in PowerShell:
+
+   ~~~powershell
+   Set-Location D:\Island
+   $env:DOTNET_ROOT = "$PWD\.tools\dotnet"
+   Start-Process "$PWD\src\Island.App\bin\Release\net8.0-windows10.0.19041.0\Island.App.exe"
+   ~~~
+
+2. Play a song in your usual player. Check that the compact notch widens, the bars respond to audio, and pausing restores the small clock. Hover and open Music. Compare the title, artwork, position and transport actions with the player.
+3. For a song with synced lyrics, drag the seek bar forward and backward. The player and highlighted lyric should follow. In Settings change **Preview text** to **Lyric**, then **Title**, and collapse to check each mode.
+4. Open a second player. Click the player name in Music, switch sessions, and choose **Pin this player**. Quit and relaunch Island with the player still open to check the pin. Close that player and check fallback.
+5. With audio playing, switch the Windows default output to headphones or speakers. Confirm the meter follows the new output. Try a live stream or player with limited controls and confirm unavailable actions are disabled.
+
+### Next milestone
+
+M4 adds the System tab and compact system readouts. Waiting for the user's instruction to continue.
+
 ## M2 complete · 2026-11-19
 
 ### What works

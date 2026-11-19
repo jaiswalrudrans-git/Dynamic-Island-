@@ -6,14 +6,18 @@ namespace Island.App.Interop;
 internal static class OverlayDesktop
 {
     private const int ExtendedStyle = -20;
-    private const long ToolWindow = 0x80, AppWindow = 0x40000, NoActivate = 0x08000000;
+    private const long ToolWindow = 0x80, AppWindow = 0x40000, NoActivate = 0x08000000, Transparent = 0x20;
     private const uint NoSize = 0x1, NoMove = 0x2, NoZOrder = 0x4, KeepFocus = 0x10, FrameChanged = 0x20;
 
-    internal static void Configure(nint hwnd)
+    internal static void Configure(nint hwnd, bool rendered = false)
     {
         var original = GetWindowLongPtrW(hwnd, ExtendedStyle);
+        // Before WPF submits its first alpha surface, the entire layered rectangle can receive input.
+        long style = ((long)original | ToolWindow | NoActivate) & ~AppWindow;
+        style = rendered ? style & ~Transparent : style | Transparent;
+        if ((long)original == style) return;
         Marshal.SetLastPInvokeError(0);
-        var previous = SetWindowLongPtrW(hwnd, ExtendedStyle, (nint)(((long)original | ToolWindow | NoActivate) & ~AppWindow));
+        var previous = SetWindowLongPtrW(hwnd, ExtendedStyle, (nint)style);
         if (previous == 0 && Marshal.GetLastPInvokeError() != 0)
             throw new Win32Exception(Marshal.GetLastPInvokeError());
         if (!SetWindowPos(hwnd, 0, 0, 0, 0, 0, NoSize | NoMove | NoZOrder | KeepFocus | FrameChanged))

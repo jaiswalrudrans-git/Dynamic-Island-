@@ -1,0 +1,104 @@
+<UserControl x:Class="Island.App.Views.MusicPage" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+ xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:Island.App.Views" Focusable="False" Foreground="#F2F5FA">
+ <UserControl.Resources>
+    <BooleanToVisibilityConverter x:Key="Visible"/>
+    <Style x:Key="SeekRail" TargetType="RepeatButton">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="RepeatButton">
+            <Border VerticalAlignment="Center" Height="3" CornerRadius="1.5" Background="{TemplateBinding Background}"/>
+        </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style x:Key="Transport" TargetType="Button">
+        <Setter Property="Width" Value="35"/><Setter Property="Height" Value="29"/>
+        <Setter Property="Focusable" Value="False"/><Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="#F1F4FA"/><Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets"/><Setter Property="FontSize" Value="14"/>
+        <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+            <Border x:Name="Box" Background="{TemplateBinding Background}" CornerRadius="14">
+                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+                <Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.29"/></Trigger>
+                <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Box" Property="Opacity" Value=".72"/></Trigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate></Setter.Value></Setter>
+    </Style>
+ </UserControl.Resources>
+ <Grid>
+    <Border CornerRadius="22" Background="#141820"/>
+    <Border CornerRadius="22"><Border.Background><RadialGradientBrush Center="0.09,0.35" GradientOrigin="0.09,0.35" RadiusX=".93" RadiusY="1.55">
+        <GradientStop Color="{Binding Glow}" Offset="0"/><GradientStop Color="#00141820" Offset="1"/>
+    </RadialGradientBrush></Border.Background></Border>
+    <Grid x:Name="Empty" Margin="26,20">
+        <Grid.Style><Style TargetType="Grid"><Style.Triggers><DataTrigger Binding="{Binding HasPlayer}" Value="True">
+            <Setter Property="Visibility" Value="Collapsed"/></DataTrigger></Style.Triggers></Style></Grid.Style>
+        <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="&#xE8D6;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="25" Foreground="#9FBDDF"/>
+            <TextBlock Text="{Binding EmptyStatus}" FontSize="23" FontWeight="SemiBold" Margin="0,12,0,3"/>
+            <TextBlock Text="Play audio in a Windows media player or a supported browser." Foreground="#B2BCCA" FontSize="13"/>
+        </StackPanel>
+    </Grid>
+    <Grid Margin="20,10" Visibility="{Binding HasPlayer, Converter={StaticResource Visible}}">
+        <Grid.RowDefinitions><RowDefinition Height="26"/><RowDefinition/><RowDefinition Height="25"/><RowDefinition Height="32"/></Grid.RowDefinitions>
+        <DockPanel>
+            <local:SpectrumMeter x:Name="Meter" DockPanel.Dock="Right" Width="28" Height="16" VerticalAlignment="Center" ToolTip="Default output spectrum"/>
+            <Button HorizontalAlignment="Left" Click="ChoosePlayer" Focusable="False" ToolTip="Choose or pin a player" AutomationProperties.Name="Choose or pin a player"
+                    Background="Transparent" Foreground="#CEE0F3" BorderThickness="0" Cursor="Hand" Padding="2">
+                <Button.Template><ControlTemplate TargetType="Button"><ContentPresenter/></ControlTemplate></Button.Template>
+                <StackPanel Orientation="Horizontal"><TextBlock Text="{Binding Player}" MaxWidth="380" TextTrimming="CharacterEllipsis" FontSize="12" FontWeight="SemiBold"/>
+                    <TextBlock Margin="6,3,0,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE70D;" FontSize="10"/>
+                    <TextBlock Margin="5,2,0,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE718;" FontSize="11" Visibility="{Binding Pinned, Converter={StaticResource Visible}}"/>
+                </StackPanel>
+            </Button>
+        </DockPanel>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="94"/><ColumnDefinition Width="16"/><ColumnDefinition/></Grid.ColumnDefinitions>
+            <Grid Height="94" VerticalAlignment="Center">
+                <Border CornerRadius="12" Background="#323946"/>
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="27" Foreground="#B2C0D1" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE8D6;" Visibility="{Binding MissingCover, Converter={StaticResource Visible}}"/>
+                <Border CornerRadius="12"><Border.Background><ImageBrush ImageSource="{Binding Cover}" Stretch="UniformToFill"/></Border.Background></Border>
+            </Grid>
+            <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                <TextBlock Text="{Binding Title}" FontSize="21" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip="{Binding Title}"/>
+                <TextBlock Text="{Binding Artist}" FontSize="13" Foreground="#BCC8D8" TextTrimming="CharacterEllipsis"/>
+                <Grid Margin="0,8,0,0" Height="36" ClipToBounds="True" Visibility="{Binding ShowLyrics, Converter={StaticResource Visible}}">
+                    <Canvas><Canvas.RenderTransform><TranslateTransform x:Name="LyricY"/></Canvas.RenderTransform>
+                        <TextBlock Canvas.Top="-18" Width="{Binding ActualWidth,RelativeSource={RelativeSource AncestorType=Canvas}}" Text="{Binding PreviousLyric}" FontSize="12" Foreground="#9DAABA" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Width="{Binding ActualWidth,RelativeSource={RelativeSource AncestorType=Canvas}}" Text="{Binding LyricDisplay}" FontSize="13" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip="{Binding LyricDisplay}"/>
+                        <TextBlock Canvas.Top="18" Width="{Binding ActualWidth,RelativeSource={RelativeSource AncestorType=Canvas}}" Text="{Binding NextLyric}" FontSize="11" Foreground="#9DAABA" TextTrimming="CharacterEllipsis"/>
+                    </Canvas>
+                </Grid>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="2" Visibility="{Binding HasTimeline, Converter={StaticResource Visible}}">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+            <TextBlock Text="{Binding Elapsed}" VerticalAlignment="Center" FontSize="11" Foreground="#BBC5D3" Typography.NumeralAlignment="Tabular"/>
+            <Slider x:Name="Seek" Grid.Column="1" Minimum="0" Maximum="1" Margin="8,0" Value="{Binding Fraction,Mode=OneWay}"
+                    IsEnabled="{Binding CanSeek}" VerticalAlignment="Center" Focusable="False" AutomationProperties.Name="Playback position"
+                    PreviewMouseLeftButtonDown="SeekStart" PreviewMouseMove="SeekMove" PreviewMouseLeftButtonUp="SeekEnd" LostMouseCapture="SeekLost">
+                <Slider.Template><ControlTemplate TargetType="Slider"><Grid Height="18" Background="Transparent">
+                    <Track x:Name="PART_Track" VerticalAlignment="Center">
+                        <Track.DecreaseRepeatButton><RepeatButton Style="{StaticResource SeekRail}" Background="#D2E8FF"/></Track.DecreaseRepeatButton>
+                        <Track.Thumb><Thumb Width="10" Height="10"><Thumb.Template><ControlTemplate TargetType="Thumb">
+                            <Ellipse Fill="#EFF6FF"/>
+                        </ControlTemplate></Thumb.Template></Thumb></Track.Thumb>
+                        <Track.IncreaseRepeatButton><RepeatButton Style="{StaticResource SeekRail}" Background="#546070"/></Track.IncreaseRepeatButton>
+                    </Track>
+                </Grid></ControlTemplate></Slider.Template>
+            </Slider>
+            <TextBlock Grid.Column="2" Text="{Binding Duration}" VerticalAlignment="Center" FontSize="11" Foreground="#BBC5D3" Typography.NumeralAlignment="Tabular"/>
+        </Grid>
+        <StackPanel x:Name="TransportButtons" Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Button Tag="Shuffle" Click="Transport" Content="&#xE8B1;" ToolTip="Shuffle" AutomationProperties.Name="Shuffle" IsEnabled="{Binding CanShuffle}">
+                <Button.Style><Style TargetType="Button" BasedOn="{StaticResource Transport}"><Style.Triggers><DataTrigger Binding="{Binding Shuffled}" Value="True"><Setter Property="Foreground" Value="#91C8FF"/></DataTrigger></Style.Triggers></Style></Button.Style>
+            </Button>
+            <Button Style="{StaticResource Transport}" Tag="Previous" Click="Transport" Content="&#xE892;" IsEnabled="{Binding CanPrevious}" ToolTip="Previous track" AutomationProperties.Name="Previous track"/>
+            <Button Style="{StaticResource Transport}" Tag="Toggle" Click="Transport" Content="{Binding PlayGlyph}" IsEnabled="{Binding CanToggle}" Background="#E1EDFA" Foreground="#142132" Width="46" Margin="4,0" ToolTip="{Binding PlayHint}" AutomationProperties.Name="{Binding PlayHint}"/>
+            <Button Style="{StaticResource Transport}" Tag="Next" Click="Transport" Content="&#xE893;" IsEnabled="{Binding CanNext}" ToolTip="Next track" AutomationProperties.Name="Next track"/>
+            <Button Tag="Repeat" Click="Transport" Content="&#xE8EE;" IsEnabled="{Binding CanRepeat}" ToolTip="{Binding RepeatHint}" AutomationProperties.Name="{Binding RepeatHint}">
+                <Button.Style><Style TargetType="Button" BasedOn="{StaticResource Transport}"><Style.Triggers><DataTrigger Binding="{Binding Repeating}" Value="True"><Setter Property="Foreground" Value="#91C8FF"/></DataTrigger></Style.Triggers></Style></Button.Style>
+            </Button>
+        </StackPanel>
+    </Grid>
+ </Grid>
+</UserControl>

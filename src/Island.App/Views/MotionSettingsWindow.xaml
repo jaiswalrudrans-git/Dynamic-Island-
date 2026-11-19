@@ -16,5 +16,17 @@
                 <Slider x:Name="Leave" Minimum="0" Maximum="5000" TickFrequency="10" IsSnapToTickEnabled="True"/>
             </StackPanel>
         </Border>
+        <TextBlock Text="Music" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
+        <Border Margin="0,10,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+            <StackPanel>
+                <StackPanel.Resources><Style TargetType="CheckBox"><Setter Property="Foreground" Value="{DynamicResource Theme.Foreground}"/><Setter Property="Margin" Value="0,2,0,4"/></Style></StackPanel.Resources>
+                <CheckBox x:Name="MusicPreview" Content="Show compact playback preview"/>
+                <DockPanel Margin="0,4,0,8"><TextBlock Text="Preview text" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="PreviewText" HorizontalAlignment="Right" MinWidth="100"/></DockPanel>
+                <CheckBox x:Name="Equalizer" Content="Show output equalizer"/>
+                <CheckBox x:Name="Lyrics" Content="Look up synced lyrics on LRCLIB"/>
+                <CheckBox x:Name="CoverGlow" Content="Tint player with album artwork"/>
+            </StackPanel>
+        </Border>
     </StackPanel>
 </Window>

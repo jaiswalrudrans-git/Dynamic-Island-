@@ -9,6 +9,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using Island.Core.Motion;
 using Island.Core.Settings;
+using Island.App.ViewModels;
 
 namespace Island.App.Views;
 
@@ -22,6 +23,9 @@ public partial class OverlayWindow
     private MotionSettingsWindow? preferences;
     private long lastFrame;
     private double lastShape = double.NaN;
+    private readonly SpringValue previewWidth = new();
+    private double lastPreview = double.NaN;
+    private MusicViewModel music = null!;
     private bool rendering, openingIntent, suppressHover, menuOpen, escapeRegistered, previousPin;
     internal bool Paused { get; private set; }
     internal bool Pinned => settings.Current.IsPinned;
@@ -29,7 +33,18 @@ public partial class OverlayWindow
     private void InitializePanel()
     {
         Shell.Clip = notch.Geometry;
-        navigation = new(TabButtons, Pages, PillX, (Style)FindResource("IconButton"), () => settings.Current, RequestFrame);
+        music = new(Dispatcher, settings.Current, log);
+        CompactMusic.DataContext = music;
+        CompactMeter.Attach(music.Spectrum);
+        var musicPage = new MusicPage(music, id => Save(s => s with { PreferredPlayer = id }),
+            open => SetMenuOpen(open), () => settings.Current);
+        navigation = new(TabButtons, Pages, PillX, (Style)FindResource("IconButton"), () => settings.Current, RequestFrame, musicPage);
+        navigation.SelectionChanged += UpdateMusicDemand;
+        music.PreviewChanged += MusicChanged;
+        music.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(MusicViewModel.PreviewLabel)) UpdatePreviewLabel();
+        };
         PanelNavigation.AttachButtonMotion(PinButton, () => settings.Current);
         PanelNavigation.AttachButtonMotion(GearButton, () => settings.Current);
         var menu = new ContextMenu();
@@ -55,6 +70,18 @@ public partial class OverlayWindow
         intent.Tick += IntentTick;
         DrawPanel();
     }
+
+    private void UpdateMusicDemand() => music.Display(motion.Expanded && navigation.MusicSelected, !motion.Expanded, Paused);
+
+    private void MusicChanged()
+    {
+        UpdatePreviewLabel();
+        if (previewWidth.Value != (music.Preview ? 1 : 0)) RequestFrame();
+        DrawPanel();
+    }
+
+    private void UpdatePreviewLabel() => PreviewLabel.Update(music.PreviewLabel,
+        music.Preview && !music.PreviewClock && !motion.Expanded, settings.Current.ReduceMotion);
 
     internal void SetMenuOpen(bool open, bool checkLeave = true)
     {
@@ -122,6 +149,8 @@ public partial class OverlayWindow
     {
         intent.Stop();
         motion.Target(open);
+        UpdateMusicDemand();
+        UpdatePreviewLabel();
         SyncEscape();
         RequestFrame();
     }
@@ -142,8 +171,11 @@ public partial class OverlayWindow
         lastFrame = now;
         bool moving = motion.Advance(dt, config.ReduceMotion);
         bool switching = navigation.Advance(dt, config.ReduceMotion);
+        double target = music.Preview ? 1 : 0;
+        if (config.ReduceMotion) previewWidth.Set(target);
+        bool widening = previewWidth.Advance(target, dt);
         DrawPanel();
-        if (!moving && !switching) StopFrames();
+        if (!moving && !switching && !widening) StopFrames();
     }
 
     private void DrawPanel()
@@ -152,9 +184,10 @@ public partial class OverlayWindow
         bool reduced = settings.Current.ReduceMotion;
         ReducedBase.Visibility = reduced && p > 0 && p < 1 ? Visibility.Visible : Visibility.Hidden;
         double shape = reduced && p > 0 ? 1 : p;
-        if (shape != lastShape)
+        if (shape != lastShape || previewWidth.Value != lastPreview)
         {
-            notch.Update(shape);
+            notch.Update(shape, previewWidth.Value);
+            lastPreview = previewWidth.Value;
             double bottom = 32 + 288 * shape;
             double shadowTop = bottom - 5 * shape;
             BottomShadow.StartPoint = new Point(0, shadowTop);
@@ -163,12 +196,16 @@ public partial class OverlayWindow
             lastShape = shape;
         }
         Shell.Opacity = reduced && p > 0 ? Math.Clamp(p, .01, 1) : 1;
-        CompactClock.Opacity = reduced && p > 0 ? 0 : Math.Max(0, 1 - p * 2);
+        double compactOpacity = reduced && p > 0 ? 0 : Math.Max(0, 1 - p * 2);
+        CompactClock.Opacity = music.PreviewClock ? compactOpacity : 0;
+        CompactMusic.Visibility = music.Preview && compactOpacity > 0 ? Visibility.Visible : Visibility.Hidden;
+        CompactMusic.Opacity = compactOpacity * Math.Clamp(previewWidth.Value, 0, 1);
         Header.Opacity = motion.HeaderOpacity;
         Body.Opacity = motion.BodyOpacity;
         HeaderY.Y = reduced ? 0 : 6 * (1 - Header.Opacity);
         BodyY.Y = reduced ? 0 : 6 * (1 - Body.Opacity);
         Header.IsHitTestVisible = motion.Expanded && Header.Opacity > .6;
+        Body.IsHitTestVisible = motion.Expanded && Body.Opacity > .6;
     }
 
     private void StopFrames()
@@ -212,6 +249,7 @@ public partial class OverlayWindow
             StopFrames();
             tick.Stop();
             motion.Target(false);
+            UpdateMusicDemand();
             motion.Advance(2, true);
             DrawPanel();
             SyncEscape();
@@ -223,6 +261,7 @@ public partial class OverlayWindow
             Show();
             Place();
             RefreshClock();
+            UpdateMusicDemand();
             if (Pinned) Expand(true);
         }
     }
@@ -258,6 +297,8 @@ public partial class OverlayWindow
 
     private void DisposePanel()
     {
+        music.Dispose();
+        CompactMeter.Attach(null);
         intent.Stop();
         StopFrames();
         motion.Target(false);

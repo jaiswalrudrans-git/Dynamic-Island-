@@ -19,9 +19,10 @@ internal sealed class NotchClip
         Update(0);
     }
 
-    public void Update(double progress)
+    public void Update(double progress, double preview = 0)
     {
-        double halfWidth = 65 + 255 * progress;
+        double compact = 65 + 65 * preview;
+        double halfWidth = compact + (320 - compact) * progress;
         double h = 32 + 288 * progress;
         double shoulder = 8 + 5 * progress;
         double radius = 16 + 16 * progress;

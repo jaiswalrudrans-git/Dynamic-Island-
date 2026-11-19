@@ -18,9 +18,11 @@ internal sealed class PanelNavigation
     private readonly Func<AppSettings> settings;
     private readonly Action requestFrame;
     private int selected;
+    public bool MusicSelected => selected == 0;
+    public event Action? SelectionChanged;
 
     public PanelNavigation(StackPanel bar, Grid host, TranslateTransform indicator, Style style,
-        Func<AppSettings> settings, Action requestFrame)
+        Func<AppSettings> settings, Action requestFrame, MusicPage musicPage)
     {
         this.indicator = indicator;
         this.settings = settings;
@@ -36,7 +38,9 @@ internal sealed class PanelNavigation
             bar.Children.Add(button);
             buttons[i] = button;
 
-            var page = CreatePage(tab);
+            FrameworkElement page = i == 0 ? musicPage : CreatePage(tab);
+            page.RenderTransform = new TranslateTransform();
+            page.IsHitTestVisible = i == 0;
             page.Opacity = i == 0 ? 1 : 0;
             pages[i] = page;
             host.Children.Add(page);
@@ -46,8 +50,7 @@ internal sealed class PanelNavigation
 
     private static FrameworkElement CreatePage(PanelTab tab)
     {
-        var layout = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(34,0,34,0),
-            RenderTransform = new TranslateTransform() };
+        var layout = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(34,0,34,0) };
         var icon = new TextBlock { Text = tab.Glyph, FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets"),
             FontSize = 24, HorizontalAlignment = HorizontalAlignment.Left };
         icon.SetResourceReference(TextBlock.ForegroundProperty, "Theme.Accent");
@@ -81,6 +84,7 @@ internal sealed class PanelNavigation
         {
             var page = pages[i];
             bool incoming = i == selected;
+            page.IsHitTestVisible = incoming;
             if (!incoming && page.Opacity == 0 && !page.HasAnimatedProperties) continue;
             var offset = (TranslateTransform)page.RenderTransform;
             double origin = incoming && page.Opacity == 0 ? direction * 24 : offset.X;
@@ -90,6 +94,7 @@ internal sealed class PanelNavigation
                 config.ReduceMotion || incoming ? 0 : -direction * 24, duration);
         }
         requestFrame();
+        SelectionChanged?.Invoke();
     }
 
     public bool Advance(double seconds, bool reduced)
