@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using Island.App.Themes;
 using Island.App.Views;
+using Island.App.Interop;
 using Island.Core;
 using Island.Core.Services;
 using Island.Core.Settings;
@@ -29,8 +30,11 @@ public partial class App : Application
                     resources.Apply(settings.Current.Theme);
             };
 
-            MainWindow = new OverlayWindow(settings, log.Write) { Title = AppIdentity.Name };
-            MainWindow.Show();
+            var overlay = new OverlayWindow(settings, log.Write) { Title = AppIdentity.Name };
+            MainWindow = overlay;
+            overlay.Show();
+            var tray = new IslandTray(overlay);
+            overlay.Closed += (_, _) => tray.Dispose();
             log.Write($"{AppIdentity.Name} startup complete. Requested theme: {settings.Current.Theme}. " +
                 $"Applied accent: {Resources[ThemeResources.AccentKey]}.");
         }

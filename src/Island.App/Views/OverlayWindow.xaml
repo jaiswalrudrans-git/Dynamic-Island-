@@ -4,23 +4,77 @@
         Width="760" Height="400" WindowStyle="None" ResizeMode="NoResize"
         WindowStartupLocation="Manual" Background="Transparent" AllowsTransparency="True"
         Topmost="True" ShowActivated="False" Focusable="False" ShowInTaskbar="False">
-    <!-- The layered HWND uses the alpha of these pixels for cross-process hit testing. -->
+    <Window.Resources>
+        <Style x:Key="IconButton" TargetType="Button">
+            <Setter Property="Width" Value="31"/><Setter Property="Height" Value="30"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Foreground" Value="#F1F4FA"/>
+            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value><ControlTemplate TargetType="Button">
+                    <Border x:Name="Face" CornerRadius="9" Background="Transparent">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Face" Property="Background" Value="#22FFFFFF"/></Trigger>
+                        <Trigger Property="IsPressed" Value="True"><Setter TargetName="Face" Property="Background" Value="#33FFFFFF"/></Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate></Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
-        <Grid Width="130" Height="32" HorizontalAlignment="Center" VerticalAlignment="Top">
-            <Path Fill="Black" Data="M0,0 H130 C125,0 122,3 122,8 V16
-                C122,24.84 114.84,32 106,32 H24 C15.16,32 8,24.84 8,16 V8 C8,3 5,0 0,0 Z"/>
-            <Path x:Name="BottomEdge" Data="M8.6,16 C8.6,24.5 15.5,31.5 24,31.5
-                H106 C114.5,31.5 121.4,24.5 121.4,16" IsHitTestVisible="False">
-                <Path.Stroke>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Color="#00FFFFFF" Offset="0"/>
-                        <GradientStop Color="#30FFFFFF" Offset="1"/>
-                    </LinearGradientBrush>
-                </Path.Stroke>
-            </Path>
-            <TextBlock Text="{Binding Time}" HorizontalAlignment="Center" VerticalAlignment="Center"
+        <Grid x:Name="ReducedBase" Width="130" Height="32" HorizontalAlignment="Center" VerticalAlignment="Top"
+              Visibility="Hidden" IsHitTestVisible="False">
+            <Path Fill="Black" Data="M0,0 H130 Q122,0 122,8 V16 Q122,32 106,32 H24 Q8,32 8,16 V8 Q8,0 0,0 Z"/>
+            <TextBlock Text="{Binding Time}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#F4F6FA"
+                       FontFamily="Segoe UI" FontSize="14" FontWeight="SemiBold" Typography.NumeralAlignment="Tabular"/>
+        </Grid>
+        <Grid x:Name="Shell" MouseEnter="EnterShell" MouseLeave="LeaveShell">
+            <Grid.Background>
+                <LinearGradientBrush x:Name="BottomShadow" MappingMode="Absolute" StartPoint="0,32" EndPoint="0,33">
+                    <GradientStop Color="Black" Offset="0"/>
+                    <GradientStop Color="#40000000" Offset="0.4"/>
+                    <GradientStop Color="#00000000" Offset="1"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+            <Border x:Name="BottomEdge" VerticalAlignment="Top" Height="1" Background="#29FFFFFF" IsHitTestVisible="False">
+                <Border.RenderTransform><TranslateTransform x:Name="EdgeOffset" Y="31"/></Border.RenderTransform>
+            </Border>
+            <Grid Height="32" VerticalAlignment="Top">
+            <TextBlock x:Name="CompactClock" Text="{Binding Time}" HorizontalAlignment="Center" VerticalAlignment="Center"
                        FontFamily="Segoe UI" FontSize="14" FontWeight="SemiBold" Foreground="#F4F6FA"
                        Typography.NumeralAlignment="Tabular" Typography.NumeralStyle="Lining"/>
+            </Grid>
+            <Grid Width="566" Height="42" Margin="0,15,0,0" HorizontalAlignment="Center" VerticalAlignment="Top"
+                  x:Name="Header" Opacity="0" IsHitTestVisible="False">
+                <Grid.RenderTransform><TranslateTransform x:Name="HeaderY"/></Grid.RenderTransform>
+                <Border HorizontalAlignment="Left" VerticalAlignment="Center" Background="#151820" CornerRadius="13" Padding="4">
+                    <Grid>
+                        <Border Width="31" Height="30" HorizontalAlignment="Left" Background="#354252" CornerRadius="9">
+                            <Border.RenderTransform><TranslateTransform x:Name="PillX"/></Border.RenderTransform>
+                        </Border>
+                        <StackPanel x:Name="TabButtons" Orientation="Horizontal"/>
+                    </Grid>
+                </Border>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Time}" HorizontalAlignment="Center" Foreground="White" FontSize="15"
+                               FontWeight="SemiBold" Typography.NumeralAlignment="Tabular"/>
+                    <TextBlock Text="{Binding Date}" HorizontalAlignment="Center" Foreground="#A3AFBF" FontSize="11"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button x:Name="PinButton" Style="{StaticResource IconButton}" Click="PinClick" Content="&#xE718;"/>
+                    <Button x:Name="GearButton" Style="{StaticResource IconButton}" Click="SettingsClick" Content="&#xE713;"
+                            ToolTip="Settings" AutomationProperties.Name="Settings"/>
+                </StackPanel>
+            </Grid>
+            <Border x:Name="Body" Width="566" Height="222" Margin="0,73,0,0" VerticalAlignment="Top"
+                    Opacity="0" Background="{DynamicResource Theme.Surface}" CornerRadius="22" IsHitTestVisible="False">
+                <Border.RenderTransform><TranslateTransform x:Name="BodyY"/></Border.RenderTransform>
+                <Grid x:Name="Pages" ClipToBounds="True"/>
+            </Border>
         </Grid>
     </Grid>
 </Window>

@@ -1,5 +1,45 @@
 # Milestone progress
 
+## M2 complete · 2026-11-19
+
+### What works
+
+- Hovering the clock for 120 ms opens the panel to approximately 640 × 320 DIPs. The reusable damped spring animates the retained notch clip and its corner radius. The header and body appear in sequence. Leaving allows 300 ms for re-entry, then fades the content and collapses the shape. Re-entry during collapse reverses from the current position. The HWND retains its M1 dimensions.
+- Six tab buttons share a spring-driven selection pill. Tab pages slide and cross-fade. Each page identifies the feature milestone that will supply its content.
+- Pin keeps the panel open and survives restart. Escape explicitly unpins and collapses the panel while the overlay keeps keyboard focus in the foreground app.
+- The tray supports Open, Pin/Unpin, Settings, Pause/Resume and Quit. Double-click opens Settings. The panel context menu supports Settings, Pin/Unpin and Quit. Pause hides the overlay and stops its clock and frame callbacks.
+- The gear and tray open motion settings for hover delay, collapse delay, animation speed and reduced motion. Changes apply live and persist. Reduced motion uses short fades. The full settings navigation is scheduled for M8.
+
+### Verification
+
+Release built with zero warnings and zero errors. All 28 tests passed. Motion tests cover equivalent spring trajectories at 60 and 120 Hz, overshoot, delayed reveal, reversal, settling and reduced motion.
+
+Ran the Release executable and verified foreground retention, fixed HWND bounds, display re-anchoring and cross-process hit routing through the transparent side, bottom and corner. An isolated-profile desktop check moved the pointer through expand, leave and re-entry, switched tabs rapidly, verified the selected pill and page, saved a pin, and restored it in a fresh overlay. It exercised native Escape registration and message dispatch, the context menu, tray commands, live reduced motion and idle frame unsubscription. Inspected the rendered expanded panel.
+
+### Known issues and remaining checks
+
+Escape uses a temporary Windows hotkey while the panel is open. A registration conflict is logged and can prevent that shortcut from working. The automated tray check invoked the menu handlers. Physical Escape input, Explorer's tray double-click gesture and perceived smoothness on a high-refresh display remain manual checks. Frame-rate tests exercise the animation mathematics. Desktop frame-time profiling is scheduled for M9.
+
+### What to test
+
+1. Start the Release app in PowerShell:
+
+   ~~~powershell
+   Set-Location D:\Island
+   $env:DOTNET_ROOT = "$PWD\.tools\dotnet"
+   Start-Process "$PWD\src\Island.App\bin\Release\net8.0-windows\Island.App.exe"
+   ~~~
+
+2. Type in an editor. Briefly pass across the clock, then hover deliberately. The second hover should open the panel. Move away and return during collapse. The panel should reverse smoothly, and typing should continue in the editor.
+3. Click through all six tabs, including several quick switches. Confirm the highlighted pill and visible page end on the same tab.
+4. Pin using the header, move away, then Quit and relaunch. The panel should start open. Press Escape while the editor has focus. The panel should collapse and the next launch should start unpinned.
+5. Open the gear, choose Reduce motion and try 0.5× and 2× speed. Change both delays, close Settings and repeat the hover test. Double-click the tray icon to reopen Settings and confirm the saved values.
+6. Right-click the tray icon, including in the Windows hidden-icons flyout if needed. Test Open, Pin/Unpin, Pause, Resume and Quit. Pause should hide the overlay while the tray remains available. Quit should remove both. Also test Settings, Pin/Unpin and Quit from the panel's right-click menu.
+
+### Next milestone
+
+M3 adds Windows media sessions, the Music tab, collapsed music preview, real audio equalizer and lyrics. Waiting for the user's instruction to continue.
+
 ## M1 complete · 2026-11-19
 
 ### What works

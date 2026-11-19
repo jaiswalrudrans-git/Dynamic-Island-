@@ -24,6 +24,7 @@ public partial class OverlayWindow : Window
         this.log = log;
         InitializeComponent();
         DataContext = clock;
+        InitializePanel();
         settings.PropertyChanged += SettingsChanged;
         tick.Tick += ClockTick;
         RefreshClock();
@@ -36,6 +37,7 @@ public partial class OverlayWindow : Window
         source.AddHook(WindowMessage);
         OverlayDesktop.Configure(source.Handle);
         Place();
+        if (Pinned) Expand(true);
     }
 
     protected override void OnContentRendered(EventArgs e)
@@ -54,6 +56,10 @@ public partial class OverlayWindow : Window
     {
         switch (message)
         {
+            case 0x0312 when wParam == EscapeId: // WM_HOTKEY
+                Dismiss();
+                handled = true;
+                break;
             case 0x0021: // WM_MOUSEACTIVATE
                 handled = true;
                 return 3; // MA_NOACTIVATE still delivers the mouse event.
@@ -74,6 +80,7 @@ public partial class OverlayWindow : Window
         if (e.PropertyName != nameof(SettingsStore.Current)) return;
         RefreshClock();
         QueuePlacement();
+        ApplyPanelSettings();
     }
 
     private void QueuePlacement()
@@ -90,7 +97,13 @@ public partial class OverlayWindow : Window
     private void Place()
     {
         if (source is null) return;
-        BottomEdge.StrokeThickness = 1 / VisualTreeHelper.GetDpi(this).DpiScaleY;
+        double pixel = 1 / VisualTreeHelper.GetDpi(this).DpiScaleY;
+        if (BottomEdge.Height != pixel)
+        {
+            BottomEdge.Height = pixel;
+            lastShape = double.NaN;
+            DrawPanel();
+        }
         try
         {
             OverlayDesktop.Place(source.Handle, settings.Current.MonitorDeviceName);
@@ -106,6 +119,7 @@ public partial class OverlayWindow : Window
     private void RefreshClock()
     {
         tick.Stop();
+        if (Paused) return;
         var delay = clock.Refresh(DateTime.Now, settings.Current);
         tick.Interval = TimeSpan.FromMilliseconds(Math.Ceiling(delay.TotalMilliseconds));
         tick.Start();
@@ -113,6 +127,7 @@ public partial class OverlayWindow : Window
 
     protected override void OnClosed(EventArgs e)
     {
+        DisposePanel();
         tick.Stop();
         tick.Tick -= ClockTick;
         settings.PropertyChanged -= SettingsChanged;

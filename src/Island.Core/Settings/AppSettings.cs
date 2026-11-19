@@ -12,6 +12,9 @@ public sealed record AppSettings
     public bool ShowSeconds { get; init; }
     public string? MonitorDeviceName { get; init; }
     public bool ReduceMotion { get; init; }
+    public bool IsPinned { get; init; }
+    public int HoverDelayMs { get; init; } = 120;
+    public int CollapseDelayMs { get; init; } = 300;
     public double AnimationSpeed { get; init; } = 1;
 
     [JsonExtensionData]
@@ -20,6 +23,8 @@ public sealed record AppSettings
     internal AppSettings Normalize() => this with
     {
         Theme = string.IsNullOrWhiteSpace(Theme) ? "Dark" : Theme.Trim(),
+        HoverDelayMs = Math.Clamp(HoverDelayMs, 0, 2000),
+        CollapseDelayMs = Math.Clamp(CollapseDelayMs, 0, 5000),
         AnimationSpeed = double.IsFinite(AnimationSpeed) ? Math.Clamp(AnimationSpeed, 0.5, 2) : 1
     };
 }
