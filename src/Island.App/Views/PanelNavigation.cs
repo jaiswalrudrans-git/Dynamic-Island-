@@ -21,9 +21,10 @@ internal sealed class PanelNavigation
     private int selected;
     public bool MusicSelected => selected == 0;
     public bool SystemSelected => selected == 1;
-    public bool TasksSelected => selected == 3;
+    public bool TasksSelected => selected == 2;
+    public bool QuickControlsSelected => selected == 3;
     public bool FocusSelected => selected == 4;
-    public bool QuickControlsSelected => selected == 5;
+    public bool CalendarSelected => selected == 5;
     public event Action? SelectionChanged;
 
     public PanelNavigation(StackPanel bar, Grid host, TranslateTransform indicator, Style style,
@@ -49,9 +50,9 @@ internal sealed class PanelNavigation
             {
                 0 => musicPage,
                 1 => systemPage,
-                3 => tasksPage,
+                2 => tasksPage,
+                3 => quickControlsPage,
                 4 => focusPage,
-                5 => quickControlsPage,
                 _ => CreatePage(tab)
             };
             page.RenderTransform = new TranslateTransform();
