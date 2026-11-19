@@ -1,5 +1,43 @@
 # Milestone progress
 
+## M1 complete · 2026-11-19
+
+### What works
+
+The app opens a fixed 760 × 400 DIP, topmost, non-activating WPF tool window. The visible 130 × 32 DIP black notch sits flush with the top center of the chosen screen. It has curved shoulders, rounded lower corners, a subtle bottom highlight and a centered tabular clock. Windows uses the layered window's rendered alpha to pass input through transparent pixels.
+
+The clock follows the 12/24-hour and seconds settings. Its timer wakes at the next displayed minute or second. Monitor placement uses native desktop pixel coordinates, including negative origins. Display and DPI changes trigger repositioning. A missing selected monitor falls back to primary while retaining the saved preference.
+
+### Verification
+
+- Release build on Windows x64 completed with zero warnings and zero errors. All 25 tests passed.
+- Ran the Release executable over a window owned by another process. Native hit tests selected Island at the clock and the underlying window beside the shoulder, in the transparent lower corner and below the notch. Startup preserved the foreground window. The overlay returned the non-activating mouse response and had the expected topmost, layered and tool-window styles.
+- Inspected the rendered clock. Sent a display-change message after displacing the window and verified that it returned to the top center.
+- Exercised the overlay with isolated settings on two displays. The host measured 760 × 400 pixels at 96 DPI and 950 × 500 at 120 DPI on a monitor left of primary. Verified startup on the secondary screen, fallback to primary, switching back, a real seconds tick and live switching to minute precision.
+
+### Known issues and remaining checks
+
+Physical unplug/reconnect and changing Windows scaling while the overlay is open still need a hands-on check. Monitor and clock preferences can be set in JSON at this milestone. The tray with Quit is scheduled for M2.
+
+### What to test
+
+1. In PowerShell, start the Release executable from this checkout:
+
+   ~~~powershell
+   Set-Location D:\Island
+   $env:DOTNET_ROOT = "$PWD\.tools\dotnet"
+   $exe = "$PWD\src\Island.App\bin\Release\net8.0-windows\Island.App.exe"
+   $island = Start-Process -FilePath $exe -PassThru
+   ~~~
+
+2. Open an editor and type. Click the clock, then type again. Text should continue in the editor. Click a control just outside the black shape, including immediately below its bottom edge. The underlying app should receive the click. Check that Island is absent from Alt+Tab and the taskbar.
+3. End the test instance using `Stop-Process -Id $island.Id`. In `%LOCALAPPDATA%\Island\settings.json`, set `"showSeconds": true` and `"use24HourClock": false`. Start it again with the last command above and check the seconds advance. Restore your preferred values afterward.
+4. To choose a monitor, run `Add-Type -AssemblyName System.Windows.Forms` and then `[System.Windows.Forms.Screen]::AllScreens | Select-Object DeviceName, Primary`. Add `monitorDeviceName` to the settings object or edit its existing value. For example, the Windows device `\\.\DISPLAY1` is written as `"monitorDeviceName": "\\\\.\\DISPLAY1"` in JSON. Restart and check the top-center alignment. Change that display's scale, disconnect it, and reconnect it. The notch should recenter, fall back to primary during disconnection, and return when Windows reports the saved device again. Use `null` to follow the primary monitor.
+
+### Next milestone
+
+M2 adds hover expansion and collapse, spring animation, pinning, Escape, tabs and the tray. Waiting for the user's instruction to continue.
+
 ## M0 complete · 2026-11-19
 
 The solution builds an x64 WPF host, a UI-independent core library and an xUnit test assembly. [PLAN.md](PLAN.md) records the architecture, dependencies, risks and milestone order.

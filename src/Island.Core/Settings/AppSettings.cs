@@ -10,6 +10,7 @@ public sealed record AppSettings
     public string Theme { get; init; } = "Dark";
     public bool Use24HourClock { get; init; } = true;
     public bool ShowSeconds { get; init; }
+    public string? MonitorDeviceName { get; init; }
     public bool ReduceMotion { get; init; }
     public double AnimationSpeed { get; init; } = 1;
 

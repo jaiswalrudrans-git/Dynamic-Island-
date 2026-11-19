@@ -1,0 +1,26 @@
+<Window x:Class="Island.App.Views.OverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Width="760" Height="400" WindowStyle="None" ResizeMode="NoResize"
+        WindowStartupLocation="Manual" Background="Transparent" AllowsTransparency="True"
+        Topmost="True" ShowActivated="False" Focusable="False" ShowInTaskbar="False">
+    <!-- The layered HWND uses the alpha of these pixels for cross-process hit testing. -->
+    <Grid>
+        <Grid Width="130" Height="32" HorizontalAlignment="Center" VerticalAlignment="Top">
+            <Path Fill="Black" Data="M0,0 H130 C125,0 122,3 122,8 V16
+                C122,24.84 114.84,32 106,32 H24 C15.16,32 8,24.84 8,16 V8 C8,3 5,0 0,0 Z"/>
+            <Path x:Name="BottomEdge" Data="M8.6,16 C8.6,24.5 15.5,31.5 24,31.5
+                H106 C114.5,31.5 121.4,24.5 121.4,16" IsHitTestVisible="False">
+                <Path.Stroke>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#00FFFFFF" Offset="0"/>
+                        <GradientStop Color="#30FFFFFF" Offset="1"/>
+                    </LinearGradientBrush>
+                </Path.Stroke>
+            </Path>
+            <TextBlock Text="{Binding Time}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                       FontFamily="Segoe UI" FontSize="14" FontWeight="SemiBold" Foreground="#F4F6FA"
+                       Typography.NumeralAlignment="Tabular" Typography.NumeralStyle="Lining"/>
+        </Grid>
+    </Grid>
+</Window>

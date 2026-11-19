@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using Island.App.Themes;
+using Island.App.Views;
 using Island.Core;
 using Island.Core.Services;
 using Island.Core.Settings;
@@ -28,12 +29,12 @@ public partial class App : Application
                     resources.Apply(settings.Current.Theme);
             };
 
-            // M0 exercises the actual WPF startup path. M1 supplies the first window.
+            MainWindow = new OverlayWindow(settings, log.Write) { Title = AppIdentity.Name };
+            MainWindow.Show();
             log.Write($"{AppIdentity.Name} startup complete. Requested theme: {settings.Current.Theme}. " +
                 $"Applied accent: {Resources[ThemeResources.AccentKey]}.");
-            Shutdown();
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
         {
             log.Write($"Startup failed: {ex.Message}");
             Shutdown(1);
