@@ -16,7 +16,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Box" CornerRadius="{StaticResource Radius.Pill}" Background="Transparent" Padding="{TemplateBinding Padding}">
+                        <Border x:Name="Box" CornerRadius="7" Background="Transparent" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -41,7 +41,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Box" CornerRadius="{StaticResource Radius.Pill}"
+                        <Border x:Name="Box" CornerRadius="6"
                                 Background="{DynamicResource Theme.SurfaceRaised}"
                                 BorderThickness="1" BorderBrush="{DynamicResource Theme.Border}"
                                 Padding="{TemplateBinding Padding}">
@@ -73,7 +73,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Box" CornerRadius="{StaticResource Radius.Pill}"
+                        <Border x:Name="Box" CornerRadius="8"
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}">
@@ -105,7 +105,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Box" CornerRadius="{StaticResource Radius.Pill}" Background="{TemplateBinding Background}">
+                        <Border x:Name="Box" CornerRadius="12" Background="{TemplateBinding Background}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -134,8 +134,8 @@
 
         <!-- ROW 0: Segment Control -->
         <Border Grid.Row="0" HorizontalAlignment="Center" Background="{DynamicResource Theme.SurfaceRaised}"
-                BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="{StaticResource Radius.Pill}"
-                Padding="3">
+                BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="10"
+                Padding="3" ClipToBounds="True">
             <StackPanel Orientation="Horizontal">
                 <Button Content="Pomodoro" Click="PomodoroModeClick">
                     <Button.Style>

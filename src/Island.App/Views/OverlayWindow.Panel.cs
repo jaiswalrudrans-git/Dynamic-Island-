@@ -355,6 +355,7 @@ public partial class OverlayWindow
         var config = settings.Current;
         double dt = Stopwatch.GetElapsedTime(lastFrame, now).TotalSeconds * config.AnimationSpeed;
         lastFrame = now;
+        dt = Math.Clamp(dt, 0.001, 0.033);
         bool moving = motion.Advance(dt, config.ReduceMotion);
         bool switching = navigation.Advance(dt, config.ReduceMotion);
         bool sizingW = currentWidthSpring.Advance(targetIslandWidth, dt);
@@ -398,9 +399,11 @@ public partial class OverlayWindow
             EdgeOffset.Y = shadowTop - BottomEdge.Height;
             lastShape = shape;
         }
-        Header.Width = Math.Max(480, curW - 40);
-        Body.Width = Math.Max(480, curW - 40);
-        Body.Height = Math.Max(180, curH - 76);
+        double newW = Math.Max(480, Math.Round(curW - 40));
+        double newH = Math.Max(180, Math.Round(curH - 76));
+        if (Header.Width != newW) Header.Width = newW;
+        if (Body.Width != newW) Body.Width = newW;
+        if (Body.Height != newH) Body.Height = newH;
         Shell.Opacity = reduced && p > 0 ? Math.Clamp(p, .01, 1) : 1;
         double compactOpacity = reduced && p > 0 ? 0 : Math.Max(0, 1 - p * 2);
         bool showAlert = alerts.HasActiveAlert;

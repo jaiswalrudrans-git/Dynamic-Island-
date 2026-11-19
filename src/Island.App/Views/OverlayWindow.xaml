@@ -18,7 +18,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Face" CornerRadius="{StaticResource Radius.Pill}" Background="Transparent">
+                        <Border x:Name="Face" CornerRadius="8" Background="Transparent">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -156,10 +156,10 @@
                 <!-- Left: Tab Icon Bar with Selected Tab Expanded Pill -->
                 <Border HorizontalAlignment="Left" VerticalAlignment="Center"
                         Background="{DynamicResource Theme.SurfaceRaised}" BorderBrush="{DynamicResource Theme.Border}"
-                        BorderThickness="1" CornerRadius="{StaticResource Radius.Pill}" Padding="3">
+                        BorderThickness="1" CornerRadius="10" Padding="3" ClipToBounds="True">
                     <Grid>
                         <Border x:Name="PillIndicator" Width="32" Height="30" HorizontalAlignment="Left"
-                                Background="Transparent" CornerRadius="{StaticResource Radius.Pill}" Visibility="Collapsed">
+                                Background="Transparent" CornerRadius="7" Visibility="Collapsed">
                             <Border.RenderTransform><TranslateTransform x:Name="PillX"/></Border.RenderTransform>
                         </Border>
                         <StackPanel x:Name="TabButtons" Orientation="Horizontal"/>

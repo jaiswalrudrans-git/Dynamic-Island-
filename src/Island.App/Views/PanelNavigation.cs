@@ -78,9 +78,10 @@ internal sealed class PanelNavigation
 
             var box = new Border
             {
-                CornerRadius = new CornerRadius(13),
-                Padding = new Thickness(8, 2, 8, 2),
+                CornerRadius = new CornerRadius(7),
+                Padding = new Thickness(7, 2, 7, 2),
                 Background = Brushes.Transparent,
+                ClipToBounds = true,
                 Child = stack
             };
             buttonBoxes[i] = box;
@@ -94,11 +95,11 @@ internal sealed class PanelNavigation
                 Width = double.NaN, // Auto-size to content
                 MinWidth = 30,
                 Padding = new Thickness(0),
-                Margin = new Thickness(1, 0, 1, 0)
+                Margin = new Thickness(1, 0, 1, 0),
+                ClipToBounds = true
             };
             AutomationProperties.SetName(button, tab.Name);
             button.Click += (_, _) => Select(index);
-            AttachButtonMotion(button, settings);
             bar.Children.Add(button);
             buttons[i] = button;
 
@@ -170,22 +171,28 @@ internal sealed class PanelNavigation
         if (index == selected) return;
         Keyboard.ClearFocus();
         var config = settings();
-        int direction = Math.Sign(index - selected);
         MarkSelected(selected, false);
         selected = index;
         MarkSelected(index, true);
+        double duration = (config.ReduceMotion ? 100 : 200) / config.AnimationSpeed;
         for (int i = 0; i < pages.Length; i++)
         {
             var page = pages[i];
             bool incoming = i == selected;
             page.IsHitTestVisible = incoming;
             if (!incoming && page.Opacity == 0 && !page.HasAnimatedProperties) continue;
-            var offset = (TranslateTransform)page.RenderTransform;
-            double origin = incoming && page.Opacity == 0 ? direction * 24 : offset.X;
-            double duration = (config.ReduceMotion ? 100 : 220) / config.AnimationSpeed;
             Animate(page, UIElement.OpacityProperty, page.Opacity, incoming ? 1 : 0, duration);
-            Animate(offset, TranslateTransform.XProperty, config.ReduceMotion ? 0 : origin,
-                config.ReduceMotion || incoming ? 0 : -direction * 24, duration);
+            var offset = (TranslateTransform)page.RenderTransform;
+            offset.X = 0; // Keep X centered so text never slides outside the island borders
+            if (!config.ReduceMotion)
+            {
+                double originY = incoming && page.Opacity == 0 ? 6 : offset.Y;
+                Animate(offset, TranslateTransform.YProperty, originY, incoming ? 0 : -6, duration);
+            }
+            else
+            {
+                offset.Y = 0;
+            }
         }
         requestFrame();
         SelectionChanged?.Invoke();

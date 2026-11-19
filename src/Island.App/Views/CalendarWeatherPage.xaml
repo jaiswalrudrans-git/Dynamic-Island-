@@ -40,7 +40,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Box" CornerRadius="{StaticResource Radius.Pill}"
+                        <Border x:Name="Box" CornerRadius="6"
                                 Background="{DynamicResource Theme.SurfaceRaised}" Padding="{TemplateBinding Padding}"
                                 BorderThickness="1" BorderBrush="{DynamicResource Theme.Border}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -119,7 +119,7 @@
                                     ToolTip="{Binding Date, StringFormat='{}{0:D}'}">
                                 <Button.Template>
                                     <ControlTemplate TargetType="Button">
-                                        <Border x:Name="DayCell" CornerRadius="{StaticResource Radius.Pill}"
+                                        <Border x:Name="DayCell" CornerRadius="6"
                                                 Background="{Binding BackgroundBrush}">
                                             <Grid>
                                                 <TextBlock Text="{Binding DayNumber}" FontSize="{StaticResource Font.Label}"

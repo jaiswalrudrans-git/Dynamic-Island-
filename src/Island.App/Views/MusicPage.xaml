@@ -29,7 +29,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Box" Background="{TemplateBinding Background}" CornerRadius="{StaticResource Radius.Pill}">
+                        <Border x:Name="Box" Background="{TemplateBinding Background}" CornerRadius="8">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -103,7 +103,7 @@
                         BorderThickness="1" Cursor="Hand" Padding="8,4">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Border CornerRadius="{StaticResource Radius.Pill}" Background="{TemplateBinding Background}"
+                            <Border CornerRadius="8" Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                                     Padding="{TemplateBinding Padding}">
                                 <ContentPresenter/>
