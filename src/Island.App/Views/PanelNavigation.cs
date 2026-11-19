@@ -165,19 +165,19 @@ internal sealed class PanelNavigation
     public Size GetDesiredSize(int tabIndex)
     {
         if (tabIndex < 0 || tabIndex >= pages.Length)
-            return new Size(680, 400);
+            return new Size(760, 420);
 
-        // Standardized stable width across all tabs: zero jumping, zero text overflow
-        double islandW = 680;
+        // Standardized spacious 760 DIP width matching BrimDeck: zero congestion, luxurious breathing room
+        double islandW = 760;
         double islandH = tabIndex switch
         {
-            0 => 380, // Music
-            1 => 440, // System
-            2 => 400, // Tasks
-            3 => 380, // Quick Controls
-            4 => 390, // Focus
-            5 => 440, // Calendar & Weather
-            _ => 400
+            0 => 400, // Music
+            1 => 460, // System
+            2 => 420, // Tasks
+            3 => 400, // Quick Controls
+            4 => 410, // Focus
+            5 => 460, // Calendar & Weather
+            _ => 420
         };
 
         // Constraints: max 62% width, max 70% height

@@ -177,7 +177,7 @@ public partial class OverlayWindow
         targetIslandHeight = initSize.Height;
         Header.Width = Math.Max(480, Math.Round(initSize.Width - 32));
         Body.Width = Math.Max(480, Math.Round(initSize.Width - 32));
-        Body.Height = Math.Max(180, Math.Round(initSize.Height - 76));
+        Body.Height = Math.Max(180, Math.Round(initSize.Height - 88));
         currentWidthSpring.Set(targetIslandWidth);
         currentHeightSpring.Set(targetIslandHeight);
 
@@ -224,7 +224,7 @@ public partial class OverlayWindow
         targetIslandWidth = size.Width;
         targetIslandHeight = size.Height;
         double contentW = Math.Max(480, Math.Round(size.Width - 32));
-        double contentH = Math.Max(180, Math.Round(size.Height - 76));
+        double contentH = Math.Max(180, Math.Round(size.Height - 88));
         if (Header.Width != contentW) Header.Width = contentW;
         if (Body.Width != contentW) Body.Width = contentW;
         if (Body.Height != contentH) Body.Height = contentH;
