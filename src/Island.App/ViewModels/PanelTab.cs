@@ -9,6 +9,6 @@ internal sealed record PanelTab(string Name, string Glyph, string Description)
         new("Tasks", "\uE9D5", ""),
         new("Quick Controls", "\uE9E9", ""),
         new("Focus", "\uE916", ""),
-        new("Calendar & Weather", "\uE787", "Your agenda and local forecast arrive in M7.")
+        new("Calendar & Weather", "\uE787", "")
     ];
 }

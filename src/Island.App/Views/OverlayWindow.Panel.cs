@@ -12,10 +12,12 @@ using Island.App.Services.Controls;
 using Island.App.ViewModels;
 using Island.Core;
 using Island.Core.Alerts;
+using Island.Core.Calendar;
 using Island.Core.Focus;
 using Island.Core.Motion;
 using Island.Core.Settings;
 using Island.Core.Tasks;
+using Island.Core.Weather;
 
 namespace Island.App.Views;
 
@@ -40,6 +42,9 @@ public partial class OverlayWindow
     private FocusViewModel focus = null!;
     private QuickControlsManager quickControls = null!;
     private QuickControlsViewModel controls = null!;
+    private CalendarStore calendarStore = null!;
+    private WeatherClient weatherClient = null!;
+    private CalendarWeatherViewModel calendarWeather = null!;
     private AlertQueue alertQueue = null!;
     private AlertsViewModel alerts = null!;
     private AudioOsdWatcher audioOsd = null!;
@@ -118,8 +123,29 @@ public partial class OverlayWindow
         var musicPage = new MusicPage(music, id => Save(s => s with { PreferredPlayer = id }),
             open => SetMenuOpen(open), () => settings.Current);
         var systemPage = new SystemPage(system, next => Save(_ => next), () => settings.Current);
+
+        calendarStore = new(AppIdentity.DataDirectory, log);
+        calendarStore.ReminderFired += ev =>
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+                alertQueue.Enqueue(new IslandAlert(
+                    Id: Guid.NewGuid().ToString("N"),
+                    Type: AlertType.Custom,
+                    Title: $"Event: {ev.Title}",
+                    Glyph: "\uE787",
+                    Level: AlertLevel.Info,
+                    Duration: TimeSpan.FromSeconds(6),
+                    PlaySound: true
+                ));
+            });
+        };
+        weatherClient = new(AppIdentity.DataDirectory, log);
+        calendarWeather = new(Dispatcher, calendarStore, weatherClient);
+        var calendarWeatherPage = new CalendarWeatherPage(calendarWeather, SetTypingFocus);
+
         navigation = new(TabButtons, Pages, PillX, (Style)FindResource("IconButton"), () => settings.Current, RequestFrame,
-            musicPage, systemPage, tasksPage, focusPage, quickControlsPage);
+            musicPage, systemPage, tasksPage, quickControlsPage, focusPage, calendarWeatherPage);
         navigation.SelectionChanged += UpdateDemands;
         music.PreviewChanged += MusicChanged;
         music.PropertyChanged += (_, e) =>
@@ -458,6 +484,9 @@ public partial class OverlayWindow
         focusManager.Dispose();
         controls.Dispose();
         quickControls.Dispose();
+        calendarWeather.Dispose();
+        calendarStore.Dispose();
+        weatherClient.Dispose();
         CompactMeter.Attach(null);
         intent.Stop();
         StopFrames();

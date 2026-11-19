@@ -30,7 +30,8 @@ internal sealed class PanelNavigation
     public PanelNavigation(StackPanel bar, Grid host, TranslateTransform indicator, Style style,
         Func<AppSettings> settings, Action requestFrame,
         MusicPage musicPage, SystemPage systemPage,
-        TasksPage tasksPage, FocusPage focusPage, QuickControlsPage quickControlsPage)
+        TasksPage tasksPage, QuickControlsPage quickControlsPage, FocusPage focusPage,
+        CalendarWeatherPage calendarWeatherPage)
     {
         this.indicator = indicator;
         this.settings = settings;
@@ -53,6 +54,7 @@ internal sealed class PanelNavigation
                 2 => tasksPage,
                 3 => quickControlsPage,
                 4 => focusPage,
+                5 => calendarWeatherPage,
                 _ => CreatePage(tab)
             };
             page.RenderTransform = new TranslateTransform();

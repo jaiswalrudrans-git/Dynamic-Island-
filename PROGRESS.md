@@ -1,5 +1,109 @@
 # Milestone progress
 
+## M7 complete · 2026-11-19
+
+### What works
+
+- **Calendar & Agenda View**:
+  - **Full Month Calendar Grid**: 42-cell calendar grid displaying previous, current, and next month days. Features month navigation controls (previous/next month, "Today" button), accent circle highlight on today's date, selection box, and dot indicators under dates containing scheduled events.
+  - **Day Agenda & Event Management**:
+    - Detailed day event list for whichever date is selected in the month view.
+    - Each event card displays time range or "All Day" badge, event title, optional location glyph & string, and a delete button.
+    - **Quick Add**: Input box to quickly type event titles and add them to the selected date.
+  - **RFC 5545 iCalendar (`.ics`) Parser**:
+    - Robust parser handling line unfolding (`\r\n ` continuation), date/time parsing (UTC and local), all-day event detection (`VALUE=DATE`), multi-event streams, and string unescaping (`\,`, `\;`, `\\`, `\n`).
+  - **Atomic Calendar Storage**:
+    - Auto-saves all user events to `%LOCALAPPDATA%\Island\calendar.json` with transactional atomic write (`.tmp` + move) preventing corruption.
+    - Periodic background check evaluates event reminder times and automatically dispatches alert notifications with sound to the Island notch.
+- **Weather Telemetry (Open-Meteo)**:
+  - **Zero-Configuration Live Weather**: Integrates with Open-Meteo's free, high-accuracy API (`api.open-meteo.com` and `geocoding-api.open-meteo.com`) without requiring an API key.
+  - **Current Conditions**:
+    - Live weather condition glyph (Segoe Fluent Icons: Clear Sun, Partly Sunny, Overcast, Rain, Snow, Thunderstorm, Fog, etc.) mapped from standard WMO weather codes.
+    - Real-time temperature readout and apparent temperature ("Feels like").
+    - Relative humidity (%) and wind speed (km/h or mph).
+    - City location search bar with instant geocoding and refresh button.
+    - Units toggle button switching between **°C** and **°F** dynamically.
+  - **24-Hour Hourly Forecast Strip**:
+    - Horizontally scrolling strip displaying upcoming hours, weather glyphs, and forecasted temperatures.
+  - **5-Day Daily Forecast Strip**:
+    - Daily forecast showing weekday names, weather condition glyphs, and high/low temperature ranges.
+  - **Offline Caching & Resilience**:
+    - Automatically caches forecast payloads to `%LOCALAPPDATA%\Island\weather_cache.json`.
+    - Instant cold start renders cached weather data immediately, seamlessly refreshing in the background. If offline, gracefully indicates cached status without crashing.
+- **Tab Sequence & UI Polish**:
+  - Reordered the tab sequence per specification:
+    1. **Music** (`\uE8D6`)
+    2. **System** (`\uE950`)
+    3. **Tasks** (`\uE9D5`)
+    4. **Quick Controls** (`\uE9E9`)
+    5. **Focus** (`\uE916`) — *2nd to last*
+    6. **Calendar & Weather** (`\uE787`) — *last*
+  - Dual-column responsive layout for Calendar & Weather page with month view and day agenda on the left and full weather card on the right.
+
+### Verification
+
+- Solution built cleanly in Release mode with zero warnings and zero errors.
+- All 64 unit tests passed in [Island.Tests](file:///D:/Island%202/tests/Island.Tests/), including:
+  - `CalendarEvent`: Occurrence calculations, date overlap logic, and time comparisons.
+  - `IcsParser`: RFC 5545 line unfolding, UTC/local date conversion, all-day flag, escaped characters, and multi-event parsing.
+  - `CalendarStore`: Adding, updating, deleting, atomic file persistence and reload, day queries, and reminder trigger checks.
+  - `WmoWeatherCode`: Complete mapping of standard WMO condition codes to user-friendly descriptions and Segoe Fluent Icon glyphs.
+  - `WeatherCache`: Round-trip JSON serialization and deserialization of live weather data.
+- Live hardware self-test on Windows 11:
+  - Launched `Island.App.exe` on real hardware.
+  - Verified live Open-Meteo API fetch: successfully created and populated `%LOCALAPPDATA%\Island\weather_cache.json` (3,853 bytes) with live New York weather data.
+  - Confirmed process runs healthy without any UI freezes or memory leaks.
+
+### Known limitations and remaining checks
+
+- Geocoding city search uses Open-Meteo's geocoding API which requires an active internet connection; when offline, Island falls back to the last cached city and weather data.
+- Calendar sync currently supports local JSON storage and `.ics` file/URL parsing. Direct OAuth 2.0 sync for Google Calendar and Microsoft Graph is designed for external calendar URL feeds (`.ics` subscription).
+
+### What to test
+
+1. If an older Island instance is running, exit it via tray **Quit**. Start this build in PowerShell:
+
+   ~~~powershell
+   Set-Location 'D:\Island 2'
+   $env:DOTNET_ROOT = "$PWD\.tools\dotnet"
+   Start-Process "$PWD\src\Island.App\bin\Release\net8.0-windows10.0.19041.0\Island.App.exe"
+   ~~~
+
+2. **Tab Sequence**:
+   - Hover over the notch to expand it.
+   - Verify the 6 tabs in sequence from left to right:
+     - 1st: Music (notes icon)
+     - 2nd: System (chip icon)
+     - 3rd: Tasks (checklist icon)
+     - 4th: Quick Controls (sliders icon)
+     - 5th: Focus (timer icon) — *2nd to last*
+     - 6th: Calendar & Weather (calendar icon) — *last*
+3. **Calendar & Agenda**:
+   - Click the **Calendar & Weather** tab (6th tab).
+   - In the left calendar panel:
+     - Notice the current month and year header with `<` and `>` arrows to browse months, and "Today" button.
+     - Observe the 42-day grid with weekday headers (Su Mo Tu We Th Fr Sa).
+     - Notice today's date highlighted with a blue accent circle.
+     - Click any date to select it: the agenda header updates to show that date.
+   - In the **Day Agenda** below the calendar:
+     - Type a quick event title (e.g., "Team Sync") in the text box and click **+ Add**.
+     - Verify the event appears in the list with its time badge and a trash icon.
+     - Look back at the calendar grid: notice a subtle indicator dot now appears under that day number!
+     - Click the trash icon on the event to delete it: verify it is removed and the dot disappears.
+4. **Weather Telemetry**:
+   - In the right weather panel:
+     - Check the current temperature (e.g., `52°F` or `11°C`), weather condition text, and icon.
+     - Check "Feels like", humidity %, and wind speed.
+     - Click the **°F / °C** unit button: observe all temperatures in current, hourly, and daily strips toggle units instantly.
+     - Click the city name search bar, type another city (e.g. `London`, `Tokyo`, or `San Francisco`), and press Enter: verify the weather telemetry updates to that city's live forecast!
+     - Scroll through the 24-hour horizontal forecast strip and inspect the 5-day forecast cards below.
+5. **Persistence**:
+   - Add an event, quit Island via tray icon, and relaunch: verify the calendar event and selected weather city persist.
+
+### Next milestone
+
+M8 completes Settings pages, theme editing (custom accent colors and dark/light modes), global hotkey management, and autostart configuration. Waiting for the user's instruction to continue.
+
 ## M6 complete · 2026-11-19
 
 ### What works
