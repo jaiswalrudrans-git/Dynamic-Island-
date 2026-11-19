@@ -56,6 +56,34 @@ public sealed class ThemeTests : TestFolder
         Assert.Equal("#FF9BC5FF", root["Theme.Accent"].ToString());
     }
 
+    [Fact]
+    public void TransparencyAndInnerRimAppliedCorrectly()
+    {
+        var catalog = new ThemeCatalog(Folder, Messages.Add);
+        var root = new ResourceDictionary();
+        var resources = new ThemeResources(root, catalog);
+
+        // 12% background transparency and 0% collapsed transparency
+        resources.Apply("Dark", "Opaque", 12.0, 0.0);
+
+        var surface = Assert.IsType<SolidColorBrush>(root["Theme.Surface"]);
+        Assert.True(surface.IsFrozen);
+        // 255 * (1 - 0.12) = 224.4 -> 224
+        Assert.Equal(224, surface.Color.A);
+
+        var collapsed = Assert.IsType<SolidColorBrush>(root["Theme.CollapsedSurface"]);
+        Assert.True(collapsed.IsFrozen);
+        Assert.Equal(255, collapsed.Color.A);
+
+        var innerRim = Assert.IsType<SolidColorBrush>(root["Theme.InnerRim"]);
+        Assert.True(innerRim.IsFrozen);
+        Assert.Equal(Color.FromArgb(0x14, 0xFF, 0xFF, 0xFF), innerRim.Color);
+
+        var cardFill = Assert.IsType<SolidColorBrush>(root["Theme.SurfaceRaised"]);
+        Assert.True(cardFill.IsFrozen);
+        Assert.True(cardFill.Color.A <= 25); // Subtle card overlay
+    }
+
     private void WriteCustom(string input)
     {
         Directory.CreateDirectory(Path.Combine(Folder, "themes"));

@@ -17,6 +17,50 @@
                         <TextBlock Text="Surface style" VerticalAlignment="Center"/>
                         <ComboBox x:Name="SurfaceSelector" HorizontalAlignment="Right" MinWidth="130"/>
                     </DockPanel>
+                    <DockPanel Margin="0,4,0,2">
+                        <TextBlock Text="Background transparency" VerticalAlignment="Center"/>
+                        <Border HorizontalAlignment="Right" Background="{DynamicResource Theme.SurfaceRaised}"
+                                BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="6"
+                                Padding="4,2">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBox x:Name="BgTranspBox" Width="28" BorderThickness="0" Background="Transparent"
+                                         Foreground="{DynamicResource Theme.Foreground}" TextAlignment="Right"
+                                         VerticalAlignment="Center" FontSize="12"/>
+                                <TextBlock Text="%" Foreground="{DynamicResource Theme.TextSecondary}" FontSize="11"
+                                           VerticalAlignment="Center" Margin="1,0,5,0"/>
+                                <Border Width="1" Height="14" Background="{DynamicResource Theme.Border}" VerticalAlignment="Center"/>
+                                <Button x:Name="BgTranspMinus" Content="−" Width="20" Height="20" Margin="3,0,1,0"
+                                        Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
+                                        BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                                <Button x:Name="BgTranspPlus" Content="+" Width="20" Height="20" Margin="1,0,2,0"
+                                        Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
+                                        BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </DockPanel>
+                    <Slider x:Name="BgTranspSlider" Minimum="0" Maximum="70" TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,0,0,8"/>
+                    <DockPanel Margin="0,2,0,2">
+                        <TextBlock Text="Collapsed notch transparency" VerticalAlignment="Center"/>
+                        <Border HorizontalAlignment="Right" Background="{DynamicResource Theme.SurfaceRaised}"
+                                BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="6"
+                                Padding="4,2">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBox x:Name="ColTranspBox" Width="28" BorderThickness="0" Background="Transparent"
+                                         Foreground="{DynamicResource Theme.Foreground}" TextAlignment="Right"
+                                         VerticalAlignment="Center" FontSize="12"/>
+                                <TextBlock Text="%" Foreground="{DynamicResource Theme.TextSecondary}" FontSize="11"
+                                           VerticalAlignment="Center" Margin="1,0,5,0"/>
+                                <Border Width="1" Height="14" Background="{DynamicResource Theme.Border}" VerticalAlignment="Center"/>
+                                <Button x:Name="ColTranspMinus" Content="−" Width="20" Height="20" Margin="3,0,1,0"
+                                        Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
+                                        BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                                <Button x:Name="ColTranspPlus" Content="+" Width="20" Height="20" Margin="1,0,2,0"
+                                        Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
+                                        BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </DockPanel>
+                    <Slider x:Name="ColTranspSlider" Minimum="0" Maximum="50" TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,0,0,8"/>
                     <DockPanel Margin="0,4,0,8">
                         <TextBlock Text="Interface size" VerticalAlignment="Center"/>
                         <ComboBox x:Name="InterfaceSizeSelector" HorizontalAlignment="Right" MinWidth="130"/>

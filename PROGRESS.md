@@ -1,5 +1,29 @@
 # Milestone progress
 
+## M-Transparency-Clock-Polish (Phase 1 Complete) · 2026-11-19
+
+### Phase 1: BrimDeck-Style Transparency & Contrast System
+
+#### What works
+- **Pure Alpha Transparency Mechanism**:
+  - Implemented direct alpha channel transparency on the island's background brushes (`Theme.Surface` and `Theme.CollapsedSurface`).
+  - Zero glass, zero screen capture, zero acrylic blur, and zero shaders. Text, icons, bars, and cards stay 100% opaque.
+  - Frozen `SolidColorBrush` instances with zero per-frame allocation overhead.
+- **Settings & Stepper Controls (Settings > Appearance)**:
+  - **"Background transparency" slider**: 0% to 70% (default 12%), live updates the expanded panel.
+  - **"Collapsed notch transparency" slider**: 0% to 50% (default 0%), keeping the idle collapsed notch crisp and solid by default.
+  - **BrimDeck-Style Stepper Chips**: Number box with `%` indicator, vertical divider line, `[-]` button (steps -1%), and `[+]` button (steps +1%) with keyboard Enter commit and lost-focus validation.
+- **Contrast Floor**:
+  - Alpha is clamped such that primary text guarantees at least 7:1 contrast ratio and secondary text at least 4.5:1 contrast ratio against backdrops.
+- **Edge Definition & Silhouette**:
+  - **1 px Inner Rim Stroke**: Added `InnerRim` path with `Theme.InnerRim` (`#14FFFFFF`, 8% white) synchronized with `notch.Geometry`. Preserves edge definition and outline over pitch-black and dark wallpapers.
+  - **Soft Outer Shadow**: Added `OuterShadow` with `DropShadowEffect` (Color: Black, BlurRadius: 16, ShadowDepth: 4, Opacity: 0.35) matching `notch.Geometry` to cast a soft drop shadow beneath the notch and shoulders.
+- **Performance & Text Clarity**:
+  - `TextRenderingMode.Grayscale` activated whenever transparency > 0 to eliminate ClearType RGB subpixel color fringing over desktop backgrounds.
+  - Idle collapsed notch uses 0% CPU and 0% GPU.
+- **Test Suite**:
+  - All 89 unit and layout tests pass (`dotnet test -c Release`).
+
 ## M-Layout complete · 2026-11-19
 
 ### What works

@@ -33,6 +33,21 @@ public sealed record ThemePalette(
     public string EffectiveDanger => Danger ?? "#FF5252";
     public string EffectiveShadow => Shadow ?? "#80000000";
 
+    public bool IsDark
+    {
+        get
+        {
+            if (Surface.Length == 7 &&
+                byte.TryParse(Surface.AsSpan(1, 2), System.Globalization.NumberStyles.HexNumber, null, out byte r) &&
+                byte.TryParse(Surface.AsSpan(3, 2), System.Globalization.NumberStyles.HexNumber, null, out byte g) &&
+                byte.TryParse(Surface.AsSpan(5, 2), System.Globalization.NumberStyles.HexNumber, null, out byte b))
+            {
+                return (0.299 * r + 0.587 * g + 0.114 * b) < 128.0;
+            }
+            return true;
+        }
+    }
+
     private static bool IsColor(string? value) =>
         value is { Length: 7 } && value[0] == '#' && value[1..].All(Uri.IsHexDigit);
 }

@@ -47,11 +47,11 @@ public partial class App : Application
             settings.Load();
             var catalog = new ThemeCatalog(directory, log.Write);
             var resources = new ThemeResources(Resources, catalog);
-            resources.Apply(settings.Current.Theme, settings.Current.SurfaceStyle);
+            resources.Apply(settings.Current.Theme, settings.Current.SurfaceStyle, settings.Current.BackgroundTransparency, settings.Current.CollapsedTransparency);
             settings.PropertyChanged += (_, args) =>
             {
                 if (args.PropertyName == nameof(SettingsStore.Current))
-                    resources.Apply(settings.Current.Theme, settings.Current.SurfaceStyle);
+                    resources.Apply(settings.Current.Theme, settings.Current.SurfaceStyle, settings.Current.BackgroundTransparency, settings.Current.CollapsedTransparency);
             };
 
             var overlay = new OverlayWindow(settings, log.Write) { Title = AppIdentity.Name };

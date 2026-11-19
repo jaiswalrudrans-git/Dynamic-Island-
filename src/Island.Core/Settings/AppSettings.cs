@@ -11,6 +11,8 @@ public sealed record AppSettings
     public string InterfaceSize { get; init; } = "Auto"; // "Auto", "Compact", "Comfortable", "Large"
     public double UiScale { get; init; } = 1.0; // 0.90 to 1.50
     public string SurfaceStyle { get; init; } = "Opaque"; // "Opaque", "Translucent", "Clear"
+    public double BackgroundTransparency { get; init; } = 12.0; // 0% to 70% (default 12%)
+    public double CollapsedTransparency { get; init; } = 0.0;   // 0% to 50% (default 0%)
     public bool Use24HourClock { get; init; } = true;
     public bool ShowSeconds { get; init; }
     public string? MonitorDeviceName { get; init; }
@@ -50,6 +52,8 @@ public sealed record AppSettings
         InterfaceSize = InterfaceSize is "Compact" or "Comfortable" or "Large" or "Auto" ? InterfaceSize : "Auto",
         UiScale = double.IsFinite(UiScale) ? Math.Clamp(UiScale, 0.9, 1.5) : 1.0,
         SurfaceStyle = SurfaceStyle is "Translucent" or "Clear" ? SurfaceStyle : "Opaque",
+        BackgroundTransparency = double.IsFinite(BackgroundTransparency) ? Math.Clamp(BackgroundTransparency, 0.0, 70.0) : 12.0,
+        CollapsedTransparency = double.IsFinite(CollapsedTransparency) ? Math.Clamp(CollapsedTransparency, 0.0, 50.0) : 0.0,
         MusicPreviewText = MusicPreviewText is "Title" or "Lyric" ? MusicPreviewText : "Clock",
         HoverDelayMs = Math.Clamp(HoverDelayMs, 0, 2000),
         CollapseDelayMs = Math.Clamp(CollapseDelayMs, 0, 5000),

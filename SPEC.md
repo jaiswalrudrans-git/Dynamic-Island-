@@ -85,6 +85,7 @@ M4 System tab (all readings) + collapsed live readouts.
 M5 Alerts system (battery, charger, temps, OSD for volumebrightnessmic).
 M6 Quick Controls, Focus, Tasks & Reminders.
 M-Layout: auto-sizing, spacing, readability and design system overhaul.
+M-Transparency-Clock-Polish: BrimDeck-style transparency, Clock Studio, Collapsed Layout settings, System page density matching BrimDeck, and Neon/Cyberpunk polish.
 M7 Calendar & Weather.
 M8 Full Settings window with all pages, themes, hotkeys.
 M9 Fullscreenmaximized behavior, polish pass, performance profiling, installer (Inno Setup or MSIX).

@@ -84,4 +84,26 @@ public sealed class SettingsTests : TestFolder
         Assert.False(first.Current.Use24HourClock);
         Assert.True(first.Current.ReduceMotion);
     }
+
+    [Fact]
+    public void TransparencySettingsNormalizeCorrectly()
+    {
+        var settings = new AppSettings
+        {
+            BackgroundTransparency = 120.0,
+            CollapsedTransparency = -10.0
+        }.Normalize();
+
+        Assert.Equal(70.0, settings.BackgroundTransparency);
+        Assert.Equal(0.0, settings.CollapsedTransparency);
+
+        var normal = new AppSettings
+        {
+            BackgroundTransparency = 25.0,
+            CollapsedTransparency = 15.0
+        }.Normalize();
+
+        Assert.Equal(25.0, normal.BackgroundTransparency);
+        Assert.Equal(15.0, normal.CollapsedTransparency);
+    }
 }

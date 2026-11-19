@@ -65,6 +65,8 @@ public partial class OverlayWindow
     private void InitializePanel()
     {
         Shell.Clip = notch.Geometry;
+        InnerRim.Data = notch.Geometry;
+        OuterShadow.Data = notch.Geometry;
         alertQueue = new(TimeSpan.FromSeconds(settings.Current.AlertDurationSeconds));
         alerts = new(Dispatcher, alertQueue, settings.Current, log);
         CompactAlert.DataContext = alerts;
@@ -269,6 +271,10 @@ public partial class OverlayWindow
 
     private void ApplyPanelSettings()
     {
+        TextOptions.SetTextRenderingMode(this,
+            (settings.Current.BackgroundTransparency > 0 || settings.Current.CollapsedTransparency > 0)
+                ? TextRenderingMode.Grayscale
+                : TextRenderingMode.ClearType);
         string action = Pinned ? "Unpin" : "Pin";
         PinButton.ToolTip = action;
         AutomationProperties.SetName(PinButton, action);
@@ -394,11 +400,12 @@ public partial class OverlayWindow
             lastHeight = curH;
             double bottom = 35 + (curH - 35) * shape;
             double shadowTop = bottom - 5 * shape;
-            BottomShadow.StartPoint = new Point(0, shadowTop);
-            BottomShadow.EndPoint = new Point(0, bottom + .01);
             EdgeOffset.Y = shadowTop - BottomEdge.Height;
             lastShape = shape;
         }
+        IslandBackground.Opacity = shape;
+        CollapsedBackground.Opacity = Math.Max(0, 1.0 - shape);
+        OuterShadow.Opacity = 0.25 + 0.15 * shape;
         double newW = Math.Max(480, Math.Round(curW - 40));
         double newH = Math.Max(180, Math.Round(curH - 76));
         if (Header.Width != newW) Header.Width = newW;
