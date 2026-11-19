@@ -193,6 +193,7 @@
                 <Slider x:Name="Seek" Grid.Column="1" Minimum="0" Maximum="1" Margin="10,0"
                         Value="{Binding Fraction, Mode=OneWay}" IsEnabled="{Binding CanSeek}"
                         VerticalAlignment="Center" Focusable="False" AutomationProperties.Name="Playback position"
+                        IsMoveToPointEnabled="True"
                         PreviewMouseLeftButtonDown="SeekStart" PreviewMouseMove="SeekMove"
                         PreviewMouseLeftButtonUp="SeekEnd" LostMouseCapture="SeekLost">
                     <Slider.Template>

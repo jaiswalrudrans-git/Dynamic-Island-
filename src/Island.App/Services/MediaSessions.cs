@@ -284,7 +284,16 @@ internal sealed class MediaSessions(Dispatcher dispatcher, Action<string> log) :
                 }),
                 _ => null
             };
-            return command != null && await command;
+            if (command != null && await command)
+            {
+                if (action == "Seek")
+                {
+                    double clamped = Math.Clamp(position, MinSeek, MaxSeek);
+                    timeline = timeline with { Position = clamped, Updated = DateTimeOffset.UtcNow };
+                }
+                return true;
+            }
+            return false;
         }
         catch (Exception ex) { log($"Media command {action} failed: {ex.HResult:X8}"); return false; }
     }

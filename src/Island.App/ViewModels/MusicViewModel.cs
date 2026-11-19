@@ -183,6 +183,13 @@ internal sealed class MusicViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(PreviewLabel));
     }
 
+    public void PreviewSeek(double fraction)
+    {
+        if (!HasTimeline) return;
+        position = sessions.Start + Math.Clamp(fraction, 0, 1) * (sessions.End - sessions.Start);
+        OnPropertyChanged(nameof(Elapsed));
+    }
+
     public async Task CommandAsync(string action, double fraction = 0)
     {
         if (commandBusy) return;
@@ -192,7 +199,14 @@ internal sealed class MusicViewModel : ObservableObject, IDisposable
         OnPropertyChanged(string.Empty);
         try
         {
-            bool accepted = await sessions.CommandAsync(action, sessions.Start + fraction * (sessions.End - sessions.Start));
+            double targetSeconds = sessions.Start + fraction * (sessions.End - sessions.Start);
+            bool accepted = await sessions.CommandAsync(action, targetSeconds);
+            if (accepted && action == "Seek")
+            {
+                position = targetSeconds;
+                OnPropertyChanged(nameof(Fraction));
+                OnPropertyChanged(nameof(Elapsed));
+            }
             if (!accepted && Equals(original, Selected?.Session)) commandError = "Player declined the control";
         }
         finally

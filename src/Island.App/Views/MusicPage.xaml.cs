@@ -64,7 +64,7 @@ public partial class MusicPage : UserControl
     }
 
     private double PointerFraction(MouseEventArgs e) =>
-        Math.Clamp((e.GetPosition(Seek).X - 5) / Math.Max(1, Seek.ActualWidth - 10), 0, 1);
+        Math.Clamp((e.GetPosition(Seek).X - 6) / Math.Max(1, Seek.ActualWidth - 12), 0, 1);
 
     private void SeekStart(object sender, MouseButtonEventArgs e)
     {
@@ -73,29 +73,42 @@ public partial class MusicPage : UserControl
         seekingTitle = model.Title;
         seekBinding = BindingOperations.GetBindingBase(Seek, Slider.ValueProperty);
         BindingOperations.ClearBinding(Seek, Slider.ValueProperty);
-        Seek.SetCurrentValue(Slider.ValueProperty, PointerFraction(e));
+        double frac = PointerFraction(e);
+        Seek.SetCurrentValue(Slider.ValueProperty, frac);
+        model.PreviewSeek(frac);
         e.Handled = true;
     }
 
     private void SeekMove(object sender, MouseEventArgs e)
     {
-        if (seekingPlayer != null) Seek.SetCurrentValue(Slider.ValueProperty, PointerFraction(e));
+        if (seekingPlayer != null)
+        {
+            double frac = PointerFraction(e);
+            Seek.SetCurrentValue(Slider.ValueProperty, frac);
+            model.PreviewSeek(frac);
+        }
     }
 
     private async void SeekEnd(object sender, MouseButtonEventArgs e)
     {
         if (seekingPlayer == null) return;
-        bool valid = model.Selected == seekingPlayer && model.Title == seekingTitle && model.CanSeek;
         double value = PointerFraction(e);
-        Seek.ReleaseMouseCapture();
+        bool canSeek = model.CanSeek;
         e.Handled = true;
-        if (valid) await model.CommandAsync("Seek", value);
+        if (canSeek)
+        {
+            await model.CommandAsync("Seek", value);
+        }
+        Seek.ReleaseMouseCapture();
     }
 
     private void SeekLost(object sender, MouseEventArgs e)
     {
         seekingPlayer = null;
-        if (seekBinding != null) Seek.SetBinding(Slider.ValueProperty, seekBinding);
-        seekBinding = null;
+        if (seekBinding != null)
+        {
+            Seek.SetBinding(Slider.ValueProperty, seekBinding);
+            seekBinding = null;
+        }
     }
 }
