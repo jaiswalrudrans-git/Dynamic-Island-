@@ -1,5 +1,60 @@
 # Milestone progress
 
+## M4 complete · 2026-11-19
+
+### What works
+
+- The **System tab** provides real-time telemetry across all specified hardware areas without requiring administrator rights or kernel drivers:
+  - **CPU**: Circular usage gauge with exact percentage, per-core vertical mini-bars for all logical processors (via `NtQuerySystemInformation`), and thermal zone temperature where exposed.
+  - **RAM**: Physical memory usage bar with used/total formatted gigabytes and percentage (via `GlobalMemoryStatusEx`).
+  - **GPU**: Dynamically loads `nvml.dll` for NVIDIA GPUs (querying GPU utilization %, VRAM used/total, temperature in °C, and board power in Watts). Automatically falls back to native Windows PDH counters (`\GPU Engine(*)\Utilization Percentage`) for non-NVIDIA/integrated GPUs.
+  - **Network**: Real-time upload and download speeds (`GetIPStatistics`) plus accumulated today's download and upload totals that automatically reset at midnight.
+  - **Storage**: Lists internal fixed drives (`DriveType.Fixed`) with drive letters, labels, formatted used/total space, and utilization progress bars.
+  - **Power & Battery**: Current board power in Watts, rolling 60-second history curve (sparkline) and 60-second mean power. Battery status displays battery percentage, charging state, AC power connection, and power mode via `GetSystemPowerStatus`.
+  - **Top Processes**: Real-time top processes list with instant toggle between **CPU** and **RAM** sorting. Interactive cards show PID, process name, and resource usage with detailed tooltips (threads, handles, memory).
+  - **Tooltips**: Every metric includes a detailed tooltip with complete values.
+- **Collapsed Live Readouts**:
+  - The collapsed notch can display a live compact readout beside the clock (`CollapsedStat` in settings: `None`, `Cpu`, `Ram`, `Network`, `Battery`, `CpuRam`).
+  - When enabled, the notch expands to ~200 DIPs to show the time alongside the chosen live metric and icon.
+  - Music playback preview continues to take precedence when active.
+- **Efficiency & Lifecycle**:
+  - Hardware polling runs at 1-second intervals on a background thread.
+  - Polling completely pauses when the notch is collapsed unless a compact stat readout is active, ensuring near 0% idle CPU usage. Pausing the app via tray releases all hardware monitoring.
+
+### Verification
+
+- Release built on Windows x64 with zero warnings and zero errors.
+- All 42 tests passed, including rolling power buffer math and FIFO rollover, network accumulator rate calculation and midnight date rollover, process CPU delta calculation and sorting, string/speed/bytes formatters, settings normalization, dynamic NVML graceful handling, and real live hardware monitoring snapshot verification.
+- Ran the Release executable on real hardware (12th Gen Intel Core i7-12650HX with 20 logical cores, dual Intel UHD & NVIDIA GeForce RTX 4050 Laptop GPU, battery/AC). Verified NVML initialization, temperature (62°C), board power (7.1 W), per-core 20-core meter bars, RAM usage, storage drives, network transfer tracking, and process CPU/RAM switching.
+
+### Known limitations and remaining checks
+
+- CPU thermal zone temperature (`MSAcpi_ThermalZoneTemperature`) is not exposed by OEM ACPI on all laptops without kernel drivers; Island gracefully handles this and displays "N/A" rather than crashing or showing fake data.
+- Power draw curve tracks GPU board power and battery discharge rate; on desktop systems without battery or NVML, power readings cleanly indicate unavailable.
+
+### What to test
+
+1. If an older Island instance is still running, use its tray **Quit**. Start the new build in PowerShell:
+
+   ~~~powershell
+   Set-Location 'D:\Island 2'
+   $env:DOTNET_ROOT = "$PWD\.tools\dotnet"
+   Start-Process "$PWD\src\Island.App\bin\Release\net8.0-windows10.0.19041.0\Island.App.exe"
+   ~~~
+
+2. Hover the clock to expand the panel and click the **System** tab (second icon: monitor glyph `\uE950`).
+3. Verify the CPU ring gauge, the 20 vertical core bars, the RAM used/total bar, the GPU card (showing your NVIDIA GeForce RTX 4050 or integrated GPU, VRAM, temp, and power), the Power 60-second sparkline curve with Mean watts, and the Battery status.
+4. Check the **Network** meter (speeds and today's totals) and **Storage** drives.
+5. In **Top Processes**, click **CPU** and **RAM** to toggle sort order. Hover any process or metric to inspect the full tooltip.
+6. Open Settings (gear icon in header or tray icon):
+   - Under **System & Notch**, set **Collapsed live stat** to **Cpu**, **Ram**, **Network**, **Battery**, or **CpuRam**.
+   - Collapse the panel. The notch will widen and display the clock alongside your live stat (e.g. `14% CPU` or `RAM 48%`).
+   - Set **Collapsed live stat** back to **None** to return to the clean clock-only collapsed notch.
+
+### Next milestone
+
+M5 adds the queued alerts system (battery warnings, thermal limits, volume/brightness/mic OSD overlays). Waiting for the user's instruction to continue.
+
 ## M3 complete · 2026-11-19
 
 ### What works

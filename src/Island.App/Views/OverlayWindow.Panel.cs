@@ -26,6 +26,7 @@ public partial class OverlayWindow
     private readonly SpringValue previewWidth = new();
     private double lastPreview = double.NaN;
     private MusicViewModel music = null!;
+    private SystemViewModel system = null!;
     private bool rendering, openingIntent, suppressHover, menuOpen, escapeRegistered, previousPin;
     internal bool Paused { get; private set; }
     internal bool Pinned => settings.Current.IsPinned;
@@ -36,10 +37,14 @@ public partial class OverlayWindow
         music = new(Dispatcher, settings.Current, log);
         CompactMusic.DataContext = music;
         CompactMeter.Attach(music.Spectrum);
+        system = new(Dispatcher, settings.Current, log);
+        CompactStat.DataContext = system;
+        system.CollapsedStatChanged += SystemStatChanged;
         var musicPage = new MusicPage(music, id => Save(s => s with { PreferredPlayer = id }),
             open => SetMenuOpen(open), () => settings.Current);
-        navigation = new(TabButtons, Pages, PillX, (Style)FindResource("IconButton"), () => settings.Current, RequestFrame, musicPage);
-        navigation.SelectionChanged += UpdateMusicDemand;
+        var systemPage = new SystemPage(system, next => Save(_ => next), () => settings.Current);
+        navigation = new(TabButtons, Pages, PillX, (Style)FindResource("IconButton"), () => settings.Current, RequestFrame, musicPage, systemPage);
+        navigation.SelectionChanged += UpdateDemands;
         music.PreviewChanged += MusicChanged;
         music.PropertyChanged += (_, e) =>
         {
@@ -71,12 +76,24 @@ public partial class OverlayWindow
         DrawPanel();
     }
 
-    private void UpdateMusicDemand() => music.Display(motion.Expanded && navigation.MusicSelected, !motion.Expanded, Paused);
+    private void UpdateDemands()
+    {
+        music.Display(motion.Expanded && navigation.MusicSelected, !motion.Expanded, Paused);
+        system.Display(motion.Expanded && navigation.SystemSelected, !motion.Expanded, Paused);
+    }
+
+    private void SystemStatChanged()
+    {
+        double target = (music.Preview || system.HasCollapsedStat) ? 1 : 0;
+        if (previewWidth.Value != target) RequestFrame();
+        DrawPanel();
+    }
 
     private void MusicChanged()
     {
         UpdatePreviewLabel();
-        if (previewWidth.Value != (music.Preview ? 1 : 0)) RequestFrame();
+        double target = (music.Preview || system.HasCollapsedStat) ? 1 : 0;
+        if (previewWidth.Value != target) RequestFrame();
         DrawPanel();
     }
 
@@ -99,6 +116,7 @@ public partial class OverlayWindow
         AutomationProperties.SetName(PinButton, action);
         if (Pinned) PinButton.SetResourceReference(Control.ForegroundProperty, "Theme.Accent");
         else PinButton.ClearValue(Control.ForegroundProperty);
+        system?.Configure(settings.Current);
         if (previousPin != Pinned)
         {
             previousPin = Pinned;
@@ -149,7 +167,7 @@ public partial class OverlayWindow
     {
         intent.Stop();
         motion.Target(open);
-        UpdateMusicDemand();
+        UpdateDemands();
         UpdatePreviewLabel();
         SyncEscape();
         RequestFrame();
@@ -171,7 +189,7 @@ public partial class OverlayWindow
         lastFrame = now;
         bool moving = motion.Advance(dt, config.ReduceMotion);
         bool switching = navigation.Advance(dt, config.ReduceMotion);
-        double target = music.Preview ? 1 : 0;
+        double target = (music.Preview || system.HasCollapsedStat) ? 1 : 0;
         if (config.ReduceMotion) previewWidth.Set(target);
         bool widening = previewWidth.Advance(target, dt);
         DrawPanel();
@@ -197,9 +215,17 @@ public partial class OverlayWindow
         }
         Shell.Opacity = reduced && p > 0 ? Math.Clamp(p, .01, 1) : 1;
         double compactOpacity = reduced && p > 0 ? 0 : Math.Max(0, 1 - p * 2);
-        CompactClock.Opacity = music.PreviewClock ? compactOpacity : 0;
-        CompactMusic.Visibility = music.Preview && compactOpacity > 0 ? Visibility.Visible : Visibility.Hidden;
+        bool showMusic = music.Preview;
+        bool showStat = !showMusic && system.HasCollapsedStat;
+        bool showClockOnly = !showMusic && !showStat;
+
+        CompactMusic.Visibility = showMusic && compactOpacity > 0 ? Visibility.Visible : Visibility.Hidden;
         CompactMusic.Opacity = compactOpacity * Math.Clamp(previewWidth.Value, 0, 1);
+
+        CompactStat.Visibility = showStat && compactOpacity > 0 ? Visibility.Visible : Visibility.Hidden;
+        CompactStat.Opacity = compactOpacity * Math.Clamp(previewWidth.Value, 0, 1);
+
+        CompactClock.Opacity = (showClockOnly || (showMusic && music.PreviewClock)) ? compactOpacity : 0;
         Header.Opacity = motion.HeaderOpacity;
         Body.Opacity = motion.BodyOpacity;
         HeaderY.Y = reduced ? 0 : 6 * (1 - Header.Opacity);
@@ -249,7 +275,7 @@ public partial class OverlayWindow
             StopFrames();
             tick.Stop();
             motion.Target(false);
-            UpdateMusicDemand();
+            UpdateDemands();
             motion.Advance(2, true);
             DrawPanel();
             SyncEscape();
@@ -261,7 +287,7 @@ public partial class OverlayWindow
             Show();
             Place();
             RefreshClock();
-            UpdateMusicDemand();
+            UpdateDemands();
             if (Pinned) Expand(true);
         }
     }
@@ -298,6 +324,7 @@ public partial class OverlayWindow
     private void DisposePanel()
     {
         music.Dispose();
+        system.Dispose();
         CompactMeter.Attach(null);
         intent.Stop();
         StopFrames();

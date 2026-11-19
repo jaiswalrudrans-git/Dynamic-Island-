@@ -22,16 +22,22 @@ public sealed record AppSettings
     public int HoverDelayMs { get; init; } = 120;
     public int CollapseDelayMs { get; init; } = 300;
     public double AnimationSpeed { get; init; } = 1;
+    public string CollapsedStat { get; init; } = "None";
+    public string SystemProcessSort { get; init; } = "Cpu";
+    public int SystemGpuIndex { get; init; }
 
     [JsonExtensionData]
     public IDictionary<string, JsonElement>? AdditionalSettings { get; init; }
 
-    internal AppSettings Normalize() => this with
+    public AppSettings Normalize() => this with
     {
         Theme = string.IsNullOrWhiteSpace(Theme) ? "Dark" : Theme.Trim(),
         MusicPreviewText = MusicPreviewText is "Title" or "Lyric" ? MusicPreviewText : "Clock",
         HoverDelayMs = Math.Clamp(HoverDelayMs, 0, 2000),
         CollapseDelayMs = Math.Clamp(CollapseDelayMs, 0, 5000),
-        AnimationSpeed = double.IsFinite(AnimationSpeed) ? Math.Clamp(AnimationSpeed, 0.5, 2) : 1
+        AnimationSpeed = double.IsFinite(AnimationSpeed) ? Math.Clamp(AnimationSpeed, 0.5, 2) : 1,
+        CollapsedStat = CollapsedStat is "Cpu" or "Ram" or "Network" or "Battery" or "CpuRam" ? CollapsedStat : "None",
+        SystemProcessSort = SystemProcessSort is "Memory" ? "Memory" : "Cpu",
+        SystemGpuIndex = Math.Max(0, SystemGpuIndex)
     };
 }

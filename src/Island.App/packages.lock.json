@@ -11,6 +11,15 @@
           "NAudio.Core": "2.2.1"
         }
       },
+      "System.Management": {
+        "type": "Direct",
+        "requested": "[8.0.0, )",
+        "resolved": "8.0.0",
+        "contentHash": "jrK22i5LRzxZCfGb+tGmke2VH7oE0DvcDlJ1HAKYU8cPmD8XnpUT0bYn2Gy98GEhGjtfbR/sxKTVb+dE770pfA==",
+        "dependencies": {
+          "System.CodeDom": "8.0.0"
+        }
+      },
       "CommunityToolkit.Mvvm": {
         "type": "Transitive",
         "resolved": "8.4.0",
@@ -20,6 +29,11 @@
         "type": "Transitive",
         "resolved": "2.2.1",
         "contentHash": "GgkdP6K/7FqXFo7uHvoqGZTJvW4z8g2IffhOO4JHaLzKCdDOUEzVKtveoZkCuUX8eV2HAINqi7VFqlFndrnz/g=="
+      },
+      "System.CodeDom": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "WTlRjL6KWIMr/pAaq3rYqh0TJlzpouaQ/W1eelssHgtlwHAH25jXTkUphTYx9HaIIf7XA6qs/0+YhtLEQRkJ+Q=="
       },
       "island.core": {
         "type": "Project",

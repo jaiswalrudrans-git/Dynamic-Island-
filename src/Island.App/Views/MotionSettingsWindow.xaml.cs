@@ -21,11 +21,17 @@ public partial class MotionSettingsWindow : Window
         CoverGlow.IsChecked = current.CoverGlow;
         PreviewText.ItemsSource = new[] { "Clock", "Title", "Lyric" };
         PreviewText.SelectedItem = current.MusicPreviewText;
+        CollapsedStat.ItemsSource = new[] { "None", "Cpu", "Ram", "Network", "Battery", "CpuRam" };
+        CollapsedStat.SelectedItem = current.CollapsedStat;
+        ProcessSort.ItemsSource = new[] { "Cpu", "Memory" };
+        ProcessSort.SelectedItem = current.SystemProcessSort;
         MusicPreview.Click += (_, _) => save(s => s with { ShowMusicPreview = MusicPreview.IsChecked == true });
         Equalizer.Click += (_, _) => save(s => s with { MusicEqualizer = Equalizer.IsChecked == true });
         Lyrics.Click += (_, _) => save(s => s with { LyricsEnabled = Lyrics.IsChecked == true });
         CoverGlow.Click += (_, _) => save(s => s with { CoverGlow = CoverGlow.IsChecked == true });
         PreviewText.SelectionChanged += (_, _) => save(s => s with { MusicPreviewText = (string)PreviewText.SelectedItem });
+        CollapsedStat.SelectionChanged += (_, _) => save(s => s with { CollapsedStat = (string)CollapsedStat.SelectedItem });
+        ProcessSort.SelectionChanged += (_, _) => save(s => s with { SystemProcessSort = (string)ProcessSort.SelectedItem });
         Reduced.Click += (_, _) => save(s => s with { ReduceMotion = Reduced.IsChecked == true });
         // Commit settled slider edits, including keyboard input, without writing on every drag pixel.
         void Bind(Slider slider, Func<AppSettings, AppSettings> edit)

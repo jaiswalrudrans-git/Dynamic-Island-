@@ -59,6 +59,18 @@
                 <local:ScrollingLabel x:Name="PreviewLabel" Width="142" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <local:SpectrumMeter x:Name="CompactMeter" Width="25" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"/>
             </Grid>
+            <Grid x:Name="CompactStat" Width="200" HorizontalAlignment="Center" Visibility="Hidden" IsHitTestVisible="False">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Time}" FontFamily="Segoe UI" FontSize="14" FontWeight="SemiBold"
+                               Foreground="#F4F6FA" Typography.NumeralAlignment="Tabular" Typography.NumeralStyle="Lining"
+                               VerticalAlignment="Center"/>
+                    <Border Width="1" Height="10" Background="#3A4656" Margin="8,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding CollapsedStatGlyph}" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                               FontSize="11" Foreground="{DynamicResource Theme.Accent}" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding CollapsedStatLabel}" FontFamily="Segoe UI" FontSize="12" FontWeight="SemiBold"
+                               Foreground="#C4D2E2" Typography.NumeralAlignment="Tabular" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
             <TextBlock x:Name="CompactClock" Text="{Binding Time}" HorizontalAlignment="Center" VerticalAlignment="Center"
                        FontFamily="Segoe UI" FontSize="14" FontWeight="SemiBold" Foreground="#F4F6FA"
                        Typography.NumeralAlignment="Tabular" Typography.NumeralStyle="Lining"/>

@@ -74,6 +74,19 @@
         "resolved": "13.0.1",
         "contentHash": "ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A=="
       },
+      "System.CodeDom": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "WTlRjL6KWIMr/pAaq3rYqh0TJlzpouaQ/W1eelssHgtlwHAH25jXTkUphTYx9HaIIf7XA6qs/0+YhtLEQRkJ+Q=="
+      },
+      "System.Management": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "jrK22i5LRzxZCfGb+tGmke2VH7oE0DvcDlJ1HAKYU8cPmD8XnpUT0bYn2Gy98GEhGjtfbR/sxKTVb+dE770pfA==",
+        "dependencies": {
+          "System.CodeDom": "8.0.0"
+        }
+      },
       "System.Reflection.Metadata": {
         "type": "Transitive",
         "resolved": "1.6.0",
@@ -123,7 +136,8 @@
         "type": "Project",
         "dependencies": {
           "Island.Core": "[1.0.0, )",
-          "NAudio.Wasapi": "[2.2.1, )"
+          "NAudio.Wasapi": "[2.2.1, )",
+          "System.Management": "[8.0.0, )"
         }
       },
       "island.core": {

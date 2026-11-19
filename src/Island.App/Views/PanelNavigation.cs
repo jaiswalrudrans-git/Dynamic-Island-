@@ -19,10 +19,11 @@ internal sealed class PanelNavigation
     private readonly Action requestFrame;
     private int selected;
     public bool MusicSelected => selected == 0;
+    public bool SystemSelected => selected == 1;
     public event Action? SelectionChanged;
 
     public PanelNavigation(StackPanel bar, Grid host, TranslateTransform indicator, Style style,
-        Func<AppSettings> settings, Action requestFrame, MusicPage musicPage)
+        Func<AppSettings> settings, Action requestFrame, MusicPage musicPage, SystemPage systemPage)
     {
         this.indicator = indicator;
         this.settings = settings;
@@ -38,7 +39,12 @@ internal sealed class PanelNavigation
             bar.Children.Add(button);
             buttons[i] = button;
 
-            FrameworkElement page = i == 0 ? musicPage : CreatePage(tab);
+            FrameworkElement page = i switch
+            {
+                0 => musicPage,
+                1 => systemPage,
+                _ => CreatePage(tab)
+            };
             page.RenderTransform = new TranslateTransform();
             page.IsHitTestVisible = i == 0;
             page.Opacity = i == 0 ? 1 : 0;
