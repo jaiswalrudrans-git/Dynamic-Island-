@@ -1,0 +1,44 @@
+{
+  "Dark": {
+    "background": "#0A0C10",
+    "surface": "#181D26",
+    "foreground": "#F1F4FA",
+    "accent": "#9BC5FF"
+  },
+  "Light": {
+    "background": "#F4F6FB",
+    "surface": "#E2E8F3",
+    "foreground": "#192134",
+    "accent": "#315BA5"
+  },
+  "One Dark Pro": {
+    "background": "#282C34",
+    "surface": "#323842",
+    "foreground": "#ABB2BF",
+    "accent": "#61AFEF"
+  },
+  "GitHub Dark": {
+    "background": "#0D1117",
+    "surface": "#161B22",
+    "foreground": "#E6EDF3",
+    "accent": "#58A6FF"
+  },
+  "Dracula": {
+    "background": "#282A36",
+    "surface": "#343746",
+    "foreground": "#F8F8F2",
+    "accent": "#BD93F9"
+  },
+  "Night Owl": {
+    "background": "#011627",
+    "surface": "#0B2942",
+    "foreground": "#D6DEEB",
+    "accent": "#82AAFF"
+  },
+  "Cyberpunk": {
+    "background": "#140D24",
+    "surface": "#261633",
+    "foreground": "#F8EEFF",
+    "accent": "#FF58D4"
+  }
+}
