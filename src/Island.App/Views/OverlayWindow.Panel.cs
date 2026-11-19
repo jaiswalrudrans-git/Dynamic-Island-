@@ -175,6 +175,9 @@ public partial class OverlayWindow
         var initSize = navigation.GetDesiredSize(0);
         targetIslandWidth = initSize.Width;
         targetIslandHeight = initSize.Height;
+        Header.Width = Math.Max(480, Math.Round(initSize.Width - 32));
+        Body.Width = Math.Max(480, Math.Round(initSize.Width - 32));
+        Body.Height = Math.Max(180, Math.Round(initSize.Height - 76));
         currentWidthSpring.Set(targetIslandWidth);
         currentHeightSpring.Set(targetIslandHeight);
 
@@ -220,6 +223,11 @@ public partial class OverlayWindow
         var size = navigation.GetDesiredSize(navigation.SelectedIndex);
         targetIslandWidth = size.Width;
         targetIslandHeight = size.Height;
+        double contentW = Math.Max(480, Math.Round(size.Width - 32));
+        double contentH = Math.Max(180, Math.Round(size.Height - 76));
+        if (Header.Width != contentW) Header.Width = contentW;
+        if (Body.Width != contentW) Body.Width = contentW;
+        if (Body.Height != contentH) Body.Height = contentH;
         RequestFrame();
     }
 
@@ -414,11 +422,6 @@ public partial class OverlayWindow
         IslandBackground.Opacity = shape;
         CollapsedBackground.Opacity = Math.Max(0, 1.0 - shape);
         OuterShadow.Opacity = 0.25 + 0.15 * shape;
-        double newW = Math.Max(480, Math.Round(curW - 40));
-        double newH = Math.Max(180, Math.Round(curH - 76));
-        if (Header.Width != newW) Header.Width = newW;
-        if (Body.Width != newW) Body.Width = newW;
-        if (Body.Height != newH) Body.Height = newH;
         Shell.Opacity = reduced && p > 0 ? Math.Clamp(p, .01, 1) : 1;
         double compactOpacity = reduced && p > 0 ? 0 : Math.Max(0, 1 - p * 2);
         bool showAlert = alerts.HasActiveAlert;
@@ -439,7 +442,9 @@ public partial class OverlayWindow
         CompactFocus.Visibility = showFocus && compactOpacity > 0 ? Visibility.Visible : Visibility.Hidden;
         CompactFocus.Opacity = compactOpacity * Math.Clamp(previewWidth.Value, 0, 1);
 
-        CompactClock.Opacity = (showClockOnly || (showMusic && music.PreviewClock && settings.Current.ShowNotchClock)) ? compactOpacity : 0;
+        double clockOpacity = (showClockOnly || (showMusic && music.PreviewClock && settings.Current.ShowNotchClock)) ? compactOpacity : 0;
+        CompactClock.Opacity = clockOpacity;
+        CompactClock.Visibility = clockOpacity > 0.01 ? Visibility.Visible : Visibility.Hidden;
         Header.Opacity = motion.HeaderOpacity;
         Body.Opacity = motion.BodyOpacity;
         HeaderY.Y = reduced ? 0 : 6 * (1 - Header.Opacity);

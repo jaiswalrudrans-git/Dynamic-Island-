@@ -16,8 +16,6 @@ internal sealed class PanelNavigation
     private readonly TranslateTransform indicator;
     private readonly FrameworkElement[] pages = new FrameworkElement[PanelTab.All.Length];
     private readonly Button[] buttons = new Button[PanelTab.All.Length];
-    private readonly TextBlock[] labelBlocks = new TextBlock[PanelTab.All.Length];
-    private readonly Border[] buttonBoxes = new Border[PanelTab.All.Length];
     private readonly Func<AppSettings> settings;
     private readonly Action requestFrame;
     private int selected;
@@ -50,56 +48,26 @@ internal sealed class PanelNavigation
             {
                 Text = tab.Glyph,
                 FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets"),
-                FontSize = 13,
+                FontSize = 14,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
-
-            var labelBlock = new TextBlock
-            {
-                Text = tab.Name,
-                FontFamily = new FontFamily("Segoe UI Variable Text, Segoe UI"),
-                FontSize = 12,
-                FontWeight = FontWeights.SemiBold,
-                Margin = new Thickness(5, 0, 0, 0),
-                VerticalAlignment = VerticalAlignment.Center,
-                Visibility = i == 0 ? Visibility.Visible : Visibility.Collapsed
-            };
-            labelBlocks[i] = labelBlock;
-
-            var stack = new StackPanel
-            {
-                Orientation = Orientation.Horizontal,
-                VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Center
-            };
-            stack.Children.Add(iconBlock);
-            stack.Children.Add(labelBlock);
-
-            var box = new Border
-            {
-                CornerRadius = new CornerRadius(7),
-                Padding = new Thickness(7, 2, 7, 2),
-                Background = Brushes.Transparent,
-                ClipToBounds = true,
-                Child = stack
-            };
-            buttonBoxes[i] = box;
 
             var button = new Button
             {
-                Content = box,
+                Content = iconBlock,
                 Style = style,
                 ToolTip = string.IsNullOrEmpty(tab.Description) ? tab.Name : tab.Description,
                 Height = 30,
-                Width = double.NaN, // Auto-size to content
-                MinWidth = 30,
+                Width = 32,
+                MinWidth = 32,
                 Padding = new Thickness(0),
-                Margin = new Thickness(1, 0, 1, 0),
+                Margin = new Thickness(0),
                 ClipToBounds = true
             };
             AutomationProperties.SetName(button, tab.Name);
             button.Click += (_, _) => Select(index);
+            AttachButtonMotion(button, settings);
             bar.Children.Add(button);
             buttons[i] = button;
 
@@ -154,14 +122,10 @@ internal sealed class PanelNavigation
         if (active)
         {
             buttons[index].SetResourceReference(Control.ForegroundProperty, "Theme.Accent");
-            buttonBoxes[index].SetResourceReference(Border.BackgroundProperty, "Theme.SurfaceHover");
-            labelBlocks[index].Visibility = Visibility.Visible;
         }
         else
         {
             buttons[index].SetResourceReference(Control.ForegroundProperty, "Theme.TextSecondary");
-            buttonBoxes[index].Background = Brushes.Transparent;
-            labelBlocks[index].Visibility = Visibility.Collapsed;
         }
         AutomationProperties.SetItemStatus(buttons[index], active ? "Selected" : "");
     }
@@ -183,11 +147,11 @@ internal sealed class PanelNavigation
             if (!incoming && page.Opacity == 0 && !page.HasAnimatedProperties) continue;
             Animate(page, UIElement.OpacityProperty, page.Opacity, incoming ? 1 : 0, duration);
             var offset = (TranslateTransform)page.RenderTransform;
-            offset.X = 0; // Keep X centered so text never slides outside the island borders
+            offset.X = 0; // Strictly 0 so text never slides outside borders
             if (!config.ReduceMotion)
             {
-                double originY = incoming && page.Opacity == 0 ? 6 : offset.Y;
-                Animate(offset, TranslateTransform.YProperty, originY, incoming ? 0 : -6, duration);
+                double originY = incoming && page.Opacity == 0 ? 4 : offset.Y;
+                Animate(offset, TranslateTransform.YProperty, originY, incoming ? 0 : -4, duration);
             }
             else
             {
@@ -201,48 +165,27 @@ internal sealed class PanelNavigation
     public Size GetDesiredSize(int tabIndex)
     {
         if (tabIndex < 0 || tabIndex >= pages.Length)
-            return new Size(640, 360);
+            return new Size(680, 400);
 
-        var page = pages[tabIndex];
-        page.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        var natural = page.DesiredSize;
-
-        double contentW = tabIndex switch
+        // Standardized stable width across all tabs: zero jumping, zero text overflow
+        double islandW = 680;
+        double islandH = tabIndex switch
         {
-            0 => Math.Max(natural.Width, 664), // Music
-            1 => Math.Max(natural.Width, 736), // System
-            2 => Math.Max(natural.Width, 664), // Tasks
-            3 => Math.Max(natural.Width, 664), // Quick Controls
-            4 => Math.Max(natural.Width, 664), // Focus
-            5 => Math.Max(natural.Width, 720), // Calendar & Weather
-            _ => Math.Max(natural.Width, 664)
+            0 => 380, // Music
+            1 => 440, // System
+            2 => 400, // Tasks
+            3 => 380, // Quick Controls
+            4 => 390, // Focus
+            5 => 440, // Calendar & Weather
+            _ => 400
         };
 
-        double contentH = tabIndex switch
-        {
-            0 => Math.Max(natural.Height, 288), // Music
-            1 => Math.Max(natural.Height, 376), // System
-            2 => Math.Clamp(natural.Height, 200, 480), // Tasks
-            3 => Math.Max(natural.Height, 288), // Quick Controls
-            4 => Math.Max(natural.Height, 304), // Focus
-            5 => Math.Max(natural.Height, 368), // Calendar & Weather
-            _ => Math.Max(natural.Height, 288)
-        };
-
-        // Header height (52 DIP) + margins (24 DIP)
-        double islandW = contentW;
-        double islandH = contentH + 76;
-
-        // Constraints: minimum width 664 DIP for header breathing room; max 62% width, max 70% height
+        // Constraints: max 62% width, max 70% height
         double screenW = SystemParameters.WorkArea.Width > 0 ? SystemParameters.WorkArea.Width : 1920;
         double screenH = SystemParameters.WorkArea.Height > 0 ? SystemParameters.WorkArea.Height : 1080;
 
-        double minW = 664;
-        double maxW = Math.Max(minW, screenW * 0.62);
-        double maxH = Math.Max(300, screenH * 0.70);
-
-        islandW = Math.Clamp(islandW, minW, maxW);
-        islandH = Math.Clamp(islandH, 200, maxH);
+        islandW = Math.Clamp(islandW, 520, Math.Max(520, screenW * 0.62));
+        islandH = Math.Clamp(islandH, 200, Math.Max(300, screenH * 0.70));
 
         // Snap to 8 DIP grid
         islandW = Math.Ceiling(islandW / 8.0) * 8.0;
@@ -255,7 +198,7 @@ internal sealed class PanelNavigation
     {
         if (reduced) pill.Set(selected);
         bool moving = pill.Advance(selected, seconds);
-        indicator.X = pill.Value * 31;
+        indicator.X = pill.Value * 32;
         return moving;
     }
 

@@ -6,8 +6,8 @@
         <BooleanToVisibilityConverter x:Key="Visible"/>
 
         <Style x:Key="SegmentButton" TargetType="Button">
-            <Setter Property="Height" Value="28"/>
-            <Setter Property="Padding" Value="14,0"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Padding" Value="12,0"/>
             <Setter Property="FontSize" Value="{StaticResource Font.Secondary}"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Focusable" Value="False"/>
@@ -16,7 +16,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Box" CornerRadius="7" Background="Transparent" Padding="{TemplateBinding Padding}">
+                        <Border x:Name="Box" CornerRadius="4" Background="Transparent" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -134,8 +134,8 @@
 
         <!-- ROW 0: Segment Control -->
         <Border Grid.Row="0" HorizontalAlignment="Center" Background="{DynamicResource Theme.SurfaceRaised}"
-                BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="10"
-                Padding="3" ClipToBounds="True">
+                BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="6"
+                Padding="2" ClipToBounds="True">
             <StackPanel Orientation="Horizontal">
                 <Button Content="Pomodoro" Click="PomodoroModeClick">
                     <Button.Style>

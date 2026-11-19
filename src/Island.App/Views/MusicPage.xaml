@@ -100,10 +100,10 @@
                 <Button HorizontalAlignment="Left" Click="ChoosePlayer" Focusable="False"
                         ToolTip="Choose or pin player" AutomationProperties.Name="Choose or pin a player"
                         Background="{DynamicResource Theme.SurfaceRaised}" BorderBrush="{DynamicResource Theme.Border}"
-                        BorderThickness="1" Cursor="Hand" Padding="8,4">
+                        BorderThickness="1" Cursor="Hand" Padding="8,3">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Border CornerRadius="8" Background="{TemplateBinding Background}"
+                            <Border CornerRadius="6" Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                                     Padding="{TemplateBinding Padding}">
                                 <ContentPresenter/>
