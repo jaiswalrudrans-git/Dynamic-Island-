@@ -1,89 +1,36 @@
 <UserControl x:Class="Island.App.Views.QuickControlsPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Focusable="False" Foreground="#F2F5FA">
+             Focusable="False" Foreground="{DynamicResource Theme.TextPrimary}">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="Visible"/>
 
-        <Style x:Key="SliderRail" TargetType="RepeatButton">
-            <Setter Property="Focusable" Value="False"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="RepeatButton">
-                        <Border VerticalAlignment="Center" Height="5" CornerRadius="2.5" Background="{TemplateBinding Background}"/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="IslandSlider" TargetType="Slider">
-            <Setter Property="Focusable" Value="False"/>
-            <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Slider">
-                        <Grid Height="24" Background="Transparent">
-                            <Track x:Name="PART_Track" VerticalAlignment="Center">
-                                <Track.DecreaseRepeatButton>
-                                    <RepeatButton Style="{StaticResource SliderRail}" Background="{DynamicResource Theme.Accent}"/>
-                                </Track.DecreaseRepeatButton>
-                                <Track.Thumb>
-                                    <Thumb Width="12" Height="12" Cursor="Hand">
-                                        <Thumb.Template>
-                                            <ControlTemplate TargetType="Thumb">
-                                                <Ellipse Fill="#FFFFFF"/>
-                                            </ControlTemplate>
-                                        </Thumb.Template>
-                                    </Thumb>
-                                </Track.Thumb>
-                                <Track.IncreaseRepeatButton>
-                                    <RepeatButton Style="{StaticResource SliderRail}" Background="#2B3648"/>
-                                </Track.IncreaseRepeatButton>
-                            </Track>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="QuickActionCard" TargetType="Button">
-            <Setter Property="Height" Value="48"/>
+        <!-- ACTION TILE STYLE -->
+        <Style x:Key="QuickTileBtn" TargetType="Button">
+            <Setter Property="Height" Value="54"/>
             <Setter Property="Focusable" Value="False"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Background" Value="#141822"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="Background" Value="{DynamicResource Theme.SurfaceRaised}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
+            <Setter Property="Padding" Value="10,6"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Box" CornerRadius="8" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                        <Border x:Name="Box" CornerRadius="{StaticResource Radius.Control}"
+                                Background="{TemplateBinding Background}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                Padding="{TemplateBinding Padding}">
                             <ContentPresenter VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Box" Property="Background" Value="#222C3D"/>
+                                <Setter TargetName="Box" Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
+                                <Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource Theme.BorderStrong}"/>
                             </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="MuteIconBtn" TargetType="Button">
-            <Setter Property="Width" Value="28"/><Setter Property="Height" Value="28"/>
-            <Setter Property="Background" Value="Transparent"/><Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Foreground" Value="#BBC8D8"/><Setter Property="Focusable" Value="False"/>
-            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets"/><Setter Property="FontSize" Value="13"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Box" CornerRadius="6" Background="{TemplateBinding Background}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Box" Property="Background" Value="#222B38"/>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Box" Property="Opacity" Value="0.85"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -92,8 +39,10 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="18,10">
+    <Grid Margin="12,4">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="12"/>
             <RowDefinition Height="Auto"/>
@@ -101,198 +50,70 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Sliders Section -->
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="16"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <!-- FULL-WIDTH SLIDER 1: VOLUME -->
+        <Border Grid.Row="0" Style="{StaticResource IslandCard}" Padding="14,8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-            <!-- Volume Slider -->
-            <Border Grid.Column="0" Background="#141822" CornerRadius="10" Padding="10,6">
-                <Grid>
+                <!-- Slider Row -->
+                <Grid Grid.Row="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="38"/>
+                        <ColumnDefinition Width="48"/>
                     </Grid.ColumnDefinitions>
-                    <Button Style="{StaticResource MuteIconBtn}" Content="{Binding VolumeGlyph}"
-                            Click="VolumeMuteClick" ToolTip="Toggle Mute"/>
-                    <Slider Grid.Column="1" Style="{StaticResource IslandSlider}" Minimum="0" Maximum="1"
-                            Value="{Binding VolumeFraction, Mode=TwoWay}" Margin="8,0" AutomationProperties.Name="Volume"/>
-                    <TextBlock Grid.Column="2" Text="{Binding VolumePercentText}" FontSize="11" Foreground="#BBC8D8"
+
+                    <Button Style="{StaticResource IslandIconButton}" Width="32" Height="32"
+                            Content="{Binding VolumeGlyph}" Click="VolumeMuteClick" ToolTip="Toggle Mute"/>
+
+                    <Slider Grid.Column="1" Style="{StaticResource IslandFullSlider}" Minimum="0" Maximum="1"
+                            Value="{Binding VolumeFraction, Mode=TwoWay}" Margin="12,0" AutomationProperties.Name="Volume"/>
+
+                    <TextBlock Grid.Column="2" Text="{Binding VolumePercentText}" FontSize="{StaticResource FontSize.Value}"
+                               FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"
                                VerticalAlignment="Center" HorizontalAlignment="Right" Typography.NumeralAlignment="Tabular"/>
                 </Grid>
-            </Border>
 
-            <!-- Brightness Slider -->
-            <Border Grid.Column="2" Background="#141822" CornerRadius="10" Padding="10,6">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="38"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="&#xE706;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="13"
-                               Foreground="#BBC8D8" VerticalAlignment="Center" HorizontalAlignment="Center" Width="28" TextAlignment="Center"/>
-                    <Slider Grid.Column="1" Style="{StaticResource IslandSlider}" Minimum="0" Maximum="100"
-                            Value="{Binding Brightness, Mode=TwoWay}" Margin="8,0" AutomationProperties.Name="Brightness"/>
-                    <TextBlock Grid.Column="2" Text="{Binding BrightnessText}" FontSize="11" Foreground="#BBC8D8"
-                               VerticalAlignment="Center" HorizontalAlignment="Right" Typography.NumeralAlignment="Tabular"/>
-                </Grid>
-            </Border>
-        </Grid>
-
-        <!-- Action Cards: Row 1 -->
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="8"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="8"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="8"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- Mic Mute Card -->
-            <Button Grid.Column="0" Style="{StaticResource QuickActionCard}" Click="MicClick" ToolTip="Toggle Microphone Mute">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="28"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Border Width="26" Height="26" CornerRadius="13" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="Background" Value="#1D2433"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsMicMuted}" Value="True">
-                                        <Setter Property="Background" Value="#33FF5252"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="{Binding MicGlyph}" FontSize="11"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="#F2F5FA"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsMicMuted}" Value="True">
-                                            <Setter Property="Foreground" Value="#FF5252"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,0,0">
-                        <TextBlock Text="Mic" FontSize="11" FontWeight="SemiBold" Foreground="#F2F5FA"/>
-                        <TextBlock Text="{Binding MicStatusText}" FontSize="10" Foreground="#8E9DAE"/>
+                <!-- Output Device Chip Row -->
+                <Border Grid.Row="1" HorizontalAlignment="Left" CornerRadius="4"
+                        Background="{DynamicResource Theme.SurfaceHover}" Padding="6,2" Margin="38,2,0,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock FontFamily="{StaticResource Font.Icons}" Text="&#xE767;" FontSize="10"
+                                   Foreground="{DynamicResource Theme.Accent}" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding OutputDeviceName}" FontSize="{StaticResource FontSize.Label}"
+                                   Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis" MaxWidth="320"/>
                     </StackPanel>
-                </Grid>
-            </Button>
+                </Border>
+            </Grid>
+        </Border>
 
-            <!-- Wi-Fi Card -->
-            <Button Grid.Column="2" Style="{StaticResource QuickActionCard}" Click="WifiClick" ToolTip="Toggle Wi-Fi">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="28"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Border Width="26" Height="26" CornerRadius="13" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="Background" Value="#1D2433"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsWifiActive}" Value="True">
-                                        <Setter Property="Background" Value="{DynamicResource Theme.Accent}"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="{Binding WifiGlyph}" FontSize="11"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="#F2F5FA"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsWifiActive}" Value="True">
-                                            <Setter Property="Foreground" Value="#121620"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,0,0">
-                        <TextBlock Text="Wi-Fi" FontSize="11" FontWeight="SemiBold" Foreground="#F2F5FA"/>
-                        <TextBlock Text="{Binding WifiStatusText}" FontSize="10" Foreground="#8E9DAE"/>
-                    </StackPanel>
-                </Grid>
-            </Button>
+        <!-- FULL-WIDTH SLIDER 2: BRIGHTNESS -->
+        <Border Grid.Row="2" Style="{StaticResource IslandCard}" Padding="14,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="48"/>
+                </Grid.ColumnDefinitions>
 
-            <!-- Bluetooth Card -->
-            <Button Grid.Column="4" Style="{StaticResource QuickActionCard}" Click="BluetoothClick" ToolTip="Toggle Bluetooth">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="28"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Border Width="26" Height="26" CornerRadius="13" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="Background" Value="#1D2433"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsBluetoothActive}" Value="True">
-                                        <Setter Property="Background" Value="{DynamicResource Theme.Accent}"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="{Binding BluetoothGlyph}" FontSize="11"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Foreground" Value="#F2F5FA"/>
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding IsBluetoothActive}" Value="True">
-                                            <Setter Property="Foreground" Value="#121620"/>
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,0,0">
-                        <TextBlock Text="Bluetooth" FontSize="11" FontWeight="SemiBold" Foreground="#F2F5FA"/>
-                        <TextBlock Text="{Binding BluetoothStatusText}" FontSize="10" Foreground="#8E9DAE"/>
-                    </StackPanel>
-                </Grid>
-            </Button>
+                <TextBlock Text="&#xE706;" FontFamily="{StaticResource Font.Icons}" FontSize="18"
+                           Foreground="{DynamicResource Theme.Accent}" VerticalAlignment="Center" HorizontalAlignment="Center" Width="32" TextAlignment="Center"/>
 
-            <!-- Focus Assist / DND Card -->
-            <Button Grid.Column="6" Style="{StaticResource QuickActionCard}" Click="DndClick" ToolTip="Open Focus Assist / Notifications">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="28"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Border Width="26" Height="26" CornerRadius="13" Background="#1D2433" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE708;" FontSize="11"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#F2F5FA"/>
-                    </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,0,0">
-                        <TextBlock Text="Focus Assist" FontSize="11" FontWeight="SemiBold" Foreground="#F2F5FA"/>
-                        <TextBlock Text="Settings" FontSize="10" Foreground="#8E9DAE"/>
-                    </StackPanel>
-                </Grid>
-            </Button>
-        </Grid>
+                <Slider Grid.Column="1" Style="{StaticResource IslandFullSlider}" Minimum="0" Maximum="100"
+                        Value="{Binding Brightness, Mode=TwoWay}" Margin="12,0" AutomationProperties.Name="Brightness"/>
 
-        <!-- Action Cards: Row 2 -->
+                <TextBlock Grid.Column="2" Text="{Binding BrightnessText}" FontSize="{StaticResource FontSize.Value}"
+                           FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"
+                           VerticalAlignment="Center" HorizontalAlignment="Right" Typography.NumeralAlignment="Tabular"/>
+            </Grid>
+        </Border>
+
+        <!-- 8 ACTION TILES IN 4x2 GRID (ZERO EMPTY SLOTS) -->
+        <!-- Row 1 of Tiles -->
         <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -304,62 +125,230 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Screenshot Card -->
-            <Button Grid.Column="0" Style="{StaticResource QuickActionCard}" Click="ScreenshotClick" ToolTip="Snipping Tool Screenshot (Win+Shift+S)">
+            <!-- 1. Mic -->
+            <Button Grid.Column="0" Style="{StaticResource QuickTileBtn}" Click="MicClick" ToolTip="Toggle Microphone">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="28"/>
+                        <ColumnDefinition Width="32"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Border Width="26" Height="26" CornerRadius="13" Background="#1D2433" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xF158;" FontSize="11"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#F2F5FA"/>
+                    <Border Width="30" Height="30" CornerRadius="8" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsMicMuted}" Value="True">
+                                        <Setter Property="Background" Value="#33FF5252"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock FontFamily="{StaticResource Font.Icons}" Text="{Binding MicGlyph}" FontSize="13"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimary}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsMicMuted}" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource Theme.Danger}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                     </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,0,0">
-                        <TextBlock Text="Snip" FontSize="11" FontWeight="SemiBold" Foreground="#F2F5FA"/>
-                        <TextBlock Text="Screenshot" FontSize="10" Foreground="#8E9DAE"/>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+                        <TextBlock Text="Mic" FontSize="{StaticResource FontSize.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                        <TextBlock Text="{Binding MicStatusText}" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
                     </StackPanel>
                 </Grid>
             </Button>
 
-            <!-- Lock PC Card -->
-            <Button Grid.Column="2" Style="{StaticResource QuickActionCard}" Click="LockClick" ToolTip="Lock Workstation">
+            <!-- 2. Wi-Fi -->
+            <Button Grid.Column="2" Style="{StaticResource QuickTileBtn}" Click="WifiClick" ToolTip="Toggle Wi-Fi">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="28"/>
+                        <ColumnDefinition Width="32"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Border Width="26" Height="26" CornerRadius="13" Background="#1D2433" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE72E;" FontSize="11"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#F2F5FA"/>
+                    <Border Width="30" Height="30" CornerRadius="8" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsWifiActive}" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource Theme.Accent}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock FontFamily="{StaticResource Font.Icons}" Text="{Binding WifiGlyph}" FontSize="13"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimary}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsWifiActive}" Value="True">
+                                            <Setter Property="Foreground" Value="#0A0E14"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                     </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,0,0">
-                        <TextBlock Text="Lock" FontSize="11" FontWeight="SemiBold" Foreground="#F2F5FA"/>
-                        <TextBlock Text="Workstation" FontSize="10" Foreground="#8E9DAE"/>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+                        <TextBlock Text="Wi-Fi" FontSize="{StaticResource FontSize.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                        <TextBlock Text="{Binding WifiStatusText}" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
                     </StackPanel>
                 </Grid>
             </Button>
 
-            <!-- Sleep PC Card -->
-            <Button Grid.Column="4" Style="{StaticResource QuickActionCard}" Click="SleepClick" ToolTip="Sleep PC">
+            <!-- 3. Bluetooth -->
+            <Button Grid.Column="4" Style="{StaticResource QuickTileBtn}" Click="BluetoothClick" ToolTip="Toggle Bluetooth">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="28"/>
+                        <ColumnDefinition Width="32"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Border Width="26" Height="26" CornerRadius="13" Background="#1D2433" VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE7E8;" FontSize="11"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#F2F5FA"/>
+                    <Border Width="30" Height="30" CornerRadius="8" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsBluetoothActive}" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource Theme.Accent}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <TextBlock FontFamily="{StaticResource Font.Icons}" Text="{Binding BluetoothGlyph}" FontSize="13"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimary}"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsBluetoothActive}" Value="True">
+                                            <Setter Property="Foreground" Value="#0A0E14"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
                     </Border>
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="6,0,0,0">
-                        <TextBlock Text="Sleep" FontSize="11" FontWeight="SemiBold" Foreground="#F2F5FA"/>
-                        <TextBlock Text="Suspend" FontSize="10" Foreground="#8E9DAE"/>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+                        <TextBlock Text="Bluetooth" FontSize="{StaticResource FontSize.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                        <TextBlock Text="{Binding BluetoothStatusText}" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
                     </StackPanel>
                 </Grid>
             </Button>
 
-            <!-- Empty filler column -->
-            <Border Grid.Column="6"/>
+            <!-- 4. Focus Assist -->
+            <Button Grid.Column="6" Style="{StaticResource QuickTileBtn}" Click="DndClick" ToolTip="Focus Assist Settings">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="32"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Width="30" Height="30" CornerRadius="8" Background="{DynamicResource Theme.SurfaceHover}"
+                            VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock FontFamily="{StaticResource Font.Icons}" Text="&#xE708;" FontSize="13"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Theme.Accent}"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+                        <TextBlock Text="Focus Assist" FontSize="{StaticResource FontSize.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                        <TextBlock Text="{Binding FocusAssistStatusText}" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                    </StackPanel>
+                </Grid>
+            </Button>
+        </Grid>
+
+        <!-- Row 2 of Tiles -->
+        <Grid Grid.Row="6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- 5. Snip (Scissors Icon \uE8C6) -->
+            <Button Grid.Column="0" Style="{StaticResource QuickTileBtn}" Click="ScreenshotClick" ToolTip="Screen Snipping (Win+Shift+S)">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="32"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Width="30" Height="30" CornerRadius="8" Background="{DynamicResource Theme.SurfaceHover}"
+                            VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock FontFamily="{StaticResource Font.Icons}" Text="&#xE8C6;" FontSize="13"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+                        <TextBlock Text="Snip" FontSize="{StaticResource FontSize.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                        <TextBlock Text="Screenshot" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                    </StackPanel>
+                </Grid>
+            </Button>
+
+            <!-- 6. Lock -->
+            <Button Grid.Column="2" Style="{StaticResource QuickTileBtn}" Click="LockClick" ToolTip="Lock PC">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="32"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Width="30" Height="30" CornerRadius="8" Background="{DynamicResource Theme.SurfaceHover}"
+                            VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock FontFamily="{StaticResource Font.Icons}" Text="&#xE72E;" FontSize="13"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+                        <TextBlock Text="Lock" FontSize="{StaticResource FontSize.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                        <TextBlock Text="Workstation" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                    </StackPanel>
+                </Grid>
+            </Button>
+
+            <!-- 7. Sleep -->
+            <Button Grid.Column="4" Style="{StaticResource QuickTileBtn}" Click="SleepClick" ToolTip="Sleep PC">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="32"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Width="30" Height="30" CornerRadius="8" Background="{DynamicResource Theme.SurfaceHover}"
+                            VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock FontFamily="{StaticResource Font.Icons}" Text="&#xE7E8;" FontSize="13"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+                        <TextBlock Text="Sleep" FontSize="{StaticResource FontSize.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                        <TextBlock Text="Suspend" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                    </StackPanel>
+                </Grid>
+            </Button>
+
+            <!-- 8. Task Manager (No empty slots!) -->
+            <Button Grid.Column="6" Style="{StaticResource QuickTileBtn}" Click="TaskManagerClick" ToolTip="Open Task Manager">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="32"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Width="30" Height="30" CornerRadius="8" Background="{DynamicResource Theme.SurfaceHover}"
+                            VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock FontFamily="{StaticResource Font.Icons}" Text="&#xE9D9;" FontSize="13"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
+                        <TextBlock Text="Tasks" FontSize="{StaticResource FontSize.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                        <TextBlock Text="Manager" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                    </StackPanel>
+                </Grid>
+            </Button>
         </Grid>
     </Grid>
 </UserControl>

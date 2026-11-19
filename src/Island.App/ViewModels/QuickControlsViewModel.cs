@@ -19,6 +19,7 @@ public sealed class QuickControlsViewModel : ObservableObject, IDisposable
     public string VolumePercentText => $"{(int)Math.Round(manager.Volume * 100)}%";
     public bool IsMuted => manager.IsMuted;
     public string VolumeGlyph => manager.IsMuted ? "\uE74F" : manager.Volume == 0 ? "\uE74F" : manager.Volume < 0.33 ? "\uE992" : manager.Volume < 0.66 ? "\uE993" : "\uE995";
+    public string OutputDeviceName => manager.OutputDeviceName;
 
     public int Brightness
     {
@@ -34,13 +35,15 @@ public sealed class QuickControlsViewModel : ObservableObject, IDisposable
 
     public bool? IsWifiOn => manager.IsWifiOn;
     public bool IsWifiActive => manager.IsWifiOn == true;
-    public string WifiStatusText => manager.IsWifiOn.HasValue ? (manager.IsWifiOn.Value ? "On" : "Off") : "Unavailable";
+    public string WifiStatusText => manager.IsWifiOn.HasValue ? (manager.IsWifiOn.Value ? "Connected" : "Off") : "Unavailable";
     public string WifiGlyph => "\uE701";
 
     public bool? IsBluetoothOn => manager.IsBluetoothOn;
     public bool IsBluetoothActive => manager.IsBluetoothOn == true;
     public string BluetoothStatusText => manager.IsBluetoothOn.HasValue ? (manager.IsBluetoothOn.Value ? "On" : "Off") : "Unavailable";
     public string BluetoothGlyph => "\uE702";
+
+    public string FocusAssistStatusText => manager.FocusAssistState;
 
     public QuickControlsViewModel(Dispatcher dispatcher, QuickControlsManager manager)
     {
@@ -63,6 +66,7 @@ public sealed class QuickControlsViewModel : ObservableObject, IDisposable
     public void LockPc() => manager.LockPc();
     public void SleepPc() => manager.SleepPc();
     public void OpenDndSettings() => manager.OpenDndSettings();
+    public void OpenTaskManager() => manager.OpenTaskManager();
 
     public void Dispose()
     {

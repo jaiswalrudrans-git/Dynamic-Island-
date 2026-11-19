@@ -31,6 +31,17 @@ internal sealed class MusicViewModel : ObservableObject, IDisposable
     public bool Pinned => settings.PreferredPlayer != null && settings.PreferredPlayer == Selected?.Id;
     public bool HasPlayer => Selected != null;
     public string Player => Selected?.Label ?? "";
+    public string PlayerIconGlyph
+    {
+        get
+        {
+            string p = Player.ToLowerInvariant();
+            if (p.Contains("edge") || p.Contains("chrome") || p.Contains("brave") || p.Contains("firefox"))
+                return "\uE774"; // Globe/web
+            if (p.Contains("vlc")) return "\uE714"; // Video
+            return "\uE8D6"; // Music
+        }
+    }
     public string EmptyStatus => sessions.Status;
     public string Title => string.IsNullOrEmpty(sessions.Track?.Title) ? "Untitled track" : sessions.Track.Title;
     public string Artist => sessions.Track?.Artist ?? "";

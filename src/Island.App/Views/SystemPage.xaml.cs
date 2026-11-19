@@ -44,9 +44,9 @@ public partial class SystemPage : UserControl
         double p = Math.Clamp(percent, 0, 99.99) / 100.0;
         double angle = p * 2 * Math.PI;
 
-        double cx = 20;
-        double cy = 20;
-        double r = 16;
+        double cx = 25;
+        double cy = 25;
+        double r = 21;
 
         double startX = cx;
         double startY = cy - r;

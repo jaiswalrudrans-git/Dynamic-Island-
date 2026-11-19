@@ -23,4 +23,5 @@ public partial class QuickControlsPage : UserControl
     private void ScreenshotClick(object sender, RoutedEventArgs e) => model.TakeScreenshot();
     private void LockClick(object sender, RoutedEventArgs e) => model.LockPc();
     private void SleepClick(object sender, RoutedEventArgs e) => model.SleepPc();
+    private void TaskManagerClick(object sender, RoutedEventArgs e) => model.OpenTaskManager();
 }

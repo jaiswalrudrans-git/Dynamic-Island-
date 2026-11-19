@@ -8,6 +8,9 @@ public sealed record AppSettings
     public const int CurrentSchema = 1;
     public int SchemaVersion { get; init; } = CurrentSchema;
     public string Theme { get; init; } = "Dark";
+    public string InterfaceSize { get; init; } = "Auto"; // "Auto", "Compact", "Comfortable", "Large"
+    public double UiScale { get; init; } = 1.0; // 0.90 to 1.50
+    public string SurfaceStyle { get; init; } = "Opaque"; // "Opaque", "Translucent", "Clear"
     public bool Use24HourClock { get; init; } = true;
     public bool ShowSeconds { get; init; }
     public string? MonitorDeviceName { get; init; }
@@ -44,6 +47,9 @@ public sealed record AppSettings
     public AppSettings Normalize() => this with
     {
         Theme = string.IsNullOrWhiteSpace(Theme) ? "Dark" : Theme.Trim(),
+        InterfaceSize = InterfaceSize is "Compact" or "Comfortable" or "Large" or "Auto" ? InterfaceSize : "Auto",
+        UiScale = double.IsFinite(UiScale) ? Math.Clamp(UiScale, 0.9, 1.5) : 1.0,
+        SurfaceStyle = SurfaceStyle is "Translucent" or "Clear" ? SurfaceStyle : "Opaque",
         MusicPreviewText = MusicPreviewText is "Title" or "Lyric" ? MusicPreviewText : "Clock",
         HoverDelayMs = Math.Clamp(HoverDelayMs, 0, 2000),
         CollapseDelayMs = Math.Clamp(CollapseDelayMs, 0, 5000),

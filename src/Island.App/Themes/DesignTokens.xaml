@@ -1,0 +1,204 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- SPACING SCALE (4, 8, 12, 16, 24) -->
+    <sys:Double x:Key="Space.Xs">4</sys:Double>
+    <sys:Double x:Key="Space.Sm">8</sys:Double>
+    <sys:Double x:Key="Space.Md">12</sys:Double>
+    <sys:Double x:Key="Space.Lg">16</sys:Double>
+    <sys:Double x:Key="Space.Xl">24</sys:Double>
+
+    <Thickness x:Key="Padding.Card">16</Thickness>
+    <Thickness x:Key="Padding.Page">16</Thickness>
+    <Thickness x:Key="Margin.Card">0,0,0,12</Thickness>
+    <Thickness x:Key="Margin.Row">0,0,0,8</Thickness>
+
+    <!-- CORNER RADII (Card 18, Control 12, Pill 999, Chip 6) -->
+    <CornerRadius x:Key="Radius.Card">18</CornerRadius>
+    <CornerRadius x:Key="Radius.Control">12</CornerRadius>
+    <CornerRadius x:Key="Radius.Pill">999</CornerRadius>
+    <CornerRadius x:Key="Radius.Chip">6</CornerRadius>
+    <CornerRadius x:Key="Radius.Mini">4</CornerRadius>
+
+    <!-- FONT SIZES -->
+    <sys:Double x:Key="FontSize.Label">12.5</sys:Double>
+    <sys:Double x:Key="FontSize.Secondary">13</sys:Double>
+    <sys:Double x:Key="FontSize.Body">14</sys:Double>
+    <sys:Double x:Key="FontSize.SectionTitle">16</sys:Double>
+    <sys:Double x:Key="FontSize.Value">17</sys:Double>
+    <sys:Double x:Key="FontSize.HeaderTime">20</sys:Double>
+    <sys:Double x:Key="FontSize.Hero">32</sys:Double>
+    <sys:Double x:Key="FontSize.HeroLarge">56</sys:Double>
+
+    <!-- Font Size & Family Aliases -->
+    <sys:Double x:Key="Font.Label">12.5</sys:Double>
+    <sys:Double x:Key="Font.Secondary">13</sys:Double>
+    <sys:Double x:Key="Font.Body">14</sys:Double>
+    <sys:Double x:Key="Font.Title">16</sys:Double>
+    <sys:Double x:Key="Font.SectionTitle">16</sys:Double>
+    <sys:Double x:Key="Font.Value">17</sys:Double>
+    <sys:Double x:Key="Font.HeaderTime">20</sys:Double>
+    <sys:Double x:Key="Font.HeaderDate">13</sys:Double>
+    <sys:Double x:Key="Font.CollapsedClock">16</sys:Double>
+    <sys:Double x:Key="Font.Hero">32</sys:Double>
+    <sys:Double x:Key="Font.HeroLarge">56</sys:Double>
+    <FontFamily x:Key="Font.FamilyDisplay">Segoe UI Variable Display, Segoe UI</FontFamily>
+    <FontFamily x:Key="Font.FamilyText">Segoe UI Variable Text, Segoe UI</FontFamily>
+
+    <!-- TOUCH / CLICK TARGETS -->
+    <sys:Double x:Key="Target.MinSize">36</sys:Double>
+    <sys:Double x:Key="Target.IconSize">20</sys:Double>
+
+    <!-- FONT FAMILIES -->
+    <FontFamily x:Key="Font.Display">Segoe UI Variable Display, Segoe UI</FontFamily>
+    <FontFamily x:Key="Font.Text">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="Font.Icons">Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji</FontFamily>
+
+    <!-- CARD STYLE -->
+    <Style x:Key="IslandCard" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceRaised}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="{StaticResource Radius.Card}"/>
+        <Setter Property="Padding" Value="16"/>
+    </Style>
+
+    <!-- PILL BUTTON STYLE -->
+    <Style x:Key="IslandPillButton" TargetType="Button">
+        <Setter Property="MinHeight" Value="36"/>
+        <Setter Property="Padding" Value="14,6"/>
+        <Setter Property="FontFamily" Value="{StaticResource Font.Text}"/>
+        <Setter Property="FontSize" Value="{StaticResource FontSize.Secondary}"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimary}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="PillBorder" CornerRadius="{StaticResource Radius.Pill}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="PillBorder" Property="Background" Value="{DynamicResource Theme.BorderStrong}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="PillBorder" Property="Opacity" Value="0.8"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ICON BUTTON STYLE -->
+    <Style x:Key="IslandIconButton" TargetType="Button">
+        <Setter Property="Width" Value="{StaticResource Target.MinSize}"/>
+        <Setter Property="Height" Value="{StaticResource Target.MinSize}"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{DynamicResource Theme.TextSecondary}"/>
+        <Setter Property="FontFamily" Value="{StaticResource Font.Icons}"/>
+        <Setter Property="FontSize" Value="16"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="IconBox" CornerRadius="{StaticResource Radius.Control}"
+                            Background="{TemplateBinding Background}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="IconBox" Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimary}"/>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="IconBox" Property="Background" Value="{DynamicResource Theme.BorderStrong}"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.35"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- METRIC PROGRESS BAR -->
+    <Style x:Key="IslandProgressBar" TargetType="ProgressBar">
+        <Setter Property="Height" Value="6"/>
+        <Setter Property="Minimum" Value="0"/>
+        <Setter Property="Maximum" Value="100"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ProgressBar">
+                    <Border CornerRadius="3" Background="{DynamicResource Theme.Border}">
+                        <Grid x:Name="PART_Track">
+                            <Border x:Name="PART_Indicator" CornerRadius="3" HorizontalAlignment="Left"
+                                    Background="{DynamicResource Theme.Accent}"/>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- SMOOTH SLIDER -->
+    <Style x:Key="IslandFullSlider" TargetType="Slider">
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Grid Height="32" Background="Transparent">
+                        <Track x:Name="PART_Track" VerticalAlignment="Center">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Focusable="False">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Border Height="6" CornerRadius="3" Background="{DynamicResource Theme.Accent}"/>
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.DecreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Width="16" Height="16" Cursor="Hand">
+                                    <Thumb.Template>
+                                        <ControlTemplate TargetType="Thumb">
+                                            <Grid>
+                                                <Ellipse Fill="{DynamicResource Theme.Accent}" Width="16" Height="16"/>
+                                                <Ellipse Fill="#FFFFFF" Width="10" Height="10"/>
+                                            </Grid>
+                                        </ControlTemplate>
+                                    </Thumb.Template>
+                                </Thumb>
+                            </Track.Thumb>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Focusable="False">
+                                    <RepeatButton.Template>
+                                        <ControlTemplate TargetType="RepeatButton">
+                                            <Border Height="6" CornerRadius="3" Background="{DynamicResource Theme.BorderStrong}"/>
+                                        </ControlTemplate>
+                                    </RepeatButton.Template>
+                                </RepeatButton>
+                            </Track.IncreaseRepeatButton>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

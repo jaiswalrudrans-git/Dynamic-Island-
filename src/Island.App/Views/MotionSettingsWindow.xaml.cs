@@ -11,20 +11,37 @@ public partial class MotionSettingsWindow : Window
     {
         InitializeComponent();
         Title = AppIdentity.Name + " settings";
+
+        // Appearance
+        ThemeSelector.ItemsSource = new[] { "Midnight", "Dark", "Graphite", "Pure Black", "Light", "One Dark Pro", "GitHub Dark", "Dracula", "Night Owl", "Cyberpunk" };
+        ThemeSelector.SelectedItem = current.Theme;
+        SurfaceSelector.ItemsSource = new[] { "Opaque", "Translucent", "Clear" };
+        SurfaceSelector.SelectedItem = current.SurfaceStyle;
+        InterfaceSizeSelector.ItemsSource = new[] { "Auto", "Compact", "Comfortable", "Large" };
+        InterfaceSizeSelector.SelectedItem = current.InterfaceSize;
+        UiScaleSlider.Value = current.UiScale;
+
+        // Motion
         Reduced.IsChecked = current.ReduceMotion;
         Speed.Value = current.AnimationSpeed;
         Hover.Value = current.HoverDelayMs;
         Leave.Value = current.CollapseDelayMs;
+
+        // Music
         MusicPreview.IsChecked = current.ShowMusicPreview;
         Equalizer.IsChecked = current.MusicEqualizer;
         Lyrics.IsChecked = current.LyricsEnabled;
         CoverGlow.IsChecked = current.CoverGlow;
         PreviewText.ItemsSource = new[] { "Clock", "Title", "Lyric" };
         PreviewText.SelectedItem = current.MusicPreviewText;
+
+        // System
         CollapsedStat.ItemsSource = new[] { "None", "Cpu", "Ram", "Network", "Battery", "CpuRam" };
         CollapsedStat.SelectedItem = current.CollapsedStat;
         ProcessSort.ItemsSource = new[] { "Cpu", "Memory" };
         ProcessSort.SelectedItem = current.SystemProcessSort;
+
+        // Alerts
         AlertsEnabledCheck.IsChecked = current.AlertsEnabled;
         AlertVolumeCheck.IsChecked = current.AlertVolumeOsdEnabled;
         AlertBrightnessCheck.IsChecked = current.AlertBrightnessOsdEnabled;
@@ -33,6 +50,21 @@ public partial class MotionSettingsWindow : Window
         AlertTempCheck.IsChecked = current.AlertTemperatureEnabled;
         AlertSoundCheck.IsChecked = current.AlertSoundEnabled;
         AlertDurationSlider.Value = current.AlertDurationSeconds;
+
+        // Event hooks
+        ThemeSelector.SelectionChanged += (_, _) =>
+        {
+            if (ThemeSelector.SelectedItem is string theme) save(s => s with { Theme = theme });
+        };
+        SurfaceSelector.SelectionChanged += (_, _) =>
+        {
+            if (SurfaceSelector.SelectedItem is string style) save(s => s with { SurfaceStyle = style });
+        };
+        InterfaceSizeSelector.SelectionChanged += (_, _) =>
+        {
+            if (InterfaceSizeSelector.SelectedItem is string size) save(s => s with { InterfaceSize = size });
+        };
+
         MusicPreview.Click += (_, _) => save(s => s with { ShowMusicPreview = MusicPreview.IsChecked == true });
         Equalizer.Click += (_, _) => save(s => s with { MusicEqualizer = Equalizer.IsChecked == true });
         Lyrics.Click += (_, _) => save(s => s with { LyricsEnabled = Lyrics.IsChecked == true });
@@ -48,12 +80,14 @@ public partial class MotionSettingsWindow : Window
         AlertTempCheck.Click += (_, _) => save(s => s with { AlertTemperatureEnabled = AlertTempCheck.IsChecked == true });
         AlertSoundCheck.Click += (_, _) => save(s => s with { AlertSoundEnabled = AlertSoundCheck.IsChecked == true });
         Reduced.Click += (_, _) => save(s => s with { ReduceMotion = Reduced.IsChecked == true });
-        // Commit settled slider edits, including keyboard input, without writing on every drag pixel.
+
+        // Commit settled slider edits
         void Bind(Slider slider, Func<AppSettings, AppSettings> edit)
         {
             slider.ValueChanged += (_, _) => { if (!slider.IsMouseCaptureWithin) save(edit); };
             slider.LostMouseCapture += (_, _) => save(edit);
         }
+        Bind(UiScaleSlider, s => s with { UiScale = UiScaleSlider.Value });
         Bind(Speed, s => s with { AnimationSpeed = Speed.Value });
         Bind(Hover, s => s with { HoverDelayMs = (int)Hover.Value });
         Bind(Leave, s => s with { CollapseDelayMs = (int)Leave.Value });

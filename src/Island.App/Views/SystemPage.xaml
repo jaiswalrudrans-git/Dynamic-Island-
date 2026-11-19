@@ -1,52 +1,36 @@
 <UserControl x:Class="Island.App.Views.SystemPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Focusable="False" Foreground="#F2F5FA">
+             Focusable="False" Foreground="{DynamicResource Theme.TextPrimary}">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="Visible"/>
 
-        <Style x:Key="MetricBar" TargetType="ProgressBar">
-            <Setter Property="Height" Value="5"/>
-            <Setter Property="Minimum" Value="0"/>
-            <Setter Property="Maximum" Value="100"/>
-            <Setter Property="Focusable" Value="False"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ProgressBar">
-                        <Border CornerRadius="2.5" Background="#222B38">
-                            <Grid x:Name="PART_Track">
-                                <Border x:Name="PART_Indicator" CornerRadius="2.5" HorizontalAlignment="Left"
-                                        Background="{DynamicResource Theme.Accent}"/>
-                            </Grid>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style x:Key="Card" TargetType="Border">
-            <Setter Property="Background" Value="#141822"/>
-            <Setter Property="CornerRadius" Value="12"/>
-            <Setter Property="Padding" Value="10,8"/>
-        </Style>
-
-        <Style x:Key="SortTabButton" TargetType="Button">
+        <Style x:Key="MiniCoreBar" TargetType="Border">
+            <Setter Property="Width" Value="3"/>
             <Setter Property="Height" Value="18"/>
-            <Setter Property="Padding" Value="6,1"/>
-            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Margin" Value="1,0"/>
+            <Setter Property="CornerRadius" Value="1.5"/>
+            <Setter Property="Background" Value="{DynamicResource Theme.Border}"/>
+        </Style>
+
+        <Style x:Key="SegmentSortBtn" TargetType="Button">
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Padding" Value="8,2"/>
+            <Setter Property="FontSize" Value="{StaticResource FontSize.Label}"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Focusable" Value="False"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Foreground" Value="#A0AFC2"/>
+            <Setter Property="Foreground" Value="{DynamicResource Theme.TextSecondary}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Box" CornerRadius="5" Background="#1D2432" Padding="{TemplateBinding Padding}">
+                        <Border x:Name="Box" CornerRadius="6" Background="{DynamicResource Theme.SurfaceHover}" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Box" Property="Background" Value="#293345"/>
+                                <Setter TargetName="Box" Property="Background" Value="{DynamicResource Theme.BorderStrong}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimary}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -55,223 +39,319 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="16,10">
+    <!-- 3-COLUMN / 2-ROW RESPONSIVE LAYOUT -->
+    <Grid Margin="12,4">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="264"/>
-            <ColumnDefinition Width="14"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="12"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="12"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- LEFT COLUMN: CPU, RAM, GPU, Power & Battery -->
+        <!-- COLUMN 0: CPU & MEMORY -->
         <Grid Grid.Column="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="64"/>
-                <RowDefinition Height="6"/>
-                <RowDefinition Height="64"/>
-                <RowDefinition Height="6"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="12"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Card 1: CPU & RAM -->
-            <Border Grid.Row="0" Style="{StaticResource Card}" ToolTip="{Binding CpuTooltip}">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="42"/>
-                        <ColumnDefinition Width="10"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <!-- CPU Ring Gauge -->
-                    <Grid Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Ellipse Width="36" Height="36" Stroke="#222B38" StrokeThickness="3.5"/>
-                        <Path x:Name="CpuRingPath" Stroke="{DynamicResource Theme.Accent}" StrokeThickness="3.5"
-                              StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
-                        <TextBlock Text="{Binding CpuUsageFormatted}" FontSize="10" FontWeight="Bold"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   Foreground="#F1F4FA" Typography.NumeralAlignment="Tabular"/>
-                    </Grid>
-
-                    <!-- CPU Info + RAM Info -->
-                    <Grid Grid.Column="2">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="18"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-
-                        <!-- CPU Header & Mini Cores -->
-                        <DockPanel Grid.Row="0" LastChildFill="False">
-                            <TextBlock Text="CPU" FontSize="11" FontWeight="SemiBold" Foreground="#8E9DAE" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding CpuTempFormatted}" FontSize="10" Foreground="#8E9DAE" Margin="6,0,0,0" VerticalAlignment="Center"/>
-                            <ItemsControl DockPanel.Dock="Right" ItemsSource="{Binding CpuCores}" VerticalAlignment="Center">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid Width="3" Height="14" Margin="0.7,0" VerticalAlignment="Center" ToolTip="{Binding Tooltip}">
-                                            <Border CornerRadius="1" Background="#222B38"/>
-                                            <Border CornerRadius="1" Background="{DynamicResource Theme.Accent}"
-                                                    VerticalAlignment="Bottom" Height="{Binding Height}"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </DockPanel>
-
-                        <!-- RAM Bar & Numbers -->
-                        <StackPanel Grid.Row="1" VerticalAlignment="Center" ToolTip="{Binding RamTooltip}">
-                            <DockPanel Margin="0,0,0,3">
-                                <TextBlock Text="RAM" FontSize="11" FontWeight="SemiBold" Foreground="#8E9DAE"/>
-                                <TextBlock DockPanel.Dock="Right" Text="{Binding RamText}" FontSize="10" Foreground="#BBC8D8"
-                                           Typography.NumeralAlignment="Tabular"/>
-                            </DockPanel>
-                            <ProgressBar Style="{StaticResource MetricBar}" Value="{Binding RamPercent, Mode=OneWay}"/>
-                        </StackPanel>
-                    </Grid>
-                </Grid>
-            </Border>
-
-            <!-- Card 2: GPU -->
-            <Border Grid.Row="2" Style="{StaticResource Card}" ToolTip="{Binding GpuTooltip}">
+            <!-- Card 1: CPU -->
+            <Border Grid.Row="0" Style="{StaticResource IslandCard}" ToolTip="{Binding CpuTooltip}">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="18"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <DockPanel Grid.Row="0">
-                        <TextBlock Text="{Binding GpuName}" MaxWidth="140" TextTrimming="CharacterEllipsis"
-                                   FontSize="11" FontWeight="SemiBold" Foreground="#8E9DAE"/>
-                        <TextBlock Text="{Binding GpuUsageFormatted}" FontSize="11" FontWeight="SemiBold"
-                                   Foreground="#F1F4FA" Margin="6,0,0,0" Typography.NumeralAlignment="Tabular"/>
-                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                            <TextBlock Text="{Binding GpuTempFormatted}" FontSize="10" Foreground="#8E9DAE" Margin="0,0,6,0"/>
-                            <TextBlock Text="{Binding GpuPowerFormatted}" FontSize="10" Foreground="{DynamicResource Theme.Accent}"/>
-                        </StackPanel>
-                    </DockPanel>
-                    <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                        <DockPanel Margin="0,0,0,3">
-                            <TextBlock Text="VRAM" FontSize="10" Foreground="#8E9DAE"/>
-                            <TextBlock DockPanel.Dock="Right" Text="{Binding VramText}" FontSize="10" Foreground="#BBC8D8"
-                                       Typography.NumeralAlignment="Tabular"/>
-                        </DockPanel>
-                        <ProgressBar Style="{StaticResource MetricBar}" Value="{Binding VramPercent, Mode=OneWay}"/>
-                    </StackPanel>
+
+                    <!-- Header Row: Label Left, Temp Right -->
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="CPU" FontSize="{StaticResource FontSize.SectionTitle}" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="{Binding CpuTempFormatted}" FontSize="{StaticResource FontSize.Secondary}"
+                                   Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"
+                                   Visibility="{Binding HasCpuTemp, Converter={StaticResource Visible}}"/>
+                    </Grid>
+
+                    <!-- Body Row: Ring Gauge Left, Cores Right -->
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="54"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Usage Ring Gauge -->
+                        <Grid Width="50" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <Ellipse Width="46" Height="46" Stroke="{DynamicResource Theme.Border}" StrokeThickness="4"/>
+                            <Path x:Name="CpuRingPath" Stroke="{DynamicResource Theme.Accent}" StrokeThickness="4"
+                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                            <TextBlock Text="{Binding CpuUsageFormatted}" FontSize="13" FontWeight="Bold"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular"/>
+                        </Grid>
+
+                        <!-- Per-Core Bars -->
+                        <ItemsControl Grid.Column="2" ItemsSource="{Binding CpuCores}" VerticalAlignment="Center" HorizontalAlignment="Left">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel MaxWidth="160" Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Width="4" Height="20" Margin="1,1" VerticalAlignment="Bottom" ToolTip="{Binding Tooltip}">
+                                        <Border CornerRadius="1.5" Background="{DynamicResource Theme.Border}"/>
+                                        <Border CornerRadius="1.5" Background="{DynamicResource Theme.Accent}"
+                                                VerticalAlignment="Bottom" Height="{Binding Height}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
                 </Grid>
             </Border>
 
-            <!-- Card 3: Power & Battery -->
-            <Border Grid.Row="4" Style="{StaticResource Card}">
+            <!-- Card 2: Memory -->
+            <Border Grid.Row="2" Style="{StaticResource IslandCard}" ToolTip="{Binding RamTooltip}">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="106"/>
-                        <ColumnDefinition Width="10"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="6"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                    <!-- 60s Sparkline Curve -->
-                    <Grid Grid.Column="0" ToolTip="{Binding PowerTooltip}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="14"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <DockPanel Grid.Row="0">
-                            <TextBlock Text="POWER" FontSize="9" FontWeight="Bold" Foreground="#8E9DAE"/>
-                            <TextBlock DockPanel.Dock="Right" Text="{Binding PowerWattsFormatted}" FontSize="10"
-                                       Foreground="{DynamicResource Theme.Accent}" Typography.NumeralAlignment="Tabular"/>
-                        </DockPanel>
-                        <Canvas Grid.Row="1" Width="96" Height="26" HorizontalAlignment="Center" VerticalAlignment="Center" ClipToBounds="True">
-                            <Polyline Points="{Binding PowerPoints}" Stroke="{DynamicResource Theme.Accent}"
-                                      StrokeThickness="1.5" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
-                        </Canvas>
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Memory" FontSize="{StaticResource FontSize.SectionTitle}" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="{Binding RamPercentFormatted}" FontSize="{StaticResource FontSize.Value}"
+                                   FontWeight="SemiBold" Foreground="{DynamicResource Theme.Accent}"
+                                   VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
                     </Grid>
 
-                    <!-- Battery Status -->
-                    <StackPanel Grid.Column="2" VerticalAlignment="Center" ToolTip="{Binding BatteryTooltip}">
-                        <DockPanel Margin="0,0,0,2">
-                            <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="{Binding BatteryGlyph}"
-                                       FontSize="12" Foreground="{DynamicResource Theme.Accent}" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding BatteryPercentFormatted}" FontSize="11" FontWeight="SemiBold"
-                                       Foreground="#F1F4FA" Margin="5,0,0,0" Typography.NumeralAlignment="Tabular"/>
-                            <TextBlock DockPanel.Dock="Right" Text="{Binding PowerMeanFormatted}" FontSize="9"
-                                       Foreground="#8E9DAE" VerticalAlignment="Center"/>
-                        </DockPanel>
-                        <TextBlock Text="{Binding BatteryStatusText}" FontSize="10" Foreground="#8E9DAE"
-                                   TextTrimming="CharacterEllipsis"/>
-                    </StackPanel>
+                    <ProgressBar Grid.Row="2" Style="{StaticResource IslandProgressBar}" Value="{Binding RamPercent, Mode=OneWay}"/>
+
+                    <Grid Grid.Row="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="In Use" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding RamText}" FontSize="{StaticResource FontSize.Label}"
+                                   Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
+                    </Grid>
                 </Grid>
             </Border>
         </Grid>
 
-        <!-- RIGHT COLUMN: Network, Storage, Top Processes -->
+        <!-- COLUMN 1: GPU & POWER -->
         <Grid Grid.Column="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="64"/>
-                <RowDefinition Height="6"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="12"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Card 4: Network & Storage -->
-            <Border Grid.Row="0" Style="{StaticResource Card}">
+            <!-- Card 3: GPU -->
+            <Border Grid.Row="0" Style="{StaticResource IslandCard}" ToolTip="{Binding GpuTooltip}">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="10"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="6"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="6"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                    <!-- Network -->
-                    <StackPanel Grid.Column="0" ToolTip="{Binding NetworkTooltip}">
-                        <DockPanel Margin="0,0,0,2">
-                            <TextBlock Text="NET" FontSize="10" FontWeight="Bold" Foreground="#8E9DAE"/>
-                            <TextBlock DockPanel.Dock="Right" Text="{Binding DownSpeedFormatted}" FontSize="11"
-                                       FontWeight="SemiBold" Foreground="{DynamicResource Theme.Accent}" Typography.NumeralAlignment="Tabular"/>
-                        </DockPanel>
-                        <DockPanel Margin="0,0,0,2">
-                            <TextBlock Text="↑" FontSize="10" Foreground="#8E9DAE"/>
-                            <TextBlock Text="{Binding UpSpeedFormatted}" FontSize="10" Foreground="#BBC8D8" Margin="4,0,0,0"
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding GpuShortName}" MaxWidth="130" TextTrimming="CharacterEllipsis"
+                                   FontSize="{StaticResource FontSize.SectionTitle}" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding GpuUsageFormatted}" FontSize="{StaticResource FontSize.Value}"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource Theme.Accent}"
                                        Typography.NumeralAlignment="Tabular"/>
-                        </DockPanel>
-                        <TextBlock Text="{Binding TodayDownFormatted}" FontSize="9" Foreground="#7E8D9F" Typography.NumeralAlignment="Tabular"/>
-                    </StackPanel>
+                            <TextBlock Text="{Binding GpuTempFormatted, StringFormat=' · {0}'}" FontSize="{StaticResource FontSize.Secondary}"
+                                       Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"
+                                       Visibility="{Binding HasGpuTemp, Converter={StaticResource Visible}}"/>
+                        </StackPanel>
+                    </Grid>
 
-                    <!-- Storage (Internal Drives) -->
-                    <ItemsControl Grid.Column="2" ItemsSource="{Binding Drives}" VerticalAlignment="Center">
+                    <ProgressBar Grid.Row="2" Style="{StaticResource IslandProgressBar}" Value="{Binding VramPercent, Mode=OneWay}"
+                                 Visibility="{Binding HasVram, Converter={StaticResource Visible}}"/>
+
+                    <Grid Grid.Row="4" Visibility="{Binding HasVram, Converter={StaticResource Visible}}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="VRAM" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding VramText}" FontSize="{StaticResource FontSize.Label}"
+                                   Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <!-- Card 4: Power & Battery -->
+            <Border Grid.Row="2" Style="{StaticResource IslandCard}" ToolTip="{Binding PowerTooltip}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="6"/>
+                        <RowDefinition Height="28"/>
+                        <RowDefinition Height="6"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Row 0: Power label & Watts -->
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Power" FontSize="{StaticResource FontSize.SectionTitle}" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="{Binding PowerWattsFormatted}" FontSize="{StaticResource FontSize.Value}"
+                                   FontWeight="SemiBold" Foreground="{DynamicResource Theme.Accent}"
+                                   VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
+                    </Grid>
+
+                    <!-- Row 2: Sparkline Curve -->
+                    <Canvas Grid.Row="2" Height="26" HorizontalAlignment="Stretch" ClipToBounds="True">
+                        <Polyline Points="{Binding PowerPoints}" Stroke="{DynamicResource Theme.Accent}"
+                                  StrokeThickness="1.5" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                    </Canvas>
+
+                    <!-- Row 4: Battery & Mean -->
+                    <Grid Grid.Row="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock FontFamily="{StaticResource Font.Icons}" Text="{Binding BatteryGlyph}"
+                                   FontSize="14" Foreground="{DynamicResource Theme.Accent}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                        <TextBlock Grid.Column="1" Text="{Binding BatteryPercentFormatted}" FontSize="{StaticResource FontSize.Secondary}"
+                                   FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" Text="{Binding PowerMeanFormatted}" FontSize="{StaticResource FontSize.Label}"
+                                   Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"
+                                   Visibility="{Binding HasPowerMean, Converter={StaticResource Visible}}"/>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- COLUMN 2: NETWORK, STORAGE & TOP PROCESSES -->
+        <Grid Grid.Column="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="12"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Card 5: Network & Storage -->
+            <Border Grid.Row="0" Style="{StaticResource IslandCard}" ToolTip="{Binding NetworkTooltip}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="6"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Network Speeds -->
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="↓" FontSize="{StaticResource FontSize.Body}" Foreground="{DynamicResource Theme.Accent}" Margin="0,0,4,0"/>
+                            <TextBlock Text="{Binding DownSpeedFormatted}" FontSize="{StaticResource FontSize.Body}" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                            <TextBlock Text="↑" FontSize="{StaticResource FontSize.Body}" Foreground="{DynamicResource Theme.TextSecondary}" Margin="0,0,4,0"/>
+                            <TextBlock Text="{Binding UpSpeedFormatted}" FontSize="{StaticResource FontSize.Body}" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Daily Totals -->
+                    <TextBlock Grid.Row="2" Text="{Binding TodayTotalsFormatted}" FontSize="{StaticResource FontSize.Label}"
+                               Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
+
+                    <!-- Drives List -->
+                    <ItemsControl Grid.Row="4" ItemsSource="{Binding Drives}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Margin="0,1" ToolTip="{Binding Tooltip}">
-                                    <DockPanel Margin="0,0,0,1">
-                                        <TextBlock Text="{Binding Name}" FontSize="10" FontWeight="SemiBold" Foreground="#8E9DAE"/>
-                                        <TextBlock DockPanel.Dock="Right" Text="{Binding UsageText}" FontSize="9"
-                                                   Foreground="#BBC8D8" Typography.NumeralAlignment="Tabular"/>
-                                    </DockPanel>
-                                    <ProgressBar Style="{StaticResource MetricBar}" Value="{Binding Percent, Mode=OneWay}" Height="4"/>
-                                </StackPanel>
+                                <Grid Margin="0,2" ToolTip="{Binding Tooltip}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="4"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSize.Label}" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource Theme.TextSecondary}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding UsageText}" FontSize="{StaticResource FontSize.Label}"
+                                                   Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
+                                    </Grid>
+                                    <ProgressBar Grid.Row="2" Style="{StaticResource IslandProgressBar}" Height="4" Value="{Binding Percent, Mode=OneWay}"/>
+                                </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </Grid>
             </Border>
 
-            <!-- Card 5: Top Processes -->
-            <Border Grid.Row="2" Style="{StaticResource Card}">
+            <!-- Card 6: Top Processes -->
+            <Border Grid.Row="2" Style="{StaticResource IslandCard}">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="20"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="8"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Header with CPU / Memory Toggle -->
-                    <DockPanel Grid.Row="0" Margin="0,0,0,4">
-                        <TextBlock Text="TOP PROCESSES" FontSize="10" FontWeight="Bold" Foreground="#8E9DAE" VerticalAlignment="Center"/>
-                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <!-- Header Row: Title & CPU/RAM Toggle -->
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Top Apps" FontSize="{StaticResource FontSize.SectionTitle}" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
                             <Button Content="CPU" Click="SortCpuClick">
                                 <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource SortTabButton}">
+                                    <Style TargetType="Button" BasedOn="{StaticResource SegmentSortBtn}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding SortByCpu}" Value="True">
                                                 <Setter Property="Foreground" Value="{DynamicResource Theme.Accent}"/>
+                                                <Setter Property="FontWeight" Value="Bold"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
@@ -279,35 +359,35 @@
                             </Button>
                             <Button Content="RAM" Click="SortMemoryClick" Margin="4,0,0,0">
                                 <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource SortTabButton}">
+                                    <Style TargetType="Button" BasedOn="{StaticResource SegmentSortBtn}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding SortByMemory}" Value="True">
                                                 <Setter Property="Foreground" Value="{DynamicResource Theme.Accent}"/>
+                                                <Setter Property="FontWeight" Value="Bold"/>
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Button.Style>
                             </Button>
                         </StackPanel>
-                    </DockPanel>
+                    </Grid>
 
-                    <!-- Processes List -->
-                    <ItemsControl Grid.Row="1" ItemsSource="{Binding TopProcesses}">
+                    <!-- 5 Process Rows -->
+                    <ItemsControl Grid.Row="2" ItemsSource="{Binding TopProcesses}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Grid Height="18" Margin="0,1" ToolTip="{Binding Tooltip}">
+                                <Grid Height="22" Margin="0,1" ToolTip="{Binding Tooltip}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="10"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding Name}" MaxWidth="140" TextTrimming="CharacterEllipsis"
-                                                   FontSize="11" Foreground="#E2E8F0"/>
-                                        <TextBlock Text="{Binding Id, StringFormat=' ({0})'}" FontSize="9" Foreground="#6E7E92"
-                                                   VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                    <TextBlock Grid.Column="1" Text="{Binding MetricText}" FontSize="11" FontWeight="SemiBold"
-                                               Foreground="#BBC8D8" VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
+                                    <TextBlock Text="{Binding Name}" MaxWidth="140" TextTrimming="CharacterEllipsis"
+                                               FontSize="{StaticResource FontSize.Secondary}" Foreground="{DynamicResource Theme.TextPrimary}"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding MetricText}" FontSize="{StaticResource FontSize.Secondary}"
+                                               FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextSecondary}"
+                                               VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
                                 </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>

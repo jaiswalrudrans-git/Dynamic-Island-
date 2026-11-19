@@ -128,6 +128,9 @@ public sealed class CalendarWeatherViewModel : ObservableObject, IDisposable
     public string CurrentGlyph => weatherData?.Current.Glyph ?? "\uE706";
     public string CurrentWind => weatherData?.Current.FormattedWind ?? "--";
     public string CurrentHumidity => weatherData?.Current.FormattedHumidity ?? "--";
+    public string WeatherMetricsLine => weatherData != null
+        ? $"{weatherData.Current.FormattedFeelsLike} · 💧 {weatherData.Current.FormattedHumidity} · 💨 {weatherData.Current.FormattedWind}"
+        : "";
 
     public string HighLow
     {

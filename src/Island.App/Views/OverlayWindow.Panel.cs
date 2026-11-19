@@ -33,7 +33,14 @@ public partial class OverlayWindow
     private double lastShape = double.NaN;
     private readonly SpringValue previewWidth = new();
     private readonly SpringValue alertSpring = new();
+    private readonly SpringValue currentWidthSpring = new();
+    private readonly SpringValue currentHeightSpring = new();
+    private readonly DispatcherTimer contentDebounceTimer = new() { Interval = TimeSpan.FromMilliseconds(80) };
+    private double targetIslandWidth = 656;
+    private double targetIslandHeight = 356;
     private double lastPreview = double.NaN;
+    private double lastWidth = double.NaN;
+    private double lastHeight = double.NaN;
     private MusicViewModel music = null!;
     private SystemViewModel system = null!;
     private TaskStore taskStore = null!;
@@ -146,7 +153,29 @@ public partial class OverlayWindow
 
         navigation = new(TabButtons, Pages, PillX, (Style)FindResource("IconButton"), () => settings.Current, RequestFrame,
             musicPage, systemPage, tasksPage, quickControlsPage, focusPage, calendarWeatherPage);
-        navigation.SelectionChanged += UpdateDemands;
+        navigation.SelectionChanged += () =>
+        {
+            UpdateDemands();
+            UpdateIslandTargetSize();
+        };
+
+        contentDebounceTimer.Tick += (_, _) =>
+        {
+            contentDebounceTimer.Stop();
+            UpdateIslandTargetSize();
+        };
+        tasks.TasksCountChanged += () =>
+        {
+            contentDebounceTimer.Stop();
+            contentDebounceTimer.Start();
+        };
+
+        var initSize = navigation.GetDesiredSize(0);
+        targetIslandWidth = initSize.Width;
+        targetIslandHeight = initSize.Height;
+        currentWidthSpring.Set(targetIslandWidth);
+        currentHeightSpring.Set(targetIslandHeight);
+
         music.PreviewChanged += MusicChanged;
         music.PropertyChanged += (_, e) =>
         {
@@ -182,6 +211,14 @@ public partial class OverlayWindow
     {
         music.Display(motion.Expanded && navigation.MusicSelected, !motion.Expanded, Paused);
         system.Display(motion.Expanded && navigation.SystemSelected, !motion.Expanded, Paused);
+    }
+
+    private void UpdateIslandTargetSize()
+    {
+        var size = navigation.GetDesiredSize(navigation.SelectedIndex);
+        targetIslandWidth = size.Width;
+        targetIslandHeight = size.Height;
+        RequestFrame();
     }
 
     private void OnAlertChanged()
@@ -320,17 +357,23 @@ public partial class OverlayWindow
         lastFrame = now;
         bool moving = motion.Advance(dt, config.ReduceMotion);
         bool switching = navigation.Advance(dt, config.ReduceMotion);
+        bool sizingW = currentWidthSpring.Advance(targetIslandWidth, dt);
+        bool sizingH = currentHeightSpring.Advance(targetIslandHeight, dt);
         double target = (alerts.HasActiveAlert || music.Preview || system.HasCollapsedStat || (focus != null && focus.IsRunning)) ? 1 : 0;
         if (config.ReduceMotion)
         {
             previewWidth.Set(target);
             alertSpring.Set(alerts.HasActiveAlert ? 1 : 0);
+            currentWidthSpring.Set(targetIslandWidth);
+            currentHeightSpring.Set(targetIslandHeight);
+            sizingW = false;
+            sizingH = false;
         }
         bool widening = previewWidth.Advance(target, dt);
         bool alerting = alertSpring.Advance(alerts.HasActiveAlert ? 1 : 0, dt);
         AlertY.Y = config.ReduceMotion ? 0 : (1 - alertSpring.Value) * -12;
         DrawPanel();
-        if (!moving && !switching && !widening && !alerting) StopFrames();
+        if (!moving && !switching && !widening && !alerting && !sizingW && !sizingH) StopFrames();
     }
 
     private void DrawPanel()
@@ -339,17 +382,25 @@ public partial class OverlayWindow
         bool reduced = settings.Current.ReduceMotion;
         ReducedBase.Visibility = reduced && p > 0 && p < 1 ? Visibility.Visible : Visibility.Hidden;
         double shape = reduced && p > 0 ? 1 : p;
-        if (shape != lastShape || previewWidth.Value != lastPreview)
+        double curW = currentWidthSpring.Value;
+        double curH = currentHeightSpring.Value;
+        if (shape != lastShape || previewWidth.Value != lastPreview || curW != lastWidth || curH != lastHeight)
         {
-            notch.Update(shape, previewWidth.Value);
+            double centerX = ActualWidth > 0 ? ActualWidth / 2.0 : 520.0;
+            notch.Update(shape, previewWidth.Value, curW, curH, centerX);
             lastPreview = previewWidth.Value;
-            double bottom = 32 + 288 * shape;
+            lastWidth = curW;
+            lastHeight = curH;
+            double bottom = 35 + (curH - 35) * shape;
             double shadowTop = bottom - 5 * shape;
             BottomShadow.StartPoint = new Point(0, shadowTop);
             BottomShadow.EndPoint = new Point(0, bottom + .01);
             EdgeOffset.Y = shadowTop - BottomEdge.Height;
             lastShape = shape;
         }
+        Header.Width = Math.Max(480, curW - 32);
+        Body.Width = Math.Max(480, curW - 32);
+        Body.Height = Math.Max(180, curH - 74);
         Shell.Opacity = reduced && p > 0 ? Math.Clamp(p, .01, 1) : 1;
         double compactOpacity = reduced && p > 0 ? 0 : Math.Max(0, 1 - p * 2);
         bool showAlert = alerts.HasActiveAlert;

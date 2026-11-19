@@ -23,11 +23,11 @@ public partial class App : Application
             settings.Load();
             var catalog = new ThemeCatalog(directory, log.Write);
             var resources = new ThemeResources(Resources, catalog);
-            resources.Apply(settings.Current.Theme);
+            resources.Apply(settings.Current.Theme, settings.Current.SurfaceStyle);
             settings.PropertyChanged += (_, args) =>
             {
                 if (args.PropertyName == nameof(SettingsStore.Current))
-                    resources.Apply(settings.Current.Theme);
+                    resources.Apply(settings.Current.Theme, settings.Current.SurfaceStyle);
             };
 
             var overlay = new OverlayWindow(settings, log.Write) { Title = AppIdentity.Name };

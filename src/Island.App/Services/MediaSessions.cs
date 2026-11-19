@@ -1,3 +1,5 @@
+using System.IO;
+using System.Diagnostics;
 using System.Windows.Threading;
 using Windows.Media;
 using Windows.Media.Control;
@@ -127,13 +129,46 @@ internal sealed class MediaSessions(Dispatcher dispatcher, Action<string> log) :
     private string PlayerName(string id)
     {
         if (playerNames.TryGetValue(id, out var name)) return name;
-        try { name = Windows.ApplicationModel.AppInfo.GetFromAppUserModelId(id).DisplayInfo.DisplayName; }
-        catch (Exception) { name = null; } // Unpackaged players can expose only a path or an ID.
+
+        string lower = id.ToLowerInvariant();
+        if (lower.Contains("spotify")) name = "Spotify";
+        else if (lower.Contains("msedge") || lower.Contains("microsoft.edge")) name = "Microsoft Edge";
+        else if (lower.Contains("chrome")) name = "Google Chrome";
+        else if (lower.Contains("brave")) name = "Brave";
+        else if (lower.Contains("firefox")) name = "Firefox";
+        else if (lower.Contains("zunemusic") || lower.Contains("mediaplayer")) name = "Media Player";
+        else if (lower.Contains("applemusic")) name = "Apple Music";
+        else if (lower.Contains("vlc")) name = "VLC";
+        else if (lower.Contains("tidal")) name = "Tidal";
+        else if (lower.Contains("foobar2000")) name = "foobar2000";
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            try { name = Windows.ApplicationModel.AppInfo.GetFromAppUserModelId(id).DisplayInfo.DisplayName; }
+            catch (Exception) { name = null; } // Unpackaged players can expose only a path or an ID.
+        }
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            if (File.Exists(id))
+            {
+                try
+                {
+                    var vi = FileVersionInfo.GetVersionInfo(id);
+                    if (!string.IsNullOrWhiteSpace(vi.FileDescription)) name = vi.FileDescription;
+                    else if (!string.IsNullOrWhiteSpace(vi.ProductName)) name = vi.ProductName;
+                }
+                catch { }
+            }
+        }
+
         if (string.IsNullOrWhiteSpace(name))
         {
             name = id.Split('!')[0].Split('\\')[^1];
+            if (name.Contains('_')) name = name.Split('_')[0];
             if (name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)) name = name[..^4];
         }
+
         playerNames[id] = name;
         return name;
     }

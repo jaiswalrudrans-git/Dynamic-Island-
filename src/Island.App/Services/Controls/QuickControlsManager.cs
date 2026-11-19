@@ -35,6 +35,33 @@ public sealed class QuickControlsManager : IMMNotificationClient, IDisposable
     public int Brightness => currentBrightness;
     public bool? IsWifiOn => isWifiOn;
     public bool? IsBluetoothOn => isBtOn;
+    public string OutputDeviceName => renderDevice?.FriendlyName ?? "Speakers";
+
+    public string FocusAssistState
+    {
+        get
+        {
+            try
+            {
+                if (SHQueryUserNotificationState(out int qState) == 0)
+                {
+                    return qState switch
+                    {
+                        5 => "Off",
+                        6 => "Priority only",
+                        2 => "Alarms only",
+                        3 or 4 => "Presentation",
+                        _ => "Open"
+                    };
+                }
+            }
+            catch { }
+            return "Open";
+        }
+    }
+
+    [DllImport("shell32.dll")]
+    private static extern int SHQueryUserNotificationState(out int qState);
 
     public event Action? StateChanged;
 
@@ -325,6 +352,15 @@ public sealed class QuickControlsManager : IMMNotificationClient, IDisposable
         try
         {
             Process.Start(new ProcessStartInfo("ms-settings:quiethours") { UseShellExecute = true });
+        }
+        catch { }
+    }
+
+    public void OpenTaskManager()
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo("taskmgr") { UseShellExecute = true });
         }
         catch { }
     }

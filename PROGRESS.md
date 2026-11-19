@@ -1,5 +1,95 @@
 # Milestone progress
 
+## M-Layout complete · 2026-11-19
+
+### What works
+
+- **STEP 0: Complete UI Audit (`docs/UI_AUDIT.md`)**:
+  - Audited the entire shell, header, collapsed notch, and every tab (`Music`, `System`, `Tasks`, `Quick Controls`, `Focus`, `Calendar & Weather`).
+  - Cataloged double-boxing issues, spacing bugs, label-value collisions, truncated text, unspaced sensor values, missing icons, and empty slot deficiencies.
+  - Documented specific fixes applied across all views.
+
+- **1) Dynamic Auto-Sizing Island Engine**:
+  - **Content-Driven Island Geometry**: The island dynamically measures and fits the active tab's content. Never fixed at arbitrary dimensions (e.g. 566x222/640x320) and never has dead space.
+  - **Grid Snapping**: All island dimensions snap strictly to an 8 DIP grid (`Math.Ceiling(val / 8.0) * 8.0`).
+  - **Continuous Morph Transitions**: Width and height animate smoothly using analytical underdamped spring physics (`SpringValue`, damping 0.78, ~350 ms, slight overshoot) while pages cross-fade (~220 ms), delivering an organic morph feel during tab switches.
+  - **Debounced Content Resizing**: Content-driven changes (adding/removing tasks, list expansion, process changes) debounce over 80 ms to ensure smooth, jitter-free morphing.
+  - **Fixed OS Window Architecture**: Win32 HWND (`OverlayWindow`) remains fixed at the maximum boundary (1040x680 DIPs); only the inner notch geometry, clip path (`NotchClip`), and click-through region animate.
+  - **Safety Constraints**: Minimum width constraint enforced at 520 DIP; maximum constraints enforced at 62% of monitor working-area width and 70% of monitor working-area height. Large task lists scroll gracefully with auto-hidden scrollbars within maximum constraints.
+
+- **2) Scale, Readability & Appearance Settings**:
+  - **UI Scale System**: Added `InterfaceSize` ("Auto", "Compact", "Comfortable", "Large") and fine slider `UiScale` (0.9 to 1.5, normalized) in `AppSettings`.
+  - **Strict Font Size Minimums (100% scale)**:
+    - Body text: >= 14 DIP
+    - Secondary text: >= 13 DIP
+    - Labels: >= 12.5 DIP (never below 12 DIP)
+    - Values: 16–18 DIP
+    - Section titles: 15–16 DIP semibold
+    - Hero numbers (clock, CPU %, timer): 28–56 DIP
+    - Header time: 20 DIP semibold, date: 13 DIP
+    - Collapsed notch clock: 16 DIP semibold
+    - Click targets: >= 36x36 DIP with 8 DIP spacing
+  - **High Contrast**: Primary text exceeds 7:1 contrast ratio, secondary text exceeds 4.5:1 ratio against island surfaces.
+
+- **3) Unified Design System & Tokens**:
+  - **`Themes/DesignTokens.xaml`**: Created token dictionary containing spacing scale (`Space.Xs`, `Space.Sm`, `Space.Md`, `Space.Lg`, `Space.Xl`), corner radii (`Radius.Card` 18, `Radius.Control` 12, `Radius.Pill` 999), font sizes, weights, and reusable control styles (`IslandCard`, `IslandPillButton`, `IslandIconButton`, `IslandProgressBar`, `IslandFullSlider`).
+  - **Eliminated Double Boxing**: Removed the inner gray wrapper border (`Border x:Name="Body"` background is now transparent). Content cards sit directly on the island surface. Cards only group related items with 16 DIP inner padding and 12 DIP card gaps.
+  - **Slimmer Header (~52 DIP)**: Tab icon bar on the left with active tab animated pill (displaying icon + text label, unselected icon-only with tooltips), centered 20px clock and 13px date, right-aligned pin and settings buttons.
+  - **8 Shipped Themes**: `Midnight` (default near-black blue-tinted), `Dark`, `Graphite`, `Pure Black`, `Light`, `One Dark Pro`, `GitHub Dark`, `Dracula`, `Night Owl`, `Cyberpunk`.
+  - **3 Surface Styles**: `Opaque` (alpha 255), `Translucent` (alpha 205), `Clear` (alpha 115).
+  - **Settings UI**: Added Appearance controls to `MotionSettingsWindow` for runtime theme switching, surface style, interface size, and fine UI scale.
+
+- **4) Page Redesigns**:
+  - **System Page**: Sized 3-column / 2-row responsive grid.
+    - CPU card: usage ring with large % in center, per-core mini bars, hidden when sensor unavailable (never "N/A").
+    - Memory card: "Memory" left, "9.7 / 15.7 GB" right, progress bar below.
+    - GPU card: friendly clean name ("RTX 4050 Laptop", full name in tooltip), usage %, temperature, power, VRAM bar.
+    - Network card: download & upload rows ("↓ 4.5 KB/s", "↑ 10.0 KB/s") and "Today: ... down · ... up" beneath.
+    - Power card: watts, battery % with charging bolt, "Mean ... W" secondary text.
+    - Top Processes: 5 rows grouped by application (all instances of `LenovoVantage` merged into one row), friendly names, PIDs moved to tooltip, values right-aligned.
+  - **Tasks Page**:
+    - Input row with Enter-to-add, priority chip, filter segments ("All (N)", "Active (N)", "Done (N)").
+    - Task rows: custom checkbox, title, priority dot, reminder bell, hover-revealed move up/down and delete buttons.
+    - Compact 1-line empty state ("No tasks yet. Type above and press Enter to add!").
+    - Auto-sizing height that grows with item count.
+  - **Quick Controls Page**:
+    - Volume & Brightness: 2 full-width glass-ready sliders with icon, slider track, and percentage.
+    - Audio output device chip directly under volume slider.
+    - 4-column x 2-row grid of 8 tiles (Mic, Wi-Fi, Bluetooth, Focus Assist with real state subtitle, Snip with scissors icon `\uE8C6`, Lock, Sleep, Task Manager). Zero empty slots.
+  - **Focus Page**:
+    - Mode segments (`Pomodoro`, `Timer`, `Stopwatch`) on top row.
+    - Mode title & cycle subtitle ("Work · 1 of 4") on dedicated row below.
+    - 56px digital timer with tabular figures inside a circular progress arc ring.
+    - Preset chips (15m, 25m, 45m, 60m) under timer in Timer mode.
+    - Controls row with reset (38x38), play/pause (48x48 accent circle), and skip/lap (38x38).
+  - **Calendar & Weather Page**:
+    - Month calendar grid with today highlighted and dots under event dates.
+    - Compact agenda with 1-line "No events today. + Add" empty state.
+    - Weather card: current temperature, condition TEXT next to glyph, feels-like, humidity, wind speed, hourly scroll strip, 5-day forecast.
+  - **Music Page**:
+    - Friendly player name mapping (Spotify, Microsoft Edge, Google Chrome, Brave, Media Player, VLC) and dynamic player glyph (`\uE8D6` music / `\uE774` web / `\uE714` video).
+    - Rounded album art with `Radius.Card`.
+    - Body-large title (20px semibold) and artist (14px).
+    - Seek slider and transport buttons with >= 36x36 click targets and 8 DIP spacing.
+
+- **5) Collapsed State Check**:
+  - Collapsed clock text >= 16 px semibold with lining tabular figures.
+  - Collapsed pill height 35 DIP.
+  - Alert and preview pills styled with design tokens and high contrast.
+
+### Verification
+
+- **Layout & Design Tests**: Added `tests/Island.Tests/LayoutTests.cs` validating:
+  - All 10 shipped themes resolve and contain design tokens.
+  - All 3 surface style alpha levels (Opaque 255, Translucent 205, Clear 115).
+  - Normalization of UI scale (0.9 to 1.5) and interface size.
+  - All tab dimensions snap to an 8 DIP grid and satisfy min (>= 520 DIP) and max constraints across 1366x768, 1920x1080 (100% and 125%), and 2560x1440 (100% and 150%) screens.
+  - Design tokens dictionary defines required font sizes (>= 12.5 px labels, >= 14 px body, >= 20 px header time) and corner radii.
+- **Full Test Suite**: All 87 unit and integration tests passing (`dotnet test -c Release`).
+- **Hardware Run Verification**: Launched `Island.App.exe`, verified clean startup, low memory footprint, and proper shutdown.
+
+---
+
 ## M7 complete · 2026-11-19
 
 ### What works

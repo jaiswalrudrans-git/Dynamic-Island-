@@ -2,9 +2,36 @@ using System.Text.Json;
 
 namespace Island.Core.Themes;
 
-public sealed record ThemePalette(string Background, string Surface, string Foreground, string Accent)
+public sealed record ThemePalette(
+    string Background,
+    string Surface,
+    string Foreground,
+    string Accent,
+    string? SurfaceRaised = null,
+    string? SurfaceHover = null,
+    string? Border = null,
+    string? BorderStrong = null,
+    string? TextSecondary = null,
+    string? TextTertiary = null,
+    string? AccentSoft = null,
+    string? Success = null,
+    string? Warning = null,
+    string? Danger = null,
+    string? Shadow = null)
 {
     internal bool IsValid => IsColor(Background) && IsColor(Surface) && IsColor(Foreground) && IsColor(Accent);
+
+    public string EffectiveSurfaceRaised => SurfaceRaised ?? Surface;
+    public string EffectiveSurfaceHover => SurfaceHover ?? "#222D3D";
+    public string EffectiveBorder => Border ?? "#202836";
+    public string EffectiveBorderStrong => BorderStrong ?? "#2D3748";
+    public string EffectiveTextSecondary => TextSecondary ?? "#8E9DAE";
+    public string EffectiveTextTertiary => TextTertiary ?? "#5E6D7E";
+    public string EffectiveAccentSoft => AccentSoft ?? "#2A" + Accent.TrimStart('#');
+    public string EffectiveSuccess => Success ?? "#4CAF50";
+    public string EffectiveWarning => Warning ?? "#FFA726";
+    public string EffectiveDanger => Danger ?? "#FF5252";
+    public string EffectiveShadow => Shadow ?? "#80000000";
 
     private static bool IsColor(string? value) =>
         value is { Length: 7 } && value[0] == '#' && value[1..].All(Uri.IsHexDigit);

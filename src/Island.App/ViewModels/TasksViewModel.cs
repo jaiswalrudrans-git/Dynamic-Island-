@@ -14,6 +14,7 @@ public sealed record TaskItemUi(
     Brush PriorityBrush,
     string? DueText,
     bool IsOverdue,
+    bool HasReminder,
     int Order
 );
 
@@ -74,12 +75,7 @@ public sealed class TasksViewModel : ObservableObject, IDisposable
         {
             if (SetProperty(ref filter, value))
             {
-                OnPropertyChanged(nameof(FilteredTasks));
-                OnPropertyChanged(nameof(HasFilteredTasks));
-                OnPropertyChanged(nameof(IsEmpty));
-                OnPropertyChanged(nameof(IsAllFilter));
-                OnPropertyChanged(nameof(IsActiveFilter));
-                OnPropertyChanged(nameof(IsDoneFilter));
+                NotifyFilterChanges();
             }
         }
     }
@@ -88,9 +84,19 @@ public sealed class TasksViewModel : ObservableObject, IDisposable
     public bool IsActiveFilter => filter == "Active";
     public bool IsDoneFilter => filter == "Done";
 
+    public int AllCount => store.Items.Count;
+    public int ActiveCount => store.Items.Count(t => !t.IsCompleted);
+    public int DoneCount => store.Items.Count(t => t.IsCompleted);
+
+    public string AllFilterText => $"All ({AllCount})";
+    public string ActiveFilterText => $"Active ({ActiveCount})";
+    public string DoneFilterText => $"Done ({DoneCount})";
+
     public bool HasTasks => store.Items.Count > 0;
     public bool HasFilteredTasks => FilteredTasks.Count > 0;
     public bool IsEmpty => FilteredTasks.Count == 0;
+
+    public event Action? TasksCountChanged;
 
     public IReadOnlyList<TaskItemUi> FilteredTasks
     {
@@ -114,9 +120,9 @@ public sealed class TasksViewModel : ObservableObject, IDisposable
 
                 Brush prioBrush = t.Priority switch
                 {
-                    TaskPriority.High => new SolidColorBrush(Color.FromRgb(255, 99, 132)),
-                    TaskPriority.Low => new SolidColorBrush(Color.FromRgb(100, 181, 246)),
-                    _ => new SolidColorBrush(Color.FromRgb(255, 193, 7))
+                    TaskPriority.High => new SolidColorBrush(Color.FromRgb(255, 82, 82)),
+                    TaskPriority.Low => new SolidColorBrush(Color.FromRgb(66, 165, 245)),
+                    _ => new SolidColorBrush(Color.FromRgb(255, 167, 38))
                 };
 
                 string? dueText = null;
@@ -140,6 +146,7 @@ public sealed class TasksViewModel : ObservableObject, IDisposable
                     prioBrush,
                     dueText,
                     isOverdue,
+                    t.ReminderTime.HasValue,
                     t.Order
                 ));
             }
@@ -151,40 +158,73 @@ public sealed class TasksViewModel : ObservableObject, IDisposable
     {
         this.dispatcher = dispatcher;
         this.store = store;
-        store.ItemsChanged += OnItemsChanged;
-    }
-
-    private void OnItemsChanged()
-    {
-        if (disposed) return;
-        dispatcher.InvokeAsync(() =>
-        {
-            OnPropertyChanged(nameof(HasTasks));
-            OnPropertyChanged(nameof(FilteredTasks));
-            OnPropertyChanged(nameof(HasFilteredTasks));
-            OnPropertyChanged(nameof(IsEmpty));
-        });
+        store.ItemsChanged += OnTasksChanged;
     }
 
     public void AddTask()
     {
-        if (string.IsNullOrWhiteSpace(NewTaskTitle)) return;
-        store.Add(NewTaskTitle, NewTaskPriority);
+        if (string.IsNullOrWhiteSpace(newTaskTitle)) return;
+        store.Add(newTaskTitle.Trim(), newTaskPriority);
         NewTaskTitle = "";
+        TasksCountChanged?.Invoke();
     }
 
-    public void ToggleComplete(string id) => store.ToggleComplete(id);
+    public void ToggleComplete(string id)
+    {
+        store.ToggleComplete(id);
+        TasksCountChanged?.Invoke();
+    }
 
-    public void DeleteTask(string id) => store.Delete(id);
+    public void DeleteTask(string id)
+    {
+        store.Delete(id);
+        TasksCountChanged?.Invoke();
+    }
 
     public void MoveUp(string id) => store.Move(id, -1);
-
     public void MoveDown(string id) => store.Move(id, 1);
+
+    public void CyclePriority()
+    {
+        NewTaskPriority = newTaskPriority switch
+        {
+            TaskPriority.Low => TaskPriority.Medium,
+            TaskPriority.Medium => TaskPriority.High,
+            _ => TaskPriority.Low
+        };
+    }
+
+    private void OnTasksChanged()
+    {
+        if (disposed) return;
+        dispatcher.InvokeAsync(() =>
+        {
+            NotifyFilterChanges();
+            OnPropertyChanged(nameof(HasTasks));
+            OnPropertyChanged(nameof(AllCount));
+            OnPropertyChanged(nameof(ActiveCount));
+            OnPropertyChanged(nameof(DoneCount));
+            OnPropertyChanged(nameof(AllFilterText));
+            OnPropertyChanged(nameof(ActiveFilterText));
+            OnPropertyChanged(nameof(DoneFilterText));
+            TasksCountChanged?.Invoke();
+        });
+    }
+
+    private void NotifyFilterChanges()
+    {
+        OnPropertyChanged(nameof(FilteredTasks));
+        OnPropertyChanged(nameof(HasFilteredTasks));
+        OnPropertyChanged(nameof(IsEmpty));
+        OnPropertyChanged(nameof(IsAllFilter));
+        OnPropertyChanged(nameof(IsActiveFilter));
+        OnPropertyChanged(nameof(IsDoneFilter));
+    }
 
     public void Dispose()
     {
         if (disposed) return;
         disposed = true;
-        store.ItemsChanged -= OnItemsChanged;
+        store.ItemsChanged -= OnTasksChanged;
     }
 }

@@ -1,56 +1,89 @@
 <Window x:Class="Island.App.Views.MotionSettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Width="390" SizeToContent="Height" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
+        Width="420" SizeToContent="Height" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
         Background="{DynamicResource Theme.Background}" Foreground="{DynamicResource Theme.Foreground}">
-    <StackPanel Margin="24">
-        <TextBlock Text="Motion" FontSize="24" FontWeight="SemiBold"/>
-        <Border Margin="0,16,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
-            <StackPanel>
-                <CheckBox x:Name="Reduced" Content="Reduce motion" Foreground="{DynamicResource Theme.Foreground}"/>
-                <DockPanel Margin="0,18,0,4"><TextBlock Text="Animation speed"/><TextBlock Text="{Binding Value, ElementName=Speed, StringFormat={}{0:0.##}×}" HorizontalAlignment="Right"/></DockPanel>
-                <Slider x:Name="Speed" Minimum="0.5" Maximum="2" TickFrequency="0.25" IsSnapToTickEnabled="True"/>
-                <DockPanel Margin="0,14,0,4"><TextBlock Text="Hover delay"/><TextBlock Text="{Binding Value, ElementName=Hover, StringFormat={}{0:0} ms}" HorizontalAlignment="Right"/></DockPanel>
-                <Slider x:Name="Hover" Minimum="0" Maximum="2000" TickFrequency="10" IsSnapToTickEnabled="True"/>
-                <DockPanel Margin="0,14,0,4"><TextBlock Text="Collapse delay"/><TextBlock Text="{Binding Value, ElementName=Leave, StringFormat={}{0:0} ms}" HorizontalAlignment="Right"/></DockPanel>
-                <Slider x:Name="Leave" Minimum="0" Maximum="5000" TickFrequency="10" IsSnapToTickEnabled="True"/>
-            </StackPanel>
-        </Border>
-        <TextBlock Text="Music" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
-        <Border Margin="0,10,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
-            <StackPanel>
-                <StackPanel.Resources><Style TargetType="CheckBox"><Setter Property="Foreground" Value="{DynamicResource Theme.Foreground}"/><Setter Property="Margin" Value="0,2,0,4"/></Style></StackPanel.Resources>
-                <CheckBox x:Name="MusicPreview" Content="Show compact playback preview"/>
-                <DockPanel Margin="0,4,0,8"><TextBlock Text="Preview text" VerticalAlignment="Center"/>
-                    <ComboBox x:Name="PreviewText" HorizontalAlignment="Right" MinWidth="100"/></DockPanel>
-                <CheckBox x:Name="Equalizer" Content="Show output equalizer"/>
-                <CheckBox x:Name="Lyrics" Content="Look up synced lyrics on LRCLIB"/>
-                <CheckBox x:Name="CoverGlow" Content="Tint player with album artwork"/>
-            </StackPanel>
-        </Border>
-        <TextBlock Text="System &amp; Notch" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
-        <Border Margin="0,10,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
-            <StackPanel>
-                <DockPanel Margin="0,4,0,8"><TextBlock Text="Collapsed live stat" VerticalAlignment="Center"/>
-                    <ComboBox x:Name="CollapsedStat" HorizontalAlignment="Right" MinWidth="110"/></DockPanel>
-                <DockPanel Margin="0,4,0,0"><TextBlock Text="Top processes sort" VerticalAlignment="Center"/>
-                    <ComboBox x:Name="ProcessSort" HorizontalAlignment="Right" MinWidth="110"/></DockPanel>
-            </StackPanel>
-        </Border>
-        <TextBlock Text="Alerts &amp; OSD" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
-        <Border Margin="0,10,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
-            <StackPanel>
-                <StackPanel.Resources><Style TargetType="CheckBox"><Setter Property="Foreground" Value="{DynamicResource Theme.Foreground}"/><Setter Property="Margin" Value="0,2,0,4"/></Style></StackPanel.Resources>
-                <CheckBox x:Name="AlertsEnabledCheck" Content="Enable collapsed alerts &amp; OSD"/>
-                <CheckBox x:Name="AlertVolumeCheck" Content="Volume &amp; mute OSD"/>
-                <CheckBox x:Name="AlertBrightnessCheck" Content="Brightness OSD"/>
-                <CheckBox x:Name="AlertMicCheck" Content="Microphone mute OSD"/>
-                <CheckBox x:Name="AlertBatteryCheck" Content="Battery &amp; charger alerts"/>
-                <CheckBox x:Name="AlertTempCheck" Content="Temperature warnings"/>
-                <CheckBox x:Name="AlertSoundCheck" Content="Play alert sound"/>
-                <DockPanel Margin="0,10,0,4"><TextBlock Text="Alert duration"/><TextBlock Text="{Binding Value, ElementName=AlertDurationSlider, StringFormat={}{0:0} s}" HorizontalAlignment="Right"/></DockPanel>
-                <Slider x:Name="AlertDurationSlider" Minimum="1" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True"/>
-            </StackPanel>
-        </Border>
-    </StackPanel>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="720">
+        <StackPanel Margin="24">
+            <!-- Appearance Section -->
+            <TextBlock Text="Appearance" FontSize="24" FontWeight="SemiBold"/>
+            <Border Margin="0,14,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+                <StackPanel>
+                    <DockPanel Margin="0,2,0,8">
+                        <TextBlock Text="Theme" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="ThemeSelector" HorizontalAlignment="Right" MinWidth="130"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,4,0,8">
+                        <TextBlock Text="Surface style" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="SurfaceSelector" HorizontalAlignment="Right" MinWidth="130"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,4,0,8">
+                        <TextBlock Text="Interface size" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="InterfaceSizeSelector" HorizontalAlignment="Right" MinWidth="130"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,6,0,4">
+                        <TextBlock Text="Fine UI scale"/>
+                        <TextBlock Text="{Binding Value, ElementName=UiScaleSlider, StringFormat={}{0:P0}}" HorizontalAlignment="Right"/>
+                    </DockPanel>
+                    <Slider x:Name="UiScaleSlider" Minimum="0.9" Maximum="1.5" TickFrequency="0.05" IsSnapToTickEnabled="True"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Motion Section -->
+            <TextBlock Text="Motion" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
+            <Border Margin="0,14,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+                <StackPanel>
+                    <CheckBox x:Name="Reduced" Content="Reduce motion" Foreground="{DynamicResource Theme.Foreground}"/>
+                    <DockPanel Margin="0,18,0,4"><TextBlock Text="Animation speed"/><TextBlock Text="{Binding Value, ElementName=Speed, StringFormat={}{0:0.##}×}" HorizontalAlignment="Right"/></DockPanel>
+                    <Slider x:Name="Speed" Minimum="0.5" Maximum="2" TickFrequency="0.25" IsSnapToTickEnabled="True"/>
+                    <DockPanel Margin="0,14,0,4"><TextBlock Text="Hover delay"/><TextBlock Text="{Binding Value, ElementName=Hover, StringFormat={}{0:0} ms}" HorizontalAlignment="Right"/></DockPanel>
+                    <Slider x:Name="Hover" Minimum="0" Maximum="2000" TickFrequency="10" IsSnapToTickEnabled="True"/>
+                    <DockPanel Margin="0,14,0,4"><TextBlock Text="Collapse delay"/><TextBlock Text="{Binding Value, ElementName=Leave, StringFormat={}{0:0} ms}" HorizontalAlignment="Right"/></DockPanel>
+                    <Slider x:Name="Leave" Minimum="0" Maximum="5000" TickFrequency="10" IsSnapToTickEnabled="True"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Music Section -->
+            <TextBlock Text="Music" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
+            <Border Margin="0,10,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+                <StackPanel>
+                    <StackPanel.Resources><Style TargetType="CheckBox"><Setter Property="Foreground" Value="{DynamicResource Theme.Foreground}"/><Setter Property="Margin" Value="0,2,0,4"/></Style></StackPanel.Resources>
+                    <CheckBox x:Name="MusicPreview" Content="Show compact playback preview"/>
+                    <DockPanel Margin="0,4,0,8"><TextBlock Text="Preview text" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="PreviewText" HorizontalAlignment="Right" MinWidth="110"/></DockPanel>
+                    <CheckBox x:Name="Equalizer" Content="Show output equalizer"/>
+                    <CheckBox x:Name="Lyrics" Content="Look up synced lyrics on LRCLIB"/>
+                    <CheckBox x:Name="CoverGlow" Content="Tint player with album artwork"/>
+                </StackPanel>
+            </Border>
+
+            <!-- System & Notch Section -->
+            <TextBlock Text="System &amp; Notch" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
+            <Border Margin="0,10,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+                <StackPanel>
+                    <DockPanel Margin="0,4,0,8"><TextBlock Text="Collapsed live stat" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="CollapsedStat" HorizontalAlignment="Right" MinWidth="110"/></DockPanel>
+                    <DockPanel Margin="0,4,0,0"><TextBlock Text="Top processes sort" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="ProcessSort" HorizontalAlignment="Right" MinWidth="110"/></DockPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Alerts & OSD Section -->
+            <TextBlock Text="Alerts &amp; OSD" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
+            <Border Margin="0,10,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+                <StackPanel>
+                    <StackPanel.Resources><Style TargetType="CheckBox"><Setter Property="Foreground" Value="{DynamicResource Theme.Foreground}"/><Setter Property="Margin" Value="0,2,0,4"/></Style></StackPanel.Resources>
+                    <CheckBox x:Name="AlertsEnabledCheck" Content="Enable collapsed alerts &amp; OSD"/>
+                    <CheckBox x:Name="AlertVolumeCheck" Content="Volume &amp; mute OSD"/>
+                    <CheckBox x:Name="AlertBrightnessCheck" Content="Brightness OSD"/>
+                    <CheckBox x:Name="AlertMicCheck" Content="Microphone mute OSD"/>
+                    <CheckBox x:Name="AlertBatteryCheck" Content="Battery &amp; charger alerts"/>
+                    <CheckBox x:Name="AlertTempCheck" Content="Temperature warnings"/>
+                    <CheckBox x:Name="AlertSoundCheck" Content="Play alert sound"/>
+                    <DockPanel Margin="0,10,0,4"><TextBlock Text="Alert duration"/><TextBlock Text="{Binding Value, ElementName=AlertDurationSlider, StringFormat={}{0:0} s}" HorizontalAlignment="Right"/></DockPanel>
+                    <Slider x:Name="AlertDurationSlider" Minimum="1" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
 </Window>
