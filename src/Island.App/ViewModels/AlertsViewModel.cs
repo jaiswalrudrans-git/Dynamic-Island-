@@ -18,7 +18,11 @@ public sealed class AlertsViewModel : ObservableObject, IDisposable
     public bool HasActiveAlert => queue.ActiveAlert != null;
     public string AlertTitle => queue.ActiveAlert?.Title ?? "";
     public string AlertGlyph => queue.ActiveAlert?.Glyph ?? "";
-    public double AlertProgress => queue.ActiveAlert?.Progress.HasValue == true ? Math.Clamp(queue.ActiveAlert.Progress.Value, 0, 1) : 0;
+    public double AlertProgress
+    {
+        get => queue.ActiveAlert?.Progress.HasValue == true ? Math.Clamp(queue.ActiveAlert.Progress.Value, 0, 1) : 0;
+        set { }
+    }
     public bool HasProgress => queue.ActiveAlert?.Progress.HasValue == true;
     public bool IsWarning => queue.ActiveAlert?.Level == AlertLevel.Warning;
     public bool IsCritical => queue.ActiveAlert?.Level == AlertLevel.Critical;
