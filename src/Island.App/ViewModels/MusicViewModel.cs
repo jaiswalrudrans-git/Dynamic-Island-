@@ -49,6 +49,8 @@ internal sealed class MusicViewModel : ObservableObject, IDisposable
     public bool MissingCover => Cover == null;
     public Color Glow => settings.CoverGlow && Playing && sessions.Track?.Art is { } art
         ? Color.FromArgb(150, art.Dominant.R, art.Dominant.G, art.Dominant.B) : Colors.Transparent;
+    public Color? DominantColor => sessions.Track?.Art is { } a
+        ? Color.FromRgb(a.Dominant.R, a.Dominant.G, a.Dominant.B) : null;
     public bool Playing => sessions.State?.Playing == true;
     public bool Preview => !paused && settings.ShowMusicPreview && Playing;
     public bool PreviewClock => !Preview || settings.MusicPreviewText == "Clock";

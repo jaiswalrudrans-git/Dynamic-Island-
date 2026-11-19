@@ -11,6 +11,7 @@
     <PackageReference Include="NAudio.Wasapi" Version="2.2.1" />
     <FrameworkReference Include="Microsoft.WindowsDesktop.App.WindowsForms" />
     <EmbeddedResource Include="Assets/Island.ico" />
+    <Resource Include="Assets\Fonts\*.ttf" />
     <PackageReference Include="System.Management" Version="8.0.0" />
     <ProjectReference Include="../Island.Core/Island.Core.csproj" />
   </ItemGroup>

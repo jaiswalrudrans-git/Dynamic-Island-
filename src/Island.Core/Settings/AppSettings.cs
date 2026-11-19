@@ -15,6 +15,13 @@ public sealed record AppSettings
     public double CollapsedTransparency { get; init; } = 0.0;   // 0% to 50% (default 0%)
     public bool Use24HourClock { get; init; } = true;
     public bool ShowSeconds { get; init; }
+    public string ClockStyle { get; init; } = "Simple";
+    public string ClockColor { get; init; } = "White";
+    public string ClockCustomColor { get; init; } = "#00E5FF";
+    public bool ClockBlinkingColon { get; init; }
+    public bool ClockLeadingZero { get; init; } = true;
+    public double ClockSizeScale { get; init; } = 1.0;
+    public bool ShowNotchClock { get; init; } = true;
     public string? MonitorDeviceName { get; init; }
     public string? PreferredPlayer { get; init; }
     public bool ShowMusicPreview { get; init; } = true;
@@ -64,6 +71,10 @@ public sealed record AppSettings
         AlertBatteryLowThreshold = Math.Clamp(AlertBatteryLowThreshold, 1, 50),
         AlertBatteryCriticalThreshold = Math.Clamp(AlertBatteryCriticalThreshold, 1, 25),
         AlertTemperatureThreshold = Math.Clamp(AlertTemperatureThreshold, 50, 115),
-        AlertDurationSeconds = Math.Clamp(AlertDurationSeconds, 1, 15)
+        AlertDurationSeconds = Math.Clamp(AlertDurationSeconds, 1, 15),
+        ClockStyle = ClockStyle is "Simple" or "WithDate" or "Stacked" or "DotMatrix" or "Segment" or "Neon" or "Serif" or "Wide" or "Condensed" or "Pixel" or "Compact" or "Terminal" or "Gradient" or "Outline" ? ClockStyle : "Simple",
+        ClockColor = ClockColor is "White" or "Amber" or "Cyan" or "Pink" or "Green" or "Violet" or "Gradient" or "Cover" or "Custom" ? ClockColor : "White",
+        ClockCustomColor = string.IsNullOrWhiteSpace(ClockCustomColor) ? "#00E5FF" : ClockCustomColor.Trim(),
+        ClockSizeScale = double.IsFinite(ClockSizeScale) ? Math.Clamp(ClockSizeScale, 0.8, 1.5) : 1.0
     };
 }

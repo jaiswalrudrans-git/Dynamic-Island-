@@ -1,6 +1,42 @@
 # Milestone progress
 
-## M-Transparency-Clock-Polish (Phase 1 Complete) · 2026-11-19
+## M-Transparency-Clock-Polish (Phases 1 & 2 Complete) · 2026-11-19
+
+### Phase 2: Clock Studio
+
+#### What works
+- **Dedicated Clock Studio Engine (`src/Island.App/Views/ClockFace.cs`)**:
+  - High-performance vector rendering of 14 distinct clock styles:
+    1. **Simple**: Standard clean Segoe UI semibold tabular numbers.
+    2. **WithDate**: Two-row time with date/weekday below ("Thu 11/19").
+    3. **Stacked**: Two-line stacked digits (HH over MM) with mini seconds beside.
+    4. **DotMatrix**: Vector 5x7 matrix drawn with crisp circles (`DrawEllipse`).
+    5. **Segment**: Authentic 7-segment italic LED leaning -7° with active lit segment geometries.
+    6. **Neon**: Glowing neon digits with dynamic outer glow effect (`DropShadowEffect`).
+    7. **Serif**: Elegant italic serif typography (`Instrument Serif`).
+    8. **Wide**: Futuristic wide bold typeface (`Unbounded`).
+    9. **Condensed**: Tall athletic condensed bold font (`Bebas Neue`).
+    10. **Pixel**: Crisp pixel-art square blocks (`DrawRectangle`) on whole device pixels.
+    11. **Compact**: Soft rounded semi-bold font (`Fredoka`).
+    12. **Terminal**: Monospace developer terminal typography (`Cascadia Code` / `Consolas`).
+    13. **Gradient**: Multi-stop horizontal accent gradient fill.
+    14. **Outline**: Geometric stroked outline typography.
+- **Embedded OFL Open-License Fonts**:
+  - Bundled `Orbitron`, `Instrument Serif`, `Unbounded`, `Bebas Neue`, and `Fredoka` as pack resources.
+  - Added `ThirdPartyNotices.txt` documenting the SIL Open Font License 1.1 for all bundled fonts.
+- **Color Row & Custom Color Picker**:
+  - 9 color presets: White (`#F5F5F7`), Amber (`#FFB300`), Cyan (`#00E5FF`), Pink (`#FF2E97`), Green (`#00E676`), Violet (`#B388FF`), Accent Gradient, Album Art dominant cover color, and Custom hex picker.
+  - Active selection indicator ring around selected swatch.
+- **Options & Controls (Settings > Clock Studio)**:
+  - Live interactive preview tiles grid rendering the actual current time in each style, ticking in real-time.
+  - "Show clock in collapsed notch" toggle.
+  - "24-hour clock" toggle.
+  - "Show seconds" toggle.
+  - "Blinking colon" toggle.
+  - "Leading zero" toggle.
+  - "Clock size" slider (80% to 150%).
+- **Unified Visuals**:
+  - The chosen clock style, color, scale, and options apply dynamically and in real-time to the collapsed notch, the header clock, and reduced motion base.
 
 ### Phase 1: BrimDeck-Style Transparency & Contrast System
 

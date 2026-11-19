@@ -275,6 +275,11 @@ public partial class OverlayWindow
             (settings.Current.BackgroundTransparency > 0 || settings.Current.CollapsedTransparency > 0)
                 ? TextRenderingMode.Grayscale
                 : TextRenderingMode.ClearType);
+        CompactClock?.ApplySettings(settings.Current, music?.DominantColor);
+        HeaderClock?.ApplySettings(settings.Current, music?.DominantColor);
+        ReducedClock?.ApplySettings(settings.Current, music?.DominantColor);
+        if (HeaderDate != null)
+            HeaderDate.Visibility = settings.Current.ClockStyle == "WithDate" ? Visibility.Collapsed : Visibility.Visible;
         string action = Pinned ? "Unpin" : "Pin";
         PinButton.ToolTip = action;
         AutomationProperties.SetName(PinButton, action);
@@ -420,7 +425,7 @@ public partial class OverlayWindow
         bool showMusic = !showAlert && music.Preview;
         bool showStat = !showAlert && !showMusic && system.HasCollapsedStat;
         bool showFocus = !showAlert && !showMusic && !showStat && (focus != null && focus.IsRunning);
-        bool showClockOnly = !showAlert && !showMusic && !showStat && !showFocus;
+        bool showClockOnly = !showAlert && !showMusic && !showStat && !showFocus && settings.Current.ShowNotchClock;
 
         CompactAlert.Visibility = showAlert && compactOpacity > 0 ? Visibility.Visible : Visibility.Hidden;
         CompactAlert.Opacity = compactOpacity * Math.Clamp(previewWidth.Value, 0, 1) * Math.Clamp(alertSpring.Value, 0.01, 1);
@@ -434,7 +439,7 @@ public partial class OverlayWindow
         CompactFocus.Visibility = showFocus && compactOpacity > 0 ? Visibility.Visible : Visibility.Hidden;
         CompactFocus.Opacity = compactOpacity * Math.Clamp(previewWidth.Value, 0, 1);
 
-        CompactClock.Opacity = (showClockOnly || (showMusic && music.PreviewClock)) ? compactOpacity : 0;
+        CompactClock.Opacity = (showClockOnly || (showMusic && music.PreviewClock && settings.Current.ShowNotchClock)) ? compactOpacity : 0;
         Header.Opacity = motion.HeaderOpacity;
         Body.Opacity = motion.BodyOpacity;
         HeaderY.Y = reduced ? 0 : 6 * (1 - Header.Opacity);

@@ -147,7 +147,11 @@ public partial class OverlayWindow : Window
     {
         tick.Stop();
         if (Paused) return;
-        var delay = clock.Refresh(DateTime.Now, settings.Current);
+        var now = DateTime.Now;
+        var delay = clock.Refresh(now, settings.Current);
+        CompactClock.Time = now;
+        HeaderClock.Time = now;
+        ReducedClock.Time = now;
         tick.Interval = TimeSpan.FromMilliseconds(Math.Ceiling(delay.TotalMilliseconds));
         tick.Start();
     }

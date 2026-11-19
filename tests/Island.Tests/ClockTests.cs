@@ -29,4 +29,12 @@ public sealed class ClockTests
         var delay = clock.Refresh(DateTime.Today, new AppSettings { ShowSeconds = seconds });
         Assert.Equal(TimeSpan.FromMilliseconds(delayMs), delay);
     }
+
+    [Fact]
+    public void BlinkingColonTicksEverySecond()
+    {
+        var clock = new ClockViewModel();
+        var delay = clock.Refresh(DateTime.Today, new AppSettings { ShowSeconds = false, ClockBlinkingColon = true });
+        Assert.Equal(TimeSpan.FromMilliseconds(1000), delay);
+    }
 }

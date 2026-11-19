@@ -16,7 +16,7 @@ public sealed class ClockViewModel : ObservableObject
         var hour = settings.Use24HourClock ? "HH" : "hh";
         Time = now.ToString(hour + (settings.ShowSeconds ? ":mm:ss" : ":mm"), CultureInfo.InvariantCulture);
         Date = now.ToString("ddd, MMM d", CultureInfo.CurrentCulture);
-        long period = settings.ShowSeconds ? TimeSpan.TicksPerSecond : TimeSpan.TicksPerMinute;
+        long period = (settings.ShowSeconds || settings.ClockBlinkingColon) ? TimeSpan.TicksPerSecond : TimeSpan.TicksPerMinute;
         return TimeSpan.FromTicks(period - now.Ticks % period);
     }
 }

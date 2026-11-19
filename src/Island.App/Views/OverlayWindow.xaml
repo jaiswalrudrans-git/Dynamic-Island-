@@ -59,9 +59,7 @@
         <Grid x:Name="ReducedBase" Width="136" Height="35" HorizontalAlignment="Center" VerticalAlignment="Top"
               Visibility="Hidden" IsHitTestVisible="False">
             <Path Fill="{DynamicResource Theme.Surface}" Data="M0,0 H136 Q128,0 128,8 V18 Q128,35 110,35 H26 Q8,35 8,18 V8 Q8,0 0,0 Z"/>
-            <TextBlock Text="{Binding Time}" HorizontalAlignment="Center" VerticalAlignment="Center"
-                       Foreground="{DynamicResource Theme.TextPrimary}"
-                       FontFamily="Segoe UI" FontSize="16" FontWeight="SemiBold" Typography.NumeralAlignment="Tabular"/>
+            <local:ClockFace x:Name="ReducedClock" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
 
         <!-- Soft outer shadow matching notch silhouette -->
@@ -145,10 +143,8 @@
                     </StackPanel>
                 </Grid>
 
-                <!-- Default Collapsed Clock (>= 16px semibold) -->
-                <TextBlock x:Name="CompactClock" Text="{Binding Time}" HorizontalAlignment="Center" VerticalAlignment="Center"
-                           FontFamily="Segoe UI" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"
-                           Typography.NumeralAlignment="Tabular" Typography.NumeralStyle="Lining"/>
+                <!-- Default Collapsed Clock Face -->
+                <local:ClockFace x:Name="CompactClock" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Grid>
 
             <!-- Expanded Island Header (Slimmer ~52 DIP, tab icon bar, time 20px, date 13px, pin & settings) -->
@@ -171,10 +167,8 @@
 
                 <!-- Center: Clock & Date -->
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding Time}" HorizontalAlignment="Center" Foreground="{DynamicResource Theme.TextPrimary}"
-                               FontSize="20" FontWeight="SemiBold" FontFamily="{StaticResource Font.FamilyDisplay}"
-                               Typography.NumeralAlignment="Tabular"/>
-                    <TextBlock Text="{Binding Date}" HorizontalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"
+                    <local:ClockFace x:Name="HeaderClock" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="HeaderDate" Text="{Binding Date}" HorizontalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"
                                FontSize="13"/>
                 </StackPanel>
 
