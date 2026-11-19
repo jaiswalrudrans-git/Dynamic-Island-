@@ -19,6 +19,13 @@ public partial class TasksPage : UserControl
         DataContext = model;
     }
 
+    private void TaskInputPreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        setTypingFocus(true);
+        TaskInput.Focus();
+        Keyboard.Focus(TaskInput);
+    }
+
     private void TaskInputGotFocus(object sender, RoutedEventArgs e) => setTypingFocus(true);
     private void TaskInputLostFocus(object sender, RoutedEventArgs e) => setTypingFocus(false);
 
@@ -29,9 +36,20 @@ public partial class TasksPage : UserControl
             model.AddTask();
             e.Handled = true;
         }
+        else if (e.Key == Key.Escape)
+        {
+            setTypingFocus(false);
+            Keyboard.ClearFocus();
+            e.Handled = true;
+        }
     }
 
-    private void AddTaskClick(object sender, RoutedEventArgs e) => model.AddTask();
+    private void AddTaskClick(object sender, RoutedEventArgs e)
+    {
+        model.AddTask();
+        TaskInput.Focus();
+        Keyboard.Focus(TaskInput);
+    }
 
     private void CyclePriorityClick(object sender, RoutedEventArgs e)
     {
@@ -40,12 +58,6 @@ public partial class TasksPage : UserControl
             TaskPriority.Low => TaskPriority.Medium,
             TaskPriority.Medium => TaskPriority.High,
             _ => TaskPriority.Low
-        };
-        PriorityBtn.Content = model.NewTaskPriority switch
-        {
-            TaskPriority.High => "High",
-            TaskPriority.Low => "Low",
-            _ => "Med"
         };
     }
 

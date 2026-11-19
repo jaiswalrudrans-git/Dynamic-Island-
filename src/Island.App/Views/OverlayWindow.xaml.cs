@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
@@ -17,6 +18,7 @@ public partial class OverlayWindow : Window
     private readonly DispatcherTimer tick = new(DispatcherPriority.Background);
     private HwndSource? source;
     private bool placementPending;
+    private bool isTyping;
 
     public OverlayWindow(SettingsStore settings, Action<string> log)
     {
@@ -50,9 +52,16 @@ public partial class OverlayWindow : Window
 
     internal void SetTypingFocus(bool typing)
     {
+        isTyping = typing;
         if (source != null)
         {
             OverlayDesktop.Configure(source.Handle, rendered: true, typing: typing);
+            if (typing)
+            {
+                SetForegroundWindow(source.Handle);
+                SetActiveWindow(source.Handle);
+                Activate();
+            }
         }
     }
 
@@ -71,6 +80,11 @@ public partial class OverlayWindow : Window
                 handled = true;
                 break;
             case 0x0021: // WM_MOUSEACTIVATE
+                if (isTyping)
+                {
+                    handled = false;
+                    return 1; // MA_ACTIVATE
+                }
                 handled = true;
                 return 3; // MA_NOACTIVATE still delivers the mouse event.
             case 0x007E: // WM_DISPLAYCHANGE
@@ -148,4 +162,9 @@ public partial class OverlayWindow : Window
         source = null;
         base.OnClosed(e);
     }
+
+    [DllImport("user32.dll")]
+    private static extern bool SetForegroundWindow(nint hwnd);
+    [DllImport("user32.dll")]
+    private static extern nint SetActiveWindow(nint hwnd);
 }

@@ -22,7 +22,9 @@ internal static class OverlayDesktop
         var previous = SetWindowLongPtrW(hwnd, ExtendedStyle, (nint)style);
         if (previous == 0 && Marshal.GetLastPInvokeError() != 0)
             throw new Win32Exception(Marshal.GetLastPInvokeError());
-        if (!SetWindowPos(hwnd, 0, 0, 0, 0, 0, NoSize | NoMove | NoZOrder | KeepFocus | FrameChanged))
+        uint flags = NoSize | NoMove | NoZOrder | FrameChanged;
+        if (!typing) flags |= KeepFocus;
+        if (!SetWindowPos(hwnd, 0, 0, 0, 0, 0, flags))
             throw new Win32Exception(Marshal.GetLastPInvokeError());
     }
 

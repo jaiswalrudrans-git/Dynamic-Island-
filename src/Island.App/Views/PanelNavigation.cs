@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using Island.App.ViewModels;
@@ -89,6 +90,7 @@ internal sealed class PanelNavigation
     private void Select(int index)
     {
         if (index == selected) return;
+        Keyboard.ClearFocus();
         var config = settings();
         int direction = Math.Sign(index - selected);
         MarkSelected(selected, false);

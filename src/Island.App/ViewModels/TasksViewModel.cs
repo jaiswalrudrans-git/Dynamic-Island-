@@ -29,14 +29,43 @@ public sealed class TasksViewModel : ObservableObject, IDisposable
     public string NewTaskTitle
     {
         get => newTaskTitle;
-        set => SetProperty(ref newTaskTitle, value);
+        set
+        {
+            if (SetProperty(ref newTaskTitle, value))
+            {
+                OnPropertyChanged(nameof(HasInput));
+            }
+        }
     }
 
     public TaskPriority NewTaskPriority
     {
         get => newTaskPriority;
-        set => SetProperty(ref newTaskPriority, value);
+        set
+        {
+            if (SetProperty(ref newTaskPriority, value))
+            {
+                OnPropertyChanged(nameof(NewTaskPriorityBrush));
+                OnPropertyChanged(nameof(NewTaskPriorityText));
+            }
+        }
     }
+
+    public Brush NewTaskPriorityBrush => newTaskPriority switch
+    {
+        TaskPriority.High => new SolidColorBrush(Color.FromRgb(255, 82, 82)),
+        TaskPriority.Low => new SolidColorBrush(Color.FromRgb(66, 165, 245)),
+        _ => new SolidColorBrush(Color.FromRgb(255, 167, 38))
+    };
+
+    public string NewTaskPriorityText => newTaskPriority switch
+    {
+        TaskPriority.High => "High",
+        TaskPriority.Low => "Low",
+        _ => "Med"
+    };
+
+    public bool HasInput => !string.IsNullOrWhiteSpace(newTaskTitle);
 
     public string Filter
     {
@@ -46,11 +75,22 @@ public sealed class TasksViewModel : ObservableObject, IDisposable
             if (SetProperty(ref filter, value))
             {
                 OnPropertyChanged(nameof(FilteredTasks));
+                OnPropertyChanged(nameof(HasFilteredTasks));
+                OnPropertyChanged(nameof(IsEmpty));
+                OnPropertyChanged(nameof(IsAllFilter));
+                OnPropertyChanged(nameof(IsActiveFilter));
+                OnPropertyChanged(nameof(IsDoneFilter));
             }
         }
     }
 
+    public bool IsAllFilter => filter == "All";
+    public bool IsActiveFilter => filter == "Active";
+    public bool IsDoneFilter => filter == "Done";
+
     public bool HasTasks => store.Items.Count > 0;
+    public bool HasFilteredTasks => FilteredTasks.Count > 0;
+    public bool IsEmpty => FilteredTasks.Count == 0;
 
     public IReadOnlyList<TaskItemUi> FilteredTasks
     {
@@ -121,6 +161,8 @@ public sealed class TasksViewModel : ObservableObject, IDisposable
         {
             OnPropertyChanged(nameof(HasTasks));
             OnPropertyChanged(nameof(FilteredTasks));
+            OnPropertyChanged(nameof(HasFilteredTasks));
+            OnPropertyChanged(nameof(IsEmpty));
         });
     }
 

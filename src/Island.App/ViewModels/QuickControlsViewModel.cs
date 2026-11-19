@@ -33,10 +33,12 @@ public sealed class QuickControlsViewModel : ObservableObject, IDisposable
     public string MicGlyph => "\uE720";
 
     public bool? IsWifiOn => manager.IsWifiOn;
+    public bool IsWifiActive => manager.IsWifiOn == true;
     public string WifiStatusText => manager.IsWifiOn.HasValue ? (manager.IsWifiOn.Value ? "On" : "Off") : "Unavailable";
     public string WifiGlyph => "\uE701";
 
     public bool? IsBluetoothOn => manager.IsBluetoothOn;
+    public bool IsBluetoothActive => manager.IsBluetoothOn == true;
     public string BluetoothStatusText => manager.IsBluetoothOn.HasValue ? (manager.IsBluetoothOn.Value ? "On" : "Off") : "Unavailable";
     public string BluetoothGlyph => "\uE702";
 

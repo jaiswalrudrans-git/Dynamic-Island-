@@ -17,6 +17,7 @@ public sealed class FocusViewModel : ObservableObject, IDisposable
 
     public string DisplayTime => manager.DisplayTime;
     public double Progress => manager.Progress;
+    public bool ShowProgress => manager.Mode != FocusMode.Stopwatch;
     public bool IsRunning => manager.IsRunning;
     public string PlayPauseGlyph => manager.IsRunning ? "\uE769" : "\uE768";
     public string PlayPauseText => manager.IsRunning ? "Pause" : "Start";

@@ -266,6 +266,11 @@ public partial class OverlayWindow
     private void Expand(bool open)
     {
         intent.Stop();
+        if (!open)
+        {
+            Keyboard.ClearFocus();
+            SetTypingFocus(false);
+        }
         motion.Target(open);
         UpdateDemands();
         UpdatePreviewLabel();

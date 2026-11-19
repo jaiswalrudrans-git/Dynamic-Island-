@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:Island.App.Views"
         Width="760" Height="400" WindowStyle="None" ResizeMode="NoResize"
         WindowStartupLocation="Manual" Background="Transparent" AllowsTransparency="True"
-        Topmost="True" ShowActivated="False" Focusable="False" ShowInTaskbar="False">
+        Topmost="True" ShowActivated="False" ShowInTaskbar="False">
     <Window.Resources>
         <Style x:Key="IconButton" TargetType="Button">
             <Setter Property="Width" Value="31"/><Setter Property="Height" Value="30"/>
