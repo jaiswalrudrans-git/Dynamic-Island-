@@ -50,7 +50,7 @@ internal sealed class PanelNavigation
             {
                 Text = tab.Glyph,
                 FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets"),
-                FontSize = 14,
+                FontSize = 13,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
@@ -58,9 +58,10 @@ internal sealed class PanelNavigation
             var labelBlock = new TextBlock
             {
                 Text = tab.Name,
-                FontSize = 12.5,
+                FontFamily = new FontFamily("Segoe UI Variable Text, Segoe UI"),
+                FontSize = 12,
                 FontWeight = FontWeights.SemiBold,
-                Margin = new Thickness(6, 0, 0, 0),
+                Margin = new Thickness(5, 0, 0, 0),
                 VerticalAlignment = VerticalAlignment.Center,
                 Visibility = i == 0 ? Visibility.Visible : Visibility.Collapsed
             };
@@ -77,8 +78,8 @@ internal sealed class PanelNavigation
 
             var box = new Border
             {
-                CornerRadius = new CornerRadius(14),
-                Padding = new Thickness(10, 4, 10, 4),
+                CornerRadius = new CornerRadius(13),
+                Padding = new Thickness(8, 2, 8, 2),
                 Background = Brushes.Transparent,
                 Child = stack
             };
@@ -88,12 +89,12 @@ internal sealed class PanelNavigation
             {
                 Content = box,
                 Style = style,
-                ToolTip = tab.Name,
-                Height = 32,
+                ToolTip = string.IsNullOrEmpty(tab.Description) ? tab.Name : tab.Description,
+                Height = 30,
                 Width = double.NaN, // Auto-size to content
-                MinWidth = 36,
+                MinWidth = 30,
                 Padding = new Thickness(0),
-                Margin = new Thickness(2, 0, 2, 0)
+                Margin = new Thickness(1, 0, 1, 0)
             };
             AutomationProperties.SetName(button, tab.Name);
             button.Click += (_, _) => Select(index);
@@ -201,35 +202,35 @@ internal sealed class PanelNavigation
 
         double contentW = tabIndex switch
         {
-            0 => Math.Max(natural.Width, 656), // Music
+            0 => Math.Max(natural.Width, 664), // Music
             1 => Math.Max(natural.Width, 736), // System
-            2 => Math.Max(natural.Width, 584), // Tasks
-            3 => Math.Max(natural.Width, 640), // Quick Controls
-            4 => Math.Max(natural.Width, 536), // Focus
+            2 => Math.Max(natural.Width, 664), // Tasks
+            3 => Math.Max(natural.Width, 664), // Quick Controls
+            4 => Math.Max(natural.Width, 664), // Focus
             5 => Math.Max(natural.Width, 720), // Calendar & Weather
-            _ => Math.Max(natural.Width, 584)
+            _ => Math.Max(natural.Width, 664)
         };
 
         double contentH = tabIndex switch
         {
             0 => Math.Max(natural.Height, 288), // Music
-            1 => Math.Max(natural.Height, 368), // System
-            2 => Math.Clamp(natural.Height, 184, 464), // Tasks
+            1 => Math.Max(natural.Height, 376), // System
+            2 => Math.Clamp(natural.Height, 200, 480), // Tasks
             3 => Math.Max(natural.Height, 288), // Quick Controls
             4 => Math.Max(natural.Height, 304), // Focus
             5 => Math.Max(natural.Height, 368), // Calendar & Weather
             _ => Math.Max(natural.Height, 288)
         };
 
-        // Header height (52 DIP) + bottom margin (16 DIP)
+        // Header height (52 DIP) + margins (24 DIP)
         double islandW = contentW;
-        double islandH = contentH + 68;
+        double islandH = contentH + 76;
 
-        // Constraints: minimum width 520 DIP; max 62% width, max 70% height
+        // Constraints: minimum width 664 DIP for header breathing room; max 62% width, max 70% height
         double screenW = SystemParameters.WorkArea.Width > 0 ? SystemParameters.WorkArea.Width : 1920;
         double screenH = SystemParameters.WorkArea.Height > 0 ? SystemParameters.WorkArea.Height : 1080;
 
-        double minW = 520;
+        double minW = 664;
         double maxW = Math.Max(minW, screenW * 0.62);
         double maxH = Math.Max(300, screenH * 0.70);
 

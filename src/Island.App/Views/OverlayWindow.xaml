@@ -9,11 +9,11 @@
         <BooleanToVisibilityConverter x:Key="Visible"/>
 
         <Style x:Key="IconButton" TargetType="Button">
-            <Setter Property="Width" Value="36"/><Setter Property="Height" Value="36"/>
+            <Setter Property="Width" Value="32"/><Setter Property="Height" Value="32"/>
             <Setter Property="Focusable" Value="False"/>
             <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimary}"/>
             <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets"/>
-            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontSize" Value="14"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -73,6 +73,9 @@
                     <GradientStop Color="#00000000" Offset="1"/>
                 </LinearGradientBrush>
             </Grid.Background>
+
+            <!-- Dynamic Island Background Surface (Themed surface across the whole notch geometry) -->
+            <Border x:Name="IslandBackground" Background="{DynamicResource Theme.Surface}" IsHitTestVisible="False"/>
 
             <!-- Bottom highlight line -->
             <Border x:Name="BottomEdge" VerticalAlignment="Top" Height="1" Background="{DynamicResource Theme.Border}" IsHitTestVisible="False">

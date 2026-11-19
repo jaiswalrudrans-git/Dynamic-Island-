@@ -7,11 +7,10 @@ if not exist "src\Island.App\bin\Release\net8.0-windows10.0.19041.0\Island.App.e
     echo Building Island in Release mode...
     dotnet build -c Release
 )
-start "" "src\Island.App\bin\Release\net8.0-windows10.0.19041.0\Island.App.exe"
+start "" "src\Island.App\bin\Release\net8.0-windows10.0.19041.0\Island.App.exe" --open
 echo ========================================================
 echo Island is now running!
 echo Look at the very TOP-CENTER edge of your main display.
-echo You will see the collapsed pill showing the time.
-echo Hover your mouse over it to expand the island.
-echo Right-click the island or check the system tray to Pin or open Settings.
+echo The Island is opening right now at the top of your screen.
+echo Move your mouse over it, switch tabs, or check the system tray icon.
 echo ========================================================

@@ -90,13 +90,13 @@ public sealed class LayoutTests : TestFolder
         double maxHeight = effectiveH * 0.70;
 
         // Base content widths for tabs: Music, System, Tasks, QuickControls, Focus, CalendarWeather
-        double[] tabContentWidths = [656, 736, 584, 640, 536, 720];
-        double[] tabContentHeights = [288, 368, 220, 288, 304, 368];
+        double[] tabContentWidths = [664, 736, 664, 664, 664, 720];
+        double[] tabContentHeights = [288, 376, 220, 288, 304, 368];
 
         for (int i = 0; i < tabContentWidths.Length; i++)
         {
             double islandW = tabContentWidths[i];
-            double islandH = tabContentHeights[i] + 68; // Header + shadow
+            double islandH = tabContentHeights[i] + 76; // Header + margins
 
             islandW = Math.Clamp(islandW, minWidth, maxWidth);
             islandH = Math.Clamp(islandH, 200, maxHeight);

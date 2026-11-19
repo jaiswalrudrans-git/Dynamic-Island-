@@ -398,9 +398,9 @@ public partial class OverlayWindow
             EdgeOffset.Y = shadowTop - BottomEdge.Height;
             lastShape = shape;
         }
-        Header.Width = Math.Max(480, curW - 32);
-        Body.Width = Math.Max(480, curW - 32);
-        Body.Height = Math.Max(180, curH - 74);
+        Header.Width = Math.Max(480, curW - 40);
+        Body.Width = Math.Max(480, curW - 40);
+        Body.Height = Math.Max(180, curH - 76);
         Shell.Opacity = reduced && p > 0 ? Math.Clamp(p, .01, 1) : 1;
         double compactOpacity = reduced && p > 0 ? 0 : Math.Max(0, 1 - p * 2);
         bool showAlert = alerts.HasActiveAlert;
