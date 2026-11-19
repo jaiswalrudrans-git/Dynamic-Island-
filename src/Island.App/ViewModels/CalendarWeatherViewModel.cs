@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Windows.Media;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Island.App.Services;
 using Island.Core.Calendar;
 using Island.Core.Weather;
 
@@ -24,7 +25,8 @@ public sealed record CalendarEventUi(
     string Title,
     string TimeText,
     string? Location,
-    string Source
+    string Source,
+    bool IsLaptopCalendar
 );
 
 public sealed class CalendarWeatherViewModel : ObservableObject, IDisposable
@@ -32,12 +34,16 @@ public sealed class CalendarWeatherViewModel : ObservableObject, IDisposable
     private readonly Dispatcher dispatcher;
     private readonly CalendarStore calendarStore;
     private readonly WeatherClient weatherClient;
+    private readonly WindowsCalendarService windowsCalendarService;
     private readonly Func<DateTime> clock;
 
     private DateTime displayMonth;
     private DateTime selectedDate;
     private string newEventTitle = "";
     private bool isAddingEvent;
+    private bool syncWithLaptopChecked;
+    private List<CalendarEvent> laptopEvents = [];
+    private bool isSyncingLaptop;
 
     private WeatherData? weatherData;
     private string city = "New York";
@@ -45,6 +51,9 @@ public sealed class CalendarWeatherViewModel : ObservableObject, IDisposable
     private double longitude = -74.0060;
     private string units = "Celsius";
     private bool isLoadingWeather;
+    private bool isAutoDetectingLocation;
+    private bool isSearchingCity;
+    private string citySearchQuery = "";
     private readonly DispatcherTimer weatherTimer;
     private bool disposed;
 
@@ -74,15 +83,43 @@ public sealed class CalendarWeatherViewModel : ObservableObject, IDisposable
         set => SetProperty(ref isAddingEvent, value);
     }
 
+    public bool SyncWithLaptopChecked
+    {
+        get => syncWithLaptopChecked;
+        set => SetProperty(ref syncWithLaptopChecked, value);
+    }
+
+    public bool IsSyncingLaptop
+    {
+        get => isSyncingLaptop;
+        set => SetProperty(ref isSyncingLaptop, value);
+    }
+
     public IReadOnlyList<CalendarDayUi> MonthDays => GenerateMonthDays();
 
     public IReadOnlyList<CalendarEventUi> SelectedDayEvents => GetEventsForSelectedDay();
 
     public bool HasEventsForSelectedDay => SelectedDayEvents.Count > 0;
+    public bool IsEmptyDay => SelectedDayEvents.Count == 0;
 
     // --- Weather Properties ---
     public bool HasWeather => weatherData != null;
     public bool IsLoadingWeather => isLoadingWeather;
+    public bool IsAutoDetectingLocation => isAutoDetectingLocation;
+
+    public bool IsSearchingCity
+    {
+        get => isSearchingCity;
+        set => SetProperty(ref isSearchingCity, value);
+    }
+
+    public string CitySearchQuery
+    {
+        get => citySearchQuery;
+        set => SetProperty(ref citySearchQuery, value);
+    }
+
+    public string UnitsLabel => units == "Celsius" ? "°C" : "°F";
 
     public string WeatherCity => weatherData?.City ?? city;
     public string CurrentTemp => weatherData?.Current.FormattedTemperature ?? "--";
@@ -112,11 +149,13 @@ public sealed class CalendarWeatherViewModel : ObservableObject, IDisposable
         Dispatcher dispatcher,
         CalendarStore calendarStore,
         WeatherClient weatherClient,
+        WindowsCalendarService? windowsCalendarService = null,
         Func<DateTime>? clock = null)
     {
         this.dispatcher = dispatcher;
         this.calendarStore = calendarStore;
         this.weatherClient = weatherClient;
+        this.windowsCalendarService = windowsCalendarService ?? new WindowsCalendarService();
         this.clock = clock ?? (() => DateTime.Now);
 
         var now = this.clock();
@@ -139,7 +178,18 @@ public sealed class CalendarWeatherViewModel : ObservableObject, IDisposable
         weatherTimer.Tick += (_, _) => _ = RefreshWeatherAsync();
         weatherTimer.Start();
 
-        _ = RefreshWeatherAsync();
+        // If no cache or default "New York", try auto-detect location
+        if (cached == null || cached.City == "New York")
+        {
+            _ = AutoDetectLocationAsync();
+        }
+        else
+        {
+            _ = RefreshWeatherAsync();
+        }
+
+        // Sync initial laptop calendar events
+        _ = SyncLaptopCalendarAsync();
     }
 
     // --- Calendar Methods ---
@@ -147,12 +197,14 @@ public sealed class CalendarWeatherViewModel : ObservableObject, IDisposable
     {
         displayMonth = displayMonth.AddMonths(-1);
         RefreshCalendar();
+        _ = SyncLaptopCalendarAsync();
     }
 
     public void NextMonth()
     {
         displayMonth = displayMonth.AddMonths(1);
         RefreshCalendar();
+        _ = SyncLaptopCalendarAsync();
     }
 
     public void GoToToday()
@@ -169,14 +221,24 @@ public sealed class CalendarWeatherViewModel : ObservableObject, IDisposable
         if (date.Month != displayMonth.Month || date.Year != displayMonth.Year)
         {
             displayMonth = new DateTime(date.Year, date.Month, 1);
+            _ = SyncLaptopCalendarAsync();
         }
         RefreshCalendar();
     }
 
-    public void AddEvent()
+    public void AddEvent(bool syncToLaptop = false)
     {
         if (string.IsNullOrWhiteSpace(NewEventTitle)) return;
-        calendarStore.Add(NewEventTitle, selectedDate.Date.AddHours(12), selectedDate.Date.AddHours(13));
+        var start = selectedDate.Date.AddHours(12);
+        var end = selectedDate.Date.AddHours(13);
+
+        var ev = calendarStore.Add(NewEventTitle.Trim(), start, end);
+
+        if (ev != null && (syncToLaptop || SyncWithLaptopChecked))
+        {
+            windowsCalendarService.AddEventToLaptopCalendar(ev);
+        }
+
         NewEventTitle = "";
         IsAddingEvent = false;
         RefreshCalendar();
@@ -184,8 +246,41 @@ public sealed class CalendarWeatherViewModel : ObservableObject, IDisposable
 
     public void DeleteEvent(string id)
     {
+        if (id.StartsWith("win_"))
+        {
+            // For laptop calendar events, open native calendar app so user can manage it
+            windowsCalendarService.OpenLaptopCalendar();
+            return;
+        }
+
         calendarStore.Delete(id);
         RefreshCalendar();
+    }
+
+    public async Task SyncLaptopCalendarAsync()
+    {
+        if (isSyncingLaptop) return;
+        isSyncingLaptop = true;
+        OnPropertyChanged(nameof(IsSyncingLaptop));
+
+        try
+        {
+            var rangeStart = new DateTime(displayMonth.Year, displayMonth.Month, 1).AddDays(-7);
+            var appts = await windowsCalendarService.GetAppointmentsAsync(rangeStart, TimeSpan.FromDays(45));
+            laptopEvents = appts.ToList();
+            await dispatcher.InvokeAsync(RefreshCalendar);
+        }
+        catch { }
+        finally
+        {
+            isSyncingLaptop = false;
+            await dispatcher.InvokeAsync(() => OnPropertyChanged(nameof(IsSyncingLaptop)));
+        }
+    }
+
+    public void OpenLaptopCalendarApp()
+    {
+        windowsCalendarService.OpenLaptopCalendar();
     }
 
     private void RefreshCalendar()
@@ -195,6 +290,7 @@ public sealed class CalendarWeatherViewModel : ObservableObject, IDisposable
         OnPropertyChanged(nameof(MonthDays));
         OnPropertyChanged(nameof(SelectedDayEvents));
         OnPropertyChanged(nameof(HasEventsForSelectedDay));
+        OnPropertyChanged(nameof(IsEmptyDay));
     }
 
     private void OnEventsChanged()
@@ -207,14 +303,17 @@ public sealed class CalendarWeatherViewModel : ObservableObject, IDisposable
     {
         var list = new List<CalendarDayUi>();
         var firstDayOfMonth = displayMonth;
-        int daysInMonth = DateTime.DaysInMonth(displayMonth.Year, displayMonth.Month);
         var today = clock().Date;
 
         // Monday-based week start (ISO 8601)
         int startOffset = ((int)firstDayOfMonth.DayOfWeek + 6) % 7;
         var startGridDate = firstDayOfMonth.AddDays(-startOffset);
 
-        var daysWithEvents = calendarStore.GetDaysWithEventsInMonth(displayMonth.Year, displayMonth.Month);
+        var daysWithStoreEvents = calendarStore.GetDaysWithEventsInMonth(displayMonth.Year, displayMonth.Month);
+        var daysWithLaptopEvents = laptopEvents
+            .Where(e => e.Start.Year == displayMonth.Year && e.Start.Month == displayMonth.Month)
+            .Select(e => e.Start.Day)
+            .ToHashSet();
 
         for (int i = 0; i < 42; i++)
         {
@@ -222,14 +321,14 @@ public sealed class CalendarWeatherViewModel : ObservableObject, IDisposable
             bool isCurrentMonth = date.Month == displayMonth.Month;
             bool isToday = date.Date == today;
             bool isSelected = date.Date == selectedDate.Date;
-            bool hasEvents = isCurrentMonth && daysWithEvents.Contains(date.Day);
+            bool hasEvents = isCurrentMonth && (daysWithStoreEvents.Contains(date.Day) || daysWithLaptopEvents.Contains(date.Day));
 
             Brush fg = isCurrentMonth
-                ? (isToday ? new SolidColorBrush(Color.FromRgb(255, 255, 255)) : new SolidColorBrush(Color.FromRgb(220, 230, 242)))
-                : new SolidColorBrush(Color.FromRgb(85, 100, 118));
+                ? (isToday ? new SolidColorBrush(Color.FromRgb(255, 255, 255)) : new SolidColorBrush(Color.FromRgb(230, 238, 248)))
+                : new SolidColorBrush(Color.FromRgb(75, 88, 105));
 
             Brush bg = isSelected
-                ? new SolidColorBrush(Color.FromArgb(60, 120, 180, 255))
+                ? new SolidColorBrush(Color.FromArgb(70, 70, 140, 255))
                 : Brushes.Transparent;
 
             list.Add(new CalendarDayUi(date.Day, date, isToday, isSelected, isCurrentMonth, hasEvents, fg, bg));
@@ -240,14 +339,20 @@ public sealed class CalendarWeatherViewModel : ObservableObject, IDisposable
 
     private IReadOnlyList<CalendarEventUi> GetEventsForSelectedDay()
     {
-        var evs = calendarStore.GetEventsForDay(selectedDate);
-        return evs.Select(e =>
+        var evs = calendarStore.GetEventsForDay(selectedDate).ToList();
+
+        // Also add laptop events occurring on this day
+        var laptopDayEvents = laptopEvents.Where(e => e.OccursOn(selectedDate));
+        evs.AddRange(laptopDayEvents);
+
+        return evs.OrderBy(e => e.Start).Select(e =>
         {
             string time = e.IsAllDay ? "All Day"
                 : e.End.HasValue ? $"{e.Start:h:mm tt} – {e.End:h:mm tt}"
                 : $"{e.Start:h:mm tt}";
 
-            return new CalendarEventUi(e.Id, e.Title, time, e.Location, e.Source);
+            bool isWin = e.Source == "Laptop Calendar";
+            return new CalendarEventUi(e.Id, e.Title, time, e.Location, e.Source, isWin);
         }).ToList();
     }
 
@@ -275,6 +380,7 @@ public sealed class CalendarWeatherViewModel : ObservableObject, IDisposable
                 OnPropertyChanged(nameof(HighLow));
                 OnPropertyChanged(nameof(HourlyForecast));
                 OnPropertyChanged(nameof(DailyForecast));
+                OnPropertyChanged(nameof(UnitsLabel));
             });
         }
 
@@ -282,22 +388,58 @@ public sealed class CalendarWeatherViewModel : ObservableObject, IDisposable
         await dispatcher.InvokeAsync(() => OnPropertyChanged(nameof(IsLoadingWeather)));
     }
 
+    public async Task AutoDetectLocationAsync()
+    {
+        if (isAutoDetectingLocation) return;
+        isAutoDetectingLocation = true;
+        OnPropertyChanged(nameof(IsAutoDetectingLocation));
+
+        try
+        {
+            var detected = await weatherClient.AutoDetectLocationAsync();
+            if (detected.HasValue)
+            {
+                city = detected.Value.City;
+                latitude = detected.Value.Lat;
+                longitude = detected.Value.Lon;
+            }
+            await RefreshWeatherAsync();
+        }
+        catch { }
+        finally
+        {
+            isAutoDetectingLocation = false;
+            await dispatcher.InvokeAsync(() => OnPropertyChanged(nameof(IsAutoDetectingLocation)));
+        }
+    }
+
     public async Task SetLocationAsync(string cityName)
     {
         if (string.IsNullOrWhiteSpace(cityName)) return;
+        isLoadingWeather = true;
+        OnPropertyChanged(nameof(IsLoadingWeather));
+
         var found = await weatherClient.SearchCityAsync(cityName);
         if (found.HasValue)
         {
             city = found.Value.City;
             latitude = found.Value.Lat;
             longitude = found.Value.Lon;
+            IsSearchingCity = false;
+            CitySearchQuery = "";
             await RefreshWeatherAsync();
+        }
+        else
+        {
+            isLoadingWeather = false;
+            OnPropertyChanged(nameof(IsLoadingWeather));
         }
     }
 
     public async Task ToggleUnitsAsync()
     {
         units = units == "Celsius" ? "Fahrenheit" : "Celsius";
+        OnPropertyChanged(nameof(UnitsLabel));
         await RefreshWeatherAsync();
     }
 

@@ -6,25 +6,31 @@
 
 - **Calendar & Agenda View**:
   - **Full Month Calendar Grid**: 42-cell calendar grid displaying previous, current, and next month days. Features month navigation controls (previous/next month, "Today" button), accent circle highlight on today's date, selection box, and dot indicators under dates containing scheduled events.
+  - **Laptop / Windows Calendar Integration (`WindowsCalendarService`)**:
+    - Queries native Windows calendar appointments using `Windows.ApplicationModel.Appointments.AppointmentManager` (supported across Outlook, Google Calendar accounts, Microsoft 365, and the native Windows Calendar app).
+    - Merges laptop calendar appointments seamlessly into Island's day agenda and month view, marked with a sleek `Laptop` badge.
+    - One-click launch button to open the system Windows Calendar application (`ms-calendar:`).
+    - Quick "+ Laptop Calendar" button when creating events: generates standard `.ics` calendar objects and opens directly in the OS default calendar handler for instant laptop sync!
   - **Day Agenda & Event Management**:
     - Detailed day event list for whichever date is selected in the month view.
-    - Each event card displays time range or "All Day" badge, event title, optional location glyph & string, and a delete button.
-    - **Quick Add**: Input box to quickly type event titles and add them to the selected date.
+    - Each event card displays time range or "All Day" badge, event title, optional location glyph & string, and delete/manage buttons.
+    - **Clean Empty State**: When no events are scheduled on a day, shows an elegant empty state with calendar icon and "+ Add" button (fixing prior inverted visibility converter issue).
+    - **Quick Add**: Input box to quickly type event titles, toggle "Sync to Laptop Calendar", and add them to the selected date.
   - **RFC 5545 iCalendar (`.ics`) Parser**:
     - Robust parser handling line unfolding (`\r\n ` continuation), date/time parsing (UTC and local), all-day event detection (`VALUE=DATE`), multi-event streams, and string unescaping (`\,`, `\;`, `\\`, `\n`).
   - **Atomic Calendar Storage**:
     - Auto-saves all user events to `%LOCALAPPDATA%\Island\calendar.json` with transactional atomic write (`.tmp` + move) preventing corruption.
     - Periodic background check evaluates event reminder times and automatically dispatches alert notifications with sound to the Island notch.
 - **Weather Telemetry (Open-Meteo)**:
-  - **Zero-Configuration Live Weather**: Integrates with Open-Meteo's free, high-accuracy API (`api.open-meteo.com` and `geocoding-api.open-meteo.com`) without requiring an API key.
-  - **Current Conditions**:
-    - Live weather condition glyph (Segoe Fluent Icons: Clear Sun, Partly Sunny, Overcast, Rain, Snow, Thunderstorm, Fog, etc.) mapped from standard WMO weather codes.
-    - Real-time temperature readout and apparent temperature ("Feels like").
-    - Relative humidity (%) and wind speed (km/h or mph).
-    - City location search bar with instant geocoding and refresh button.
+  - **Zero-Configuration Live Weather & Auto-Detect Location**:
+    - Automatic IP-based geolocation on cold boot or when clicking the **Auto-Detect GPS button** (`\uE81D`): instantly resolves user's real city and coordinates without requiring Windows permission dialogs.
+    - **Interactive City Search**: Click the City pill (e.g. `📍 Kolkata`) or Search button to reveal an inline search bar with Enter key submit to query any city worldwide via Open-Meteo geocoding.
+  - **Current Conditions & Reliable Glyph Set**:
+    - Uses 100% compatible font glyphs mapped across `Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji` (Clear Sun `\uE706`, Partly Sunny `\uE707`, Clear Night `\uE708`, Overcast `\uE753`, Fog `\uE774`, Water Drop Rain `\uEB42`, Lightning `\uE945`, Snow `\u2744`), eliminating tofu/crossed-box rendering.
+    - Real-time temperature readout, apparent temperature ("Feels like"), relative humidity (%), and wind speed.
     - Units toggle button switching between **°C** and **°F** dynamically.
   - **24-Hour Hourly Forecast Strip**:
-    - Horizontally scrolling strip displaying upcoming hours, weather glyphs, and forecasted temperatures.
+    - Sleek horizontal forecast card with hidden scrollbar and smooth mouse-wheel horizontal scrolling.
   - **5-Day Daily Forecast Strip**:
     - Daily forecast showing weekday names, weather condition glyphs, and high/low temperature ranges.
   - **Offline Caching & Resilience**:

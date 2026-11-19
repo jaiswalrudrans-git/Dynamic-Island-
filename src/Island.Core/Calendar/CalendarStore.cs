@@ -35,13 +35,14 @@ public sealed class CalendarStore : IDisposable
         reminderTimer = new Timer(CheckReminders, null, 1000, 30000); // Every 30 seconds
     }
 
-    public void Add(string title, DateTime start, DateTime? end = null, bool isAllDay = false,
+    public CalendarEvent? Add(string title, DateTime start, DateTime? end = null, bool isAllDay = false,
         string? location = null, string? description = null, int? reminderMinutes = 15)
     {
-        if (string.IsNullOrWhiteSpace(title)) return;
+        if (string.IsNullOrWhiteSpace(title)) return null;
+        CalendarEvent item;
         lock (gate)
         {
-            var item = new CalendarEvent(
+            item = new CalendarEvent(
                 Id: Guid.NewGuid().ToString("N"),
                 Title: title.Trim(),
                 Start: start,
@@ -57,6 +58,7 @@ public sealed class CalendarStore : IDisposable
             Save();
         }
         EventsChanged?.Invoke();
+        return item;
     }
 
     public void Delete(string id)

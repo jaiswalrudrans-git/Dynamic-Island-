@@ -6,10 +6,10 @@
         <BooleanToVisibilityConverter x:Key="Visible"/>
 
         <Style x:Key="CalNavBtn" TargetType="Button">
-            <Setter Property="Width" Value="22"/><Setter Property="Height" Value="22"/>
+            <Setter Property="Width" Value="24"/><Setter Property="Height" Value="24"/>
             <Setter Property="Background" Value="Transparent"/><Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Foreground" Value="#8E9DAE"/><Setter Property="Focusable" Value="False"/>
-            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets"/><Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"/><Setter Property="FontSize" Value="11"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -29,22 +29,23 @@
         </Style>
 
         <Style x:Key="MiniPillBtn" TargetType="Button">
-            <Setter Property="Height" Value="20"/>
-            <Setter Property="Padding" Value="6,1"/>
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Padding" Value="7,2"/>
             <Setter Property="FontSize" Value="10"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Focusable" Value="False"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Foreground" Value="#8E9DAE"/>
+            <Setter Property="Foreground" Value="#A0B0C4"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Box" CornerRadius="4" Background="#141822" Padding="{TemplateBinding Padding}">
+                        <Border x:Name="Box" CornerRadius="5" Background="#181F2B" Padding="{TemplateBinding Padding}"
+                                BorderThickness="1" BorderBrush="#263346">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Box" Property="Background" Value="#222B38"/>
+                                <Setter TargetName="Box" Property="Background" Value="#263346"/>
                                 <Setter Property="Foreground" Value="#F2F5FA"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -54,19 +55,19 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="16,8">
+    <Grid Margin="14,6">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="275"/>
             <ColumnDefinition Width="14"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- LEFT COLUMN: Calendar -->
+        <!-- LEFT COLUMN: Calendar & Agenda -->
         <Grid Grid.Column="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="24"/>
+                <RowDefinition Height="26"/>
                 <RowDefinition Height="16"/>
-                <RowDefinition Height="114"/>
+                <RowDefinition Height="120"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
@@ -76,21 +77,22 @@
                     <Button Style="{StaticResource CalNavBtn}" Content="&#xE76B;" Click="PrevMonthClick" ToolTip="Previous Month"/>
                     <Button Style="{StaticResource MiniPillBtn}" Content="Today" Margin="2,0" Click="TodayClick" ToolTip="Jump to Today"/>
                     <Button Style="{StaticResource CalNavBtn}" Content="&#xE76C;" Click="NextMonthClick" ToolTip="Next Month"/>
-                    <Button Style="{StaticResource CalNavBtn}" Content="&#xE710;" Margin="4,0,0,0" Click="ToggleAddEventClick" ToolTip="Add Event"/>
+                    <Button Style="{StaticResource CalNavBtn}" Content="&#xE895;" Margin="3,0,0,0" Click="SyncLaptopCalendarClick" ToolTip="Sync with Laptop Calendar"/>
+                    <Button Style="{StaticResource CalNavBtn}" Content="&#xE710;" Margin="2,0,0,0" Click="ToggleAddEventClick" ToolTip="Add Event"/>
                 </StackPanel>
-                <TextBlock Text="{Binding MonthYearText}" FontSize="12" FontWeight="SemiBold"
+                <TextBlock Text="{Binding MonthYearText}" FontSize="13" FontWeight="SemiBold"
                            Foreground="#F2F5FA" VerticalAlignment="Center"/>
             </DockPanel>
 
             <!-- Day of Week Header -->
             <UniformGrid Grid.Row="1" Columns="7" Margin="0,2,0,0">
-                <TextBlock Text="M" FontSize="9" FontWeight="Bold" Foreground="#5E6D7E" HorizontalAlignment="Center"/>
-                <TextBlock Text="T" FontSize="9" FontWeight="Bold" Foreground="#5E6D7E" HorizontalAlignment="Center"/>
-                <TextBlock Text="W" FontSize="9" FontWeight="Bold" Foreground="#5E6D7E" HorizontalAlignment="Center"/>
-                <TextBlock Text="T" FontSize="9" FontWeight="Bold" Foreground="#5E6D7E" HorizontalAlignment="Center"/>
-                <TextBlock Text="F" FontSize="9" FontWeight="Bold" Foreground="#5E6D7E" HorizontalAlignment="Center"/>
-                <TextBlock Text="S" FontSize="9" FontWeight="Bold" Foreground="#5E6D7E" HorizontalAlignment="Center"/>
-                <TextBlock Text="S" FontSize="9" FontWeight="Bold" Foreground="#5E6D7E" HorizontalAlignment="Center"/>
+                <TextBlock Text="M" FontSize="9" FontWeight="Bold" Foreground="#65768C" HorizontalAlignment="Center"/>
+                <TextBlock Text="T" FontSize="9" FontWeight="Bold" Foreground="#65768C" HorizontalAlignment="Center"/>
+                <TextBlock Text="W" FontSize="9" FontWeight="Bold" Foreground="#65768C" HorizontalAlignment="Center"/>
+                <TextBlock Text="T" FontSize="9" FontWeight="Bold" Foreground="#65768C" HorizontalAlignment="Center"/>
+                <TextBlock Text="F" FontSize="9" FontWeight="Bold" Foreground="#65768C" HorizontalAlignment="Center"/>
+                <TextBlock Text="S" FontSize="9" FontWeight="Bold" Foreground="#65768C" HorizontalAlignment="Center"/>
+                <TextBlock Text="S" FontSize="9" FontWeight="Bold" Foreground="#65768C" HorizontalAlignment="Center"/>
             </UniformGrid>
 
             <!-- 42 Days Month Grid -->
@@ -109,7 +111,7 @@
                                     <Border CornerRadius="4" Background="{TemplateBinding Background}">
                                         <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
                                             <!-- Today Circle -->
-                                            <Border Width="16" Height="16" CornerRadius="8"
+                                            <Border Width="17" Height="17" CornerRadius="8.5"
                                                     Background="{DynamicResource Theme.Accent}"
                                                     Visibility="{Binding IsToday, Converter={StaticResource Visible}}"/>
                                             <TextBlock Text="{Binding DayNumber}" FontSize="10"
@@ -120,7 +122,7 @@
                                                     <Style TargetType="TextBlock">
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding IsToday}" Value="True">
-                                                                <Setter Property="Foreground" Value="#121620"/>
+                                                                <Setter Property="Foreground" Value="#0D1117"/>
                                                                 <Setter Property="FontWeight" Value="Bold"/>
                                                             </DataTrigger>
                                                         </Style.Triggers>
@@ -140,24 +142,35 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <!-- Bottom Selected Date / Events Bar -->
+            <!-- Bottom Selected Date / Events Section -->
             <Grid Grid.Row="3" Margin="0,4,0,0">
-                <!-- Add Event Mode -->
+                <!-- ADD EVENT MODE -->
                 <Grid Visibility="{Binding IsAddingEvent, Converter={StaticResource Visible}}">
-                    <DockPanel LastChildFill="True">
-                        <Button DockPanel.Dock="Right" Style="{StaticResource CalNavBtn}" Content="&#xE711;"
-                                Click="CancelAddEventClick" ToolTip="Cancel"/>
-                        <Button DockPanel.Dock="Right" Style="{StaticResource CalNavBtn}" Content="&#xE73E;"
-                                Click="SaveAddEventClick" ToolTip="Save"/>
-                        <Border Background="#141822" CornerRadius="6" Padding="6,1" BorderThickness="1" BorderBrush="#252F40">
-                            <TextBox x:Name="EventInput" Text="{Binding NewEventTitle, UpdateSourceTrigger=PropertyChanged}"
-                                     Background="Transparent" BorderThickness="0" Foreground="#F2F5FA" FontSize="11"
-                                     CaretBrush="{DynamicResource Theme.Accent}" KeyDown="EventInputKeyDown"/>
-                        </Border>
-                    </DockPanel>
+                    <Border Background="#141822" CornerRadius="8" Padding="8,6" BorderThickness="1" BorderBrush="#253245">
+                        <StackPanel>
+                            <DockPanel LastChildFill="True">
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                    <Button Style="{StaticResource CalNavBtn}" Content="&#xE73E;"
+                                            Click="SaveAddEventClick" ToolTip="Save Event" Margin="4,0,0,0"/>
+                                    <Button Style="{StaticResource CalNavBtn}" Content="&#xE711;"
+                                            Click="CancelAddEventClick" ToolTip="Cancel" Margin="2,0,0,0"/>
+                                </StackPanel>
+                                <TextBox x:Name="EventInput" Text="{Binding NewEventTitle, UpdateSourceTrigger=PropertyChanged}"
+                                         Background="Transparent" BorderThickness="0" Foreground="#F2F5FA" FontSize="11"
+                                         CaretBrush="{DynamicResource Theme.Accent}" KeyDown="EventInputKeyDown"
+                                         VerticalAlignment="Center"/>
+                            </DockPanel>
+                            <DockPanel Margin="0,4,0,0">
+                                <Button DockPanel.Dock="Right" Style="{StaticResource MiniPillBtn}" Content="+ Laptop Calendar"
+                                        Click="AddAndSyncToLaptopClick" ToolTip="Add to Laptop / Windows Calendar"/>
+                                <CheckBox Content="Sync to Laptop Calendar" IsChecked="{Binding SyncWithLaptopChecked}"
+                                          FontSize="9" Foreground="#8E9DAE" VerticalAlignment="Center"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
                 </Grid>
 
-                <!-- Normal Events Display Mode -->
+                <!-- NORMAL EVENTS DISPLAY MODE -->
                 <Grid>
                     <Grid.Style>
                         <Style TargetType="Grid">
@@ -168,42 +181,70 @@
                             </Style.Triggers>
                         </Style>
                     </Grid.Style>
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
-                        <StackPanel>
-                            <!-- Empty Day State -->
-                            <TextBlock Text="{Binding SelectedDateHeader, StringFormat='{}{0}: No events scheduled'}"
-                                       FontSize="10" Foreground="#7E8D9F" VerticalAlignment="Center"
-                                       Visibility="{Binding HasEventsForSelectedDay, Converter={StaticResource Visible}, ConverterParameter=invert}">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding HasEventsForSelectedDay}" Value="True">
-                                                <Setter Property="Visibility" Value="Collapsed"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="18"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                            <!-- Event Items -->
-                            <ItemsControl ItemsSource="{Binding SelectedDayEvents}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Background="#141822" CornerRadius="5" Padding="6,3" Margin="0,1"
-                                                BorderThickness="1" BorderBrush="#1F2837">
-                                            <DockPanel LastChildFill="True">
-                                                <Button DockPanel.Dock="Right" Style="{StaticResource CalNavBtn}" Content="&#xE74D;"
-                                                        Tag="{Binding Id}" Click="DeleteEventClick" ToolTip="Delete event" Width="18" Height="18"/>
-                                                <TextBlock DockPanel.Dock="Right" Text="{Binding TimeText}" FontSize="9"
-                                                           Foreground="#8E9DAE" VerticalAlignment="Center" Margin="6,0"/>
-                                                <TextBlock Text="{Binding Title}" FontSize="11" Foreground="#F2F5FA"
-                                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                            </DockPanel>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                    <DockPanel Grid.Row="0">
+                        <Button DockPanel.Dock="Right" Style="{StaticResource CalNavBtn}" Width="16" Height="16"
+                                Content="&#xE787;" Click="OpenLaptopCalendarClick" ToolTip="Open Laptop Calendar App"/>
+                        <TextBlock Text="{Binding SelectedDateHeader}" FontSize="10" FontWeight="SemiBold"
+                                   Foreground="#8E9DAE" VerticalAlignment="Center"/>
+                    </DockPanel>
+
+                    <!-- Empty Day State -->
+                    <Border Grid.Row="1" Visibility="{Binding IsEmptyDay, Converter={StaticResource Visible}}"
+                            VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,4">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE787;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="11"
+                                       Foreground="#556476" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBlock Text="No events." FontSize="10" Foreground="#6B7C93" VerticalAlignment="Center"/>
+                            <Button Style="{StaticResource MiniPillBtn}" Content="+ Add" Margin="8,0,0,0"
+                                    Click="ToggleAddEventClick" Height="18" Padding="5,0"/>
                         </StackPanel>
+                    </Border>
+
+                    <!-- Event Items List -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Focusable="False"
+                                  Visibility="{Binding HasEventsForSelectedDay, Converter={StaticResource Visible}}">
+                        <ItemsControl ItemsSource="{Binding SelectedDayEvents}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="#141822" CornerRadius="6" Padding="6,4" Margin="0,2"
+                                            BorderThickness="1" BorderBrush="#1F2837">
+                                        <DockPanel LastChildFill="True">
+                                            <Button DockPanel.Dock="Right"
+                                                    Tag="{Binding Id}" Click="DeleteEventClick" ToolTip="Delete / Manage event" Width="18" Height="18">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource CalNavBtn}">
+                                                        <Setter Property="Content" Value="&#xE74D;"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsLaptopCalendar}" Value="True">
+                                                                <Setter Property="Content" Value="&#xE8A7;"/>
+                                                                <Setter Property="ToolTip" Value="Open in Laptop Calendar"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+
+                                            <!-- Laptop Badge -->
+                                            <Border DockPanel.Dock="Right" Background="#1D2635" CornerRadius="3" Padding="4,1" Margin="4,0"
+                                                    Visibility="{Binding IsLaptopCalendar, Converter={StaticResource Visible}}">
+                                                <TextBlock Text="Laptop" FontSize="8" Foreground="#7E94B0"/>
+                                            </Border>
+
+                                            <TextBlock DockPanel.Dock="Right" Text="{Binding TimeText}" FontSize="9"
+                                                       Foreground="#8E9DAE" VerticalAlignment="Center" Margin="4,0"/>
+
+                                            <TextBlock Text="{Binding Title}" FontSize="11" Foreground="#F2F5FA"
+                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                        </DockPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </ScrollViewer>
                 </Grid>
             </Grid>
@@ -211,49 +252,95 @@
 
         <!-- RIGHT COLUMN: Weather Card -->
         <Border Grid.Column="2" Background="#141822" CornerRadius="12" Padding="12,10"
-                BorderThickness="1" BorderBrush="#1F2837">
+                BorderThickness="1" BorderBrush="#212C3D">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="46"/>
+                    <RowDefinition Height="56"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- Current Weather Header -->
+                <!-- Weather Header -->
                 <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                    <!-- SEARCH MODE HEADER -->
+                    <Border Visibility="{Binding IsSearchingCity, Converter={StaticResource Visible}}"
+                            Background="#10141D" CornerRadius="8" Padding="6,3" BorderThickness="1" BorderBrush="#263448">
+                        <DockPanel LastChildFill="True">
+                            <Button DockPanel.Dock="Right" Style="{StaticResource CalNavBtn}" Content="&#xE711;"
+                                    Click="CancelCitySearchClick" ToolTip="Cancel Search"/>
+                            <Button DockPanel.Dock="Right" Style="{StaticResource CalNavBtn}" Content="&#xE721;"
+                                    Click="ExecuteCitySearchClick" ToolTip="Search City" Margin="2,0"/>
+                            <TextBlock Text="&#xE707;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="11"
+                                       Foreground="{DynamicResource Theme.Accent}" VerticalAlignment="Center" Margin="2,0,6,0"/>
+                            <TextBox x:Name="CitySearchInput" Text="{Binding CitySearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="Transparent" BorderThickness="0" Foreground="#F2F5FA" FontSize="11"
+                                     CaretBrush="{DynamicResource Theme.Accent}" KeyDown="CitySearchInputKeyDown"
+                                     VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Border>
 
-                    <!-- Icon & Temp -->
-                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="{Binding CurrentGlyph}"
-                                   FontSize="26" Foreground="{DynamicResource Theme.Accent}" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                        <TextBlock Text="{Binding CurrentTemp}" FontSize="24" FontWeight="Bold"
-                                   Foreground="#F2F5FA" VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
-                    </StackPanel>
+                    <!-- NORMAL WEATHER HEADER -->
+                    <Grid>
+                        <Grid.Style>
+                            <Style TargetType="Grid">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSearchingCity}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Grid.Style>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                    <!-- Condition & City -->
-                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
-                        <TextBlock Text="{Binding CurrentCondition}" FontSize="11" FontWeight="SemiBold"
-                                   Foreground="#E2E8F0" TextTrimming="CharacterEllipsis"/>
-                        <TextBlock Text="{Binding HighLow}" FontSize="10" Foreground="#8E9DAE" Margin="0,1,0,0"/>
-                    </StackPanel>
+                        <!-- Icon & Temp -->
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji" Text="{Binding CurrentGlyph}"
+                                       FontSize="28" Foreground="{DynamicResource Theme.Accent}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding CurrentTemp}" FontSize="24" FontWeight="Bold"
+                                       Foreground="#F2F5FA" VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
+                        </StackPanel>
 
-                    <!-- City Button & Refresh -->
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                        <Button Style="{StaticResource MiniPillBtn}" Content="{Binding WeatherCity}"
-                                Click="CityClick" ToolTip="Click to change city"/>
-                        <Button Style="{StaticResource CalNavBtn}" Content="&#xE72C;" Margin="4,0,0,0"
-                                Click="RefreshWeatherClick" ToolTip="Refresh Weather"/>
-                    </StackPanel>
+                        <!-- Condition & High/Low -->
+                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,0,0">
+                            <TextBlock Text="{Binding CurrentCondition}" FontSize="11" FontWeight="SemiBold"
+                                       Foreground="#E2E8F0" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding HighLow}" FontSize="10" Foreground="#8E9DAE" Margin="0,1,0,0"/>
+                        </StackPanel>
+
+                        <!-- Location Pill, Auto-Detect & Controls -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <!-- City Pill with Map Pin -->
+                            <Button Style="{StaticResource MiniPillBtn}" Click="OpenCitySearchClick" ToolTip="Click to search city">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#xE707;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="9"
+                                               Foreground="{DynamicResource Theme.Accent}" Margin="0,0,4,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding WeatherCity}" TextTrimming="CharacterEllipsis" MaxWidth="90" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+
+                            <!-- Auto-Detect GPS Button -->
+                            <Button Style="{StaticResource CalNavBtn}" Content="&#xE81D;" Margin="3,0,0,0"
+                                    Click="AutoDetectLocationClick" ToolTip="Auto-detect current location"/>
+
+                            <!-- Units Toggle Button -->
+                            <Button Style="{StaticResource MiniPillBtn}" Content="{Binding UnitsLabel}" Margin="3,0,0,0"
+                                    Click="ToggleUnitsClick" ToolTip="Toggle °C / °F" Width="28"/>
+
+                            <!-- Refresh Button -->
+                            <Button Style="{StaticResource CalNavBtn}" Content="&#xE72C;" Margin="2,0,0,0"
+                                    Click="RefreshWeatherClick" ToolTip="Refresh Weather"/>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
 
                 <!-- Hourly Forecast Strip -->
                 <Border Grid.Row="1" Margin="0,6,0,4" Background="#10141D" CornerRadius="8" Padding="6,2">
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" Focusable="False">
+                    <ScrollViewer x:Name="HourlyScroll" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled"
+                                  Focusable="False" PreviewMouseWheel="HourlyScrollPreviewMouseWheel">
                         <ItemsControl ItemsSource="{Binding HourlyForecast}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -262,10 +349,10 @@
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Margin="6,0" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <StackPanel Margin="8,0" VerticalAlignment="Center" HorizontalAlignment="Center">
                                         <TextBlock Text="{Binding HourDisplay}" FontSize="8" Foreground="#7E8D9F" HorizontalAlignment="Center"/>
-                                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="{Binding Glyph}"
-                                                   FontSize="11" Foreground="{DynamicResource Theme.Accent}" Margin="0,1" HorizontalAlignment="Center"/>
+                                        <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji" Text="{Binding Glyph}"
+                                                   FontSize="12" Foreground="{DynamicResource Theme.Accent}" Margin="0,2" HorizontalAlignment="Center"/>
                                         <TextBlock Text="{Binding FormattedTemperature}" FontSize="10" FontWeight="SemiBold"
                                                    Foreground="#F2F5FA" HorizontalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
                                     </StackPanel>
@@ -281,13 +368,13 @@
                         <DataTemplate>
                             <Grid Margin="0,2">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="65"/>
-                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="70"/>
+                                    <ColumnDefinition Width="30"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="{Binding DayDisplay}" FontSize="10" Foreground="#BBC8D8" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="{Binding Glyph}"
-                                           FontSize="11" Foreground="{DynamicResource Theme.Accent}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji" Text="{Binding Glyph}"
+                                           FontSize="12" Foreground="{DynamicResource Theme.Accent}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 <TextBlock Grid.Column="2" Text="{Binding FormattedHighLow}" FontSize="10" Foreground="#8E9DAE"
                                            VerticalAlignment="Center" HorizontalAlignment="Right" Typography.NumeralAlignment="Tabular"/>
                             </Grid>

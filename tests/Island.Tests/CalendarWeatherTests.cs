@@ -32,6 +32,36 @@ public sealed class CalendarWeatherTests : TestFolder
         Assert.False(allDayEvent.OccursOn(new DateTime(2026, 11, 20)));
     }
 
+    private readonly Xunit.Abstractions.ITestOutputHelper output;
+    public CalendarWeatherTests(Xunit.Abstractions.ITestOutputHelper output) => this.output = output;
+
+    [Fact]
+    public async Task AutoDetectLocation_ReturnsResult()
+    {
+        using var client = new WeatherClient(Folder, s => output.WriteLine(s));
+        var result = await client.AutoDetectLocationAsync();
+        output.WriteLine($"AutoDetect: {result?.City} ({result?.Lat}, {result?.Lon})");
+        Assert.NotNull(result);
+    }
+
+    [Fact]
+    public void TestWeatherGlyphsInFonts()
+    {
+        var glyphTypeface = new System.Windows.Media.GlyphTypeface(new Uri("file:///C:/Windows/Fonts/SegoeIcons.ttf"));
+        int[] codes = [0xE706, 0xE707, 0xE708, 0xE753, 0xE774, 0xE945, 0xEB42];
+        foreach (var c in codes)
+        {
+            output.WriteLine($"SegoeIcons 0x{c:X4}: {glyphTypeface.CharacterToGlyphMap.ContainsKey(c)}");
+        }
+
+        var emojiTypeface = new System.Windows.Media.GlyphTypeface(new Uri("file:///C:/Windows/Fonts/seguiemj.ttf"));
+        int[] emojiCodes = [0x2600, 0x26C5, 0x2601, 0x2614, 0x26A1, 0x2744, 0x1F327];
+        foreach (var c in emojiCodes)
+        {
+            output.WriteLine($"SegoeUIEmoji 0x{c:X4}: {emojiTypeface.CharacterToGlyphMap.ContainsKey(c)}");
+        }
+    }
+
     [Fact]
     public void CalendarStore_AddAndRetrieve_WorksAndFiltersByDay()
     {
@@ -133,11 +163,11 @@ END:VCALENDAR";
 
         var (rain, glyphRain) = WmoWeatherCode.Describe(63);
         Assert.Equal("Moderate Rain", rain);
-        Assert.Equal("\uE77A", glyphRain);
+        Assert.Equal("\uEB42", glyphRain);
 
         var (thunder, glyphThunder) = WmoWeatherCode.Describe(95);
         Assert.Equal("Thunderstorm", thunder);
-        Assert.Equal("\uE776", glyphThunder);
+        Assert.Equal("\uE945", glyphThunder);
     }
 
     [Fact]

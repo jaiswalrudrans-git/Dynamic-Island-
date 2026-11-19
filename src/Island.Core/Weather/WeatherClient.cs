@@ -152,6 +152,61 @@ public sealed class WeatherClient : IDisposable
         return null;
     }
 
+    public async Task<(double Lat, double Lon, string City)?> AutoDetectLocationAsync(CancellationToken ct = default)
+    {
+        // Try IP Geolocation API 1
+        try
+        {
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            cts.CancelAfter(TimeSpan.FromSeconds(3.5));
+            string json = await HttpClient.GetStringAsync("http://ip-api.com/json/", cts.Token);
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+            if (root.TryGetProperty("status", out var status) && status.GetString() == "success")
+            {
+                double lat = root.GetProperty("lat").GetDouble();
+                double lon = root.GetProperty("lon").GetDouble();
+                string city = root.GetProperty("city").GetString() ?? "Local City";
+                if (root.TryGetProperty("countryCode", out var cc) && !string.IsNullOrWhiteSpace(cc.GetString()))
+                {
+                    city = $"{city}, {cc.GetString()}";
+                }
+                return (lat, lon, city);
+            }
+        }
+        catch (Exception ex)
+        {
+            log?.Invoke($"IP-API geolocation failed: {ex.Message}");
+        }
+
+        // Try IP Geolocation API 2 (Fallback)
+        try
+        {
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            cts.CancelAfter(TimeSpan.FromSeconds(3.5));
+            string json = await HttpClient.GetStringAsync("https://ipapi.co/json/", cts.Token);
+            using var doc = JsonDocument.Parse(json);
+            var root = doc.RootElement;
+            if (root.TryGetProperty("latitude", out var latProp) && root.TryGetProperty("longitude", out var lonProp))
+            {
+                double lat = latProp.GetDouble();
+                double lon = lonProp.GetDouble();
+                string city = root.TryGetProperty("city", out var cp) ? cp.GetString() ?? "Local City" : "Local City";
+                if (root.TryGetProperty("country_code", out var cc) && !string.IsNullOrWhiteSpace(cc.GetString()))
+                {
+                    city = $"{city}, {cc.GetString()}";
+                }
+                return (lat, lon, city);
+            }
+        }
+        catch (Exception ex)
+        {
+            log?.Invoke($"ipapi.co geolocation failed: {ex.Message}");
+        }
+
+        return null;
+    }
+
     public WeatherData? GetCachedForecast()
     {
         if (!File.Exists(cachePath)) return null;

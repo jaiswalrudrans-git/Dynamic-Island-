@@ -141,7 +141,7 @@ public partial class OverlayWindow
             });
         };
         weatherClient = new(AppIdentity.DataDirectory, log);
-        calendarWeather = new(Dispatcher, calendarStore, weatherClient);
+        calendarWeather = new(Dispatcher, calendarStore, weatherClient, new Island.App.Services.WindowsCalendarService(log));
         var calendarWeatherPage = new CalendarWeatherPage(calendarWeather, SetTypingFocus);
 
         navigation = new(TabButtons, Pages, PillX, (Style)FindResource("IconButton"), () => settings.Current, RequestFrame,
