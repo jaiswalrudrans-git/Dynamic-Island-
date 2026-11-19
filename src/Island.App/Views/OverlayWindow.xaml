@@ -102,6 +102,16 @@
                                Foreground="#C4D2E2" Typography.NumeralAlignment="Tabular" VerticalAlignment="Center"/>
                 </StackPanel>
             </Grid>
+            <Grid x:Name="CompactFocus" Width="200" HorizontalAlignment="Center" Visibility="Hidden" IsHitTestVisible="False">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE916;"
+                               FontSize="11" Foreground="{DynamicResource Theme.Accent}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding DisplayTime}" FontFamily="Segoe UI" FontSize="13" FontWeight="SemiBold"
+                               Foreground="#F4F6FA" Typography.NumeralAlignment="Tabular" VerticalAlignment="Center"/>
+                    <ProgressBar Style="{StaticResource AlertProgressBar}" Value="{Binding Progress, Mode=OneWay}"
+                                 Width="42" Height="4" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
             <TextBlock x:Name="CompactClock" Text="{Binding Time}" HorizontalAlignment="Center" VerticalAlignment="Center"
                        FontFamily="Segoe UI" FontSize="14" FontWeight="SemiBold" Foreground="#F4F6FA"
                        Typography.NumeralAlignment="Tabular" Typography.NumeralStyle="Lining"/>

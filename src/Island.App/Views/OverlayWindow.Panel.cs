@@ -8,10 +8,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Island.App.Services.Alerts;
+using Island.App.Services.Controls;
 using Island.App.ViewModels;
+using Island.Core;
 using Island.Core.Alerts;
+using Island.Core.Focus;
 using Island.Core.Motion;
 using Island.Core.Settings;
+using Island.Core.Tasks;
 
 namespace Island.App.Views;
 
@@ -30,6 +34,12 @@ public partial class OverlayWindow
     private double lastPreview = double.NaN;
     private MusicViewModel music = null!;
     private SystemViewModel system = null!;
+    private TaskStore taskStore = null!;
+    private TasksViewModel tasks = null!;
+    private Island.Core.Focus.FocusManager focusManager = null!;
+    private FocusViewModel focus = null!;
+    private QuickControlsManager quickControls = null!;
+    private QuickControlsViewModel controls = null!;
     private AlertQueue alertQueue = null!;
     private AlertsViewModel alerts = null!;
     private AudioOsdWatcher audioOsd = null!;
@@ -60,10 +70,56 @@ public partial class OverlayWindow
         system.SnapshotUpdated += tempAlerts.OnSnapshot;
         CompactStat.DataContext = system;
         system.CollapsedStatChanged += SystemStatChanged;
+
+        taskStore = new(AppIdentity.DataDirectory, log);
+        taskStore.ReminderFired += item =>
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+                alertQueue.Enqueue(new IslandAlert(
+                    Id: Guid.NewGuid().ToString("N"),
+                    Type: AlertType.Custom,
+                    Title: $"Reminder: {item.Title}",
+                    Glyph: "\uE9D5",
+                    Level: item.Priority == TaskPriority.High ? AlertLevel.Warning : AlertLevel.Info,
+                    Duration: TimeSpan.FromSeconds(6),
+                    PlaySound: true
+                ));
+            });
+        };
+        tasks = new(Dispatcher, taskStore);
+        var tasksPage = new TasksPage(tasks, SetTypingFocus);
+
+        focusManager = new();
+        focusManager.SessionFinished += msg =>
+        {
+            Dispatcher.InvokeAsync(() =>
+            {
+                alertQueue.Enqueue(new IslandAlert(
+                    Id: Guid.NewGuid().ToString("N"),
+                    Type: AlertType.Custom,
+                    Title: msg,
+                    Glyph: "\uE916",
+                    Level: AlertLevel.Info,
+                    Duration: TimeSpan.FromSeconds(5),
+                    PlaySound: true
+                ));
+            });
+        };
+        focus = new(Dispatcher, focusManager);
+        focusManager.StateChanged += () => Dispatcher.InvokeAsync(FocusChanged);
+        CompactFocus.DataContext = focus;
+        var focusPage = new FocusPage(focus);
+
+        quickControls = new(Dispatcher, log);
+        controls = new(Dispatcher, quickControls);
+        var quickControlsPage = new QuickControlsPage(controls);
+
         var musicPage = new MusicPage(music, id => Save(s => s with { PreferredPlayer = id }),
             open => SetMenuOpen(open), () => settings.Current);
         var systemPage = new SystemPage(system, next => Save(_ => next), () => settings.Current);
-        navigation = new(TabButtons, Pages, PillX, (Style)FindResource("IconButton"), () => settings.Current, RequestFrame, musicPage, systemPage);
+        navigation = new(TabButtons, Pages, PillX, (Style)FindResource("IconButton"), () => settings.Current, RequestFrame,
+            musicPage, systemPage, tasksPage, focusPage, quickControlsPage);
         navigation.SelectionChanged += UpdateDemands;
         music.PreviewChanged += MusicChanged;
         music.PropertyChanged += (_, e) =>
@@ -108,7 +164,7 @@ public partial class OverlayWindow
         {
             alertSpring.Set(0);
         }
-        double target = (alerts.HasActiveAlert || music.Preview || system.HasCollapsedStat) ? 1 : 0;
+        double target = (alerts.HasActiveAlert || music.Preview || system.HasCollapsedStat || (focus != null && focus.IsRunning)) ? 1 : 0;
         if (previewWidth.Value != target || alertSpring.Value != (alerts.HasActiveAlert ? 1 : 0))
             RequestFrame();
         DrawPanel();
@@ -116,7 +172,7 @@ public partial class OverlayWindow
 
     private void SystemStatChanged()
     {
-        double target = (alerts.HasActiveAlert || music.Preview || system.HasCollapsedStat) ? 1 : 0;
+        double target = (alerts.HasActiveAlert || music.Preview || system.HasCollapsedStat || (focus != null && focus.IsRunning)) ? 1 : 0;
         if (previewWidth.Value != target) RequestFrame();
         DrawPanel();
     }
@@ -124,7 +180,14 @@ public partial class OverlayWindow
     private void MusicChanged()
     {
         UpdatePreviewLabel();
-        double target = (alerts.HasActiveAlert || music.Preview || system.HasCollapsedStat) ? 1 : 0;
+        double target = (alerts.HasActiveAlert || music.Preview || system.HasCollapsedStat || (focus != null && focus.IsRunning)) ? 1 : 0;
+        if (previewWidth.Value != target) RequestFrame();
+        DrawPanel();
+    }
+
+    private void FocusChanged()
+    {
+        double target = (alerts.HasActiveAlert || music.Preview || system.HasCollapsedStat || (focus != null && focus.IsRunning)) ? 1 : 0;
         if (previewWidth.Value != target) RequestFrame();
         DrawPanel();
     }
@@ -226,7 +289,7 @@ public partial class OverlayWindow
         lastFrame = now;
         bool moving = motion.Advance(dt, config.ReduceMotion);
         bool switching = navigation.Advance(dt, config.ReduceMotion);
-        double target = (alerts.HasActiveAlert || music.Preview || system.HasCollapsedStat) ? 1 : 0;
+        double target = (alerts.HasActiveAlert || music.Preview || system.HasCollapsedStat || (focus != null && focus.IsRunning)) ? 1 : 0;
         if (config.ReduceMotion)
         {
             previewWidth.Set(target);
@@ -261,7 +324,8 @@ public partial class OverlayWindow
         bool showAlert = alerts.HasActiveAlert;
         bool showMusic = !showAlert && music.Preview;
         bool showStat = !showAlert && !showMusic && system.HasCollapsedStat;
-        bool showClockOnly = !showAlert && !showMusic && !showStat;
+        bool showFocus = !showAlert && !showMusic && !showStat && (focus != null && focus.IsRunning);
+        bool showClockOnly = !showAlert && !showMusic && !showStat && !showFocus;
 
         CompactAlert.Visibility = showAlert && compactOpacity > 0 ? Visibility.Visible : Visibility.Hidden;
         CompactAlert.Opacity = compactOpacity * Math.Clamp(previewWidth.Value, 0, 1) * Math.Clamp(alertSpring.Value, 0.01, 1);
@@ -271,6 +335,9 @@ public partial class OverlayWindow
 
         CompactStat.Visibility = showStat && compactOpacity > 0 ? Visibility.Visible : Visibility.Hidden;
         CompactStat.Opacity = compactOpacity * Math.Clamp(previewWidth.Value, 0, 1);
+
+        CompactFocus.Visibility = showFocus && compactOpacity > 0 ? Visibility.Visible : Visibility.Hidden;
+        CompactFocus.Opacity = compactOpacity * Math.Clamp(previewWidth.Value, 0, 1);
 
         CompactClock.Opacity = (showClockOnly || (showMusic && music.PreviewClock)) ? compactOpacity : 0;
         Header.Opacity = motion.HeaderOpacity;
@@ -380,6 +447,12 @@ public partial class OverlayWindow
         alertQueue.Dispose();
         music.Dispose();
         system.Dispose();
+        tasks.Dispose();
+        taskStore.Dispose();
+        focus.Dispose();
+        focusManager.Dispose();
+        controls.Dispose();
+        quickControls.Dispose();
         CompactMeter.Attach(null);
         intent.Stop();
         StopFrames();

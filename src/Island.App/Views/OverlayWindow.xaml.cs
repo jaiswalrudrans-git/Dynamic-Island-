@@ -48,6 +48,14 @@ public partial class OverlayWindow : Window
         Place();
     }
 
+    internal void SetTypingFocus(bool typing)
+    {
+        if (source != null)
+        {
+            OverlayDesktop.Configure(source.Handle, rendered: true, typing: typing);
+        }
+    }
+
     protected override void OnDpiChanged(DpiScale oldDpi, DpiScale newDpi)
     {
         base.OnDpiChanged(oldDpi, newDpi);

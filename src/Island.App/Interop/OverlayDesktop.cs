@@ -9,11 +9,13 @@ internal static class OverlayDesktop
     private const long ToolWindow = 0x80, AppWindow = 0x40000, NoActivate = 0x08000000, Transparent = 0x20;
     private const uint NoSize = 0x1, NoMove = 0x2, NoZOrder = 0x4, KeepFocus = 0x10, FrameChanged = 0x20;
 
-    internal static void Configure(nint hwnd, bool rendered = false)
+    internal static void Configure(nint hwnd, bool rendered = false, bool typing = false)
     {
         var original = GetWindowLongPtrW(hwnd, ExtendedStyle);
         // Before WPF submits its first alpha surface, the entire layered rectangle can receive input.
-        long style = ((long)original | ToolWindow | NoActivate) & ~AppWindow;
+        long style = ((long)original | ToolWindow) & ~AppWindow;
+        if (typing) style &= ~NoActivate;
+        else style |= NoActivate;
         style = rendered ? style & ~Transparent : style | Transparent;
         if ((long)original == style) return;
         Marshal.SetLastPInvokeError(0);

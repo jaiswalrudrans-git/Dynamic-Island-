@@ -1,0 +1,75 @@
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using Island.App.ViewModels;
+using Island.Core.Tasks;
+
+namespace Island.App.Views;
+
+public partial class TasksPage : UserControl
+{
+    private readonly TasksViewModel model;
+    private readonly Action<bool> setTypingFocus;
+
+    public TasksPage(TasksViewModel model, Action<bool> setTypingFocus)
+    {
+        InitializeComponent();
+        this.model = model;
+        this.setTypingFocus = setTypingFocus;
+        DataContext = model;
+    }
+
+    private void TaskInputGotFocus(object sender, RoutedEventArgs e) => setTypingFocus(true);
+    private void TaskInputLostFocus(object sender, RoutedEventArgs e) => setTypingFocus(false);
+
+    private void TaskInputKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            model.AddTask();
+            e.Handled = true;
+        }
+    }
+
+    private void AddTaskClick(object sender, RoutedEventArgs e) => model.AddTask();
+
+    private void CyclePriorityClick(object sender, RoutedEventArgs e)
+    {
+        model.NewTaskPriority = model.NewTaskPriority switch
+        {
+            TaskPriority.Low => TaskPriority.Medium,
+            TaskPriority.Medium => TaskPriority.High,
+            _ => TaskPriority.Low
+        };
+        PriorityBtn.Content = model.NewTaskPriority switch
+        {
+            TaskPriority.High => "High",
+            TaskPriority.Low => "Low",
+            _ => "Med"
+        };
+    }
+
+    private void FilterAllClick(object sender, RoutedEventArgs e) => model.Filter = "All";
+    private void FilterActiveClick(object sender, RoutedEventArgs e) => model.Filter = "Active";
+    private void FilterDoneClick(object sender, RoutedEventArgs e) => model.Filter = "Done";
+
+    private void ToggleClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string id }) model.ToggleComplete(id);
+    }
+
+    private void DeleteClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string id }) model.DeleteTask(id);
+    }
+
+    private void MoveUpClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string id }) model.MoveUp(id);
+    }
+
+    private void MoveDownClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string id }) model.MoveDown(id);
+    }
+}

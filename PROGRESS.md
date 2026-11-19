@@ -1,5 +1,96 @@
 # Milestone progress
 
+## M6 complete · 2026-11-19
+
+### What works
+
+- **Tasks & Reminders**:
+  - Full-featured to-do list integrated directly in the Island expanded panel:
+    - **Quick Add**: Input box with Enter key trigger, priority selector (Low, Med, High with color-coded badges), and instant add button.
+    - **Filter Pills**: Instant switching between **All**, **Active**, and **Done** tasks.
+    - **Item Management**: Check/uncheck completion (with strikethrough animation), reorder tasks up/down, and delete tasks.
+    - **Due Dates & Snooze**: Relative due date formatting ("Today", "Tomorrow", "MMM d") with overdue highlighting.
+    - **Reminders**: Periodic background check for scheduled reminders; fires alert notifications to the Island notch with sound and optional snooze.
+    - **Atomic Persistence**: Auto-saves to `%LOCALAPPDATA%\Island\tasks.json` using atomic temporary file write and replacement to prevent data corruption.
+    - **Dynamic Input Focus**: Automatically clears `WS_EX_NOACTIVATE` while the task input box has focus so the user can type normally, and restores non-activating mode when focus is lost.
+- **Focus Sessions (Pomodoro, Timer, Stopwatch)**:
+  - Three distinct focus productivity modes:
+    - **Pomodoro**: Standard work session (25m), short break (5m), and long break (15m) cycles with cycle counter (`Cycle 1 of 4`). Features play/pause, reset, and skip stage controls.
+    - **Countdown Timer**: Custom timer with instant preset pill buttons (5m, 10m, 15m, 25m), countdown display, and alert notification with chime upon completion.
+    - **Stopwatch**: High-precision stopwatch with digital centisecond display, play/pause, reset, and split lap recordings with lap history sidebar.
+  - **Collapsed Focus Notch**:
+    - When a Focus session or timer is active, the collapsed notch expands smoothly to display the focus icon, active countdown or elapsed time, and a progress bar.
+    - Automatically notifies via the alert queue when a Pomodoro stage or countdown timer completes.
+- **Quick Controls**:
+  - Comprehensive device and audio control center:
+    - **Master Volume Slider**: Interactive slider (0–100%) with volume percentage display and icon button to toggle mute.
+    - **Brightness Slider**: Interactive slider (0–100%) with brightness percentage display, controlling physical or built-in display brightness via WMI (`WmiMonitorBrightnessMethods`).
+    - **Microphone Mute Card**: One-click toggle for default communication microphone mute state with live status badge ("Active" / "Muted").
+    - **Wi-Fi Card**: Live Wi-Fi radio status and one-click toggle using `Windows.Devices.Radios`.
+    - **Bluetooth Card**: Live Bluetooth radio status and one-click toggle using `Windows.Devices.Radios`.
+    - **Focus Assist / DND**: One-click shortcut to Windows Focus Assist / Quiet Hours settings.
+    - **Snipping Tool (Screenshot)**: Triggers Windows screen clipping (`ms-screenclip:` / Win+Shift+S).
+    - **Lock Workstation**: One-click workstation lock (`LockWorkStation`).
+    - **Sleep PC**: One-click sleep suspension (`SetSuspendState`).
+- **Panel Navigation**:
+  - All 6 navigation tabs are now active in the expanded notch:
+    1. Music
+    2. System
+    3. Calendar & Weather (scheduled for M7)
+    4. Tasks
+    5. Focus
+    6. Quick Controls
+
+### Verification
+
+- Solution built in Release mode with zero warnings and zero errors.
+- All 57 unit tests passed in [Island.Tests](file:///D:/Island%202/tests/Island.Tests/), including:
+  - `TaskStore`: Adding, priorities, ordering, completion toggling, deletion, moving/reordering with clamp checks, atomic disk persistence/reloading, snoozing, and reminder advancements.
+  - `FocusManager`: Pomodoro stage cycle progression (Work -> Short Break -> Work -> Long Break), countdown timer presets and durations, and stopwatch lap recordings and reset.
+- Live hardware self-test on Windows 11: launched `Island.App.exe`, verified clean startup, zero unhandled exceptions, healthy process lifetime, and correct logging in `%LOCALAPPDATA%\Island\logs\`.
+
+### Known limitations and remaining checks
+
+- External desktop monitors that do not implement DDC/CI WMI brightness methods cannot adjust brightness through software sliders; laptop displays and supported monitors work natively.
+- Wi-Fi and Bluetooth radio control requires standard Windows 10/11 radio permissions; where radio hardware is absent, cards cleanly display "Unavailable".
+
+### What to test
+
+1. If an older Island instance is running, exit it via tray **Quit**. Start this build in PowerShell:
+
+   ~~~powershell
+   Set-Location 'D:\Island 2'
+   $env:DOTNET_ROOT = "$PWD\.tools\dotnet"
+   Start-Process "$PWD\src\Island.App\bin\Release\net8.0-windows10.0.19041.0\Island.App.exe"
+   ~~~
+
+2. **Quick Controls Tab**:
+   - Hover over the notch to expand it, and click the **Quick Controls** tab (sliders icon, 6th tab).
+   - Drag the **Volume** slider: verify the volume changes and the percentage updates. Click the speaker icon to toggle mute.
+   - Drag the **Brightness** slider: verify display brightness adjusts.
+   - Click the **Mic** tile: verify microphone muting toggles.
+   - Click the **Wi-Fi** or **Bluetooth** tiles: verify radios toggle.
+   - Click **Snip**: verify Windows screen clipping opens.
+3. **Focus Tab**:
+   - Click the **Focus** tab (timer icon, 5th tab).
+   - In **Pomodoro** mode: click Play. Collapse the notch (move mouse away): notice the collapsed notch displays the countdown timer and progress bar!
+   - Expand the notch again, click Skip: verify it switches to Short Break.
+   - Switch to **Timer** mode: click the "10m" preset pill button, then click Play.
+   - Switch to **Stopwatch** mode: click Play, click the Lap button, and check the recorded split laps in the right sidebar.
+4. **Tasks Tab**:
+   - Click the **Tasks** tab (checklist icon, 4th tab).
+   - Click in the text box: notice you can type normally.
+   - Cycle priority using the priority button ("Med", "High", "Low").
+   - Type a task name (e.g. "Finish project review") and press Enter (or click "+").
+   - Add another task, test clicking the check mark to mark complete (strikethrough styling).
+   - Test **All / Active / Done** filter pills.
+   - Test the Move Up / Move Down buttons to reorder tasks, and click the trash can icon to delete.
+   - Close Island and restart: verify all tasks persisted from `%LOCALAPPDATA%\Island\tasks.json`.
+
+### Next milestone
+
+M7 adds Calendar & Weather (Windows Agenda / Google Calendar / Outlook integration, Open-Meteo local weather forecasts, collapsed weather icons, and precipitation alerts). Waiting for the user's instruction to continue.
+
 ## M5 complete · 2026-11-19
 
 ### What works
