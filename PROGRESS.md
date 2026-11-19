@@ -1,6 +1,17 @@
 # Milestone progress
 
-## M-Transparency-Clock-Polish (Phases 1 & 2 Complete) · 2026-11-19
+## M-Transparency-Clock-Polish (Phases 1 & 2 Complete + Music Seek Polished) · 2026-11-20
+
+### Music Playback Seek Fix (BrimDeck-Style Seek & Timeline Hold)
+- **Eliminated Slider Pullback / Snapping**:
+  - Identified root causes:
+    1. Background `200ms` timer tick continuously overwriting `position` and `Fraction` during active dragging.
+    2. `commandBusy = true` in `MusicViewModel.CommandAsync` disabling `CanSeek` during async dispatch, triggering WPF mouse capture loss and aborting drag.
+    3. Windows GSMTC reporting asynchronous timeline changes where initial post-seek reads reflect pre-seek timestamps before the media player processes the seek.
+  - Implemented BrimDeck-style `isSeeking` suppression across the ViewModel and View.
+  - Implemented `MediaSessions.pendingSeekPosition` with a 3-second hold window that filters out obsolete pre-seek timeline events from Windows until the player catches up.
+  - Implemented standard WPF `Slider.DecreaseLarge` / `IncreaseLarge` track commands with handled event listeners on `Thumb.DragStarted`, `Thumb.DragCompleted`, and `ValueChanged`.
+  - Both clicking anywhere on the track and dragging the thumb now immediately update the target position and smoothly seek playback in Windows Media Player, Spotify, and browsers without snapback.
 
 ### Phase 2: Clock Studio
 
