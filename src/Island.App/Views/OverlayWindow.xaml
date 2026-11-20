@@ -78,9 +78,12 @@
             <!-- 1 px inner stroke white at 8% so the shape stays defined over dark backdrops -->
             <Path x:Name="InnerRim" Stroke="{DynamicResource Theme.InnerRim}" StrokeThickness="2" IsHitTestVisible="False"/>
 
-            <!-- Bottom highlight line -->
-            <Border x:Name="BottomEdge" VerticalAlignment="Top" Height="1" Background="{DynamicResource Theme.Border}" IsHitTestVisible="False">
+            <!-- Bottom neon reactive line -->
+            <Border x:Name="BottomEdge" VerticalAlignment="Top" Height="1.5" Background="{DynamicResource Theme.NeonLine}" IsHitTestVisible="False">
                 <Border.RenderTransform><TranslateTransform x:Name="EdgeOffset" Y="34"/></Border.RenderTransform>
+                <Border.Effect>
+                    <DropShadowEffect x:Name="BottomNeonGlow" Color="#FFFF2E97" BlurRadius="8" ShadowDepth="0" Opacity="0.75"/>
+                </Border.Effect>
             </Border>
 
             <!-- Collapsed Notch Center Content -->
@@ -154,12 +157,15 @@
 
                 <!-- Left: Tab Icon Bar with Selected Tab Gliding Indicator -->
                 <Border HorizontalAlignment="Left" VerticalAlignment="Center" Margin="16,0,0,0"
-                        Background="{DynamicResource Theme.SurfaceRaised}" BorderBrush="{DynamicResource Theme.Border}"
+                        Background="{DynamicResource Theme.SurfaceRaised}" BorderBrush="{DynamicResource Theme.CardRestBorder}"
                         BorderThickness="1" CornerRadius="6" Padding="2" ClipToBounds="True">
                     <Grid>
                         <Border x:Name="PillIndicator" Width="32" Height="30" HorizontalAlignment="Left"
-                                Background="{DynamicResource Theme.SurfaceHover}" CornerRadius="4">
+                                Background="{DynamicResource Theme.Accent}" CornerRadius="4">
                             <Border.RenderTransform><TranslateTransform x:Name="PillX"/></Border.RenderTransform>
+                            <Border.Effect>
+                                <DropShadowEffect x:Name="PillGlow" Color="#FFFF2E97" BlurRadius="10" ShadowDepth="0" Opacity="0.8"/>
+                            </Border.Effect>
                         </Border>
                         <StackPanel x:Name="TabButtons" Orientation="Horizontal"/>
                     </Grid>

@@ -43,7 +43,8 @@
     <sys:Double x:Key="Font.CollapsedClock">16</sys:Double>
     <sys:Double x:Key="Font.Hero">32</sys:Double>
     <sys:Double x:Key="Font.HeroLarge">56</sys:Double>
-    <FontFamily x:Key="Font.FamilyDisplay">Segoe UI Variable Display, Segoe UI</FontFamily>
+    <FontFamily x:Key="Font.FamilyDisplay">pack://application:,,,/Fonts/#Orbitron, Segoe UI Variable Display, Segoe UI</FontFamily>
+    <FontFamily x:Key="Font.FamilyMono">Cascadia Code, Consolas, Courier New</FontFamily>
     <FontFamily x:Key="Font.FamilyText">Segoe UI Variable Text, Segoe UI</FontFamily>
 
     <!-- TOUCH / CLICK TARGETS -->
@@ -51,17 +52,22 @@
     <sys:Double x:Key="Target.IconSize">20</sys:Double>
 
     <!-- FONT FAMILIES -->
-    <FontFamily x:Key="Font.Display">Segoe UI Variable Display, Segoe UI</FontFamily>
+    <FontFamily x:Key="Font.Display">pack://application:,,,/Fonts/#Orbitron, Segoe UI Variable Display, Segoe UI</FontFamily>
     <FontFamily x:Key="Font.Text">Segoe UI Variable Text, Segoe UI</FontFamily>
     <FontFamily x:Key="Font.Icons">Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji</FontFamily>
 
-    <!-- CARD STYLE -->
+    <!-- CARD STYLE (Subtle fill, 1px top highlight, outline only on hover/focus) -->
     <Style x:Key="IslandCard" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource Theme.SurfaceRaised}"/>
-        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.CardRestBorder}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="CornerRadius" Value="{StaticResource Radius.Card}"/>
         <Setter Property="Padding" Value="16"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- PILL BUTTON STYLE -->
@@ -135,7 +141,7 @@
         </Setter>
     </Style>
 
-    <!-- METRIC PROGRESS BAR -->
+    <!-- METRIC PROGRESS BAR (Cyan Data) -->
     <Style x:Key="IslandProgressBar" TargetType="ProgressBar">
         <Setter Property="Height" Value="6"/>
         <Setter Property="Minimum" Value="0"/>
@@ -147,7 +153,7 @@
                     <Border CornerRadius="3" Background="{DynamicResource Theme.Border}">
                         <Grid x:Name="PART_Track">
                             <Border x:Name="PART_Indicator" CornerRadius="3" HorizontalAlignment="Left"
-                                    Background="{DynamicResource Theme.Accent}"/>
+                                    Background="{DynamicResource Theme.Data}"/>
                         </Grid>
                     </Border>
                 </ControlTemplate>
@@ -168,7 +174,7 @@
                                 <RepeatButton Focusable="False">
                                     <RepeatButton.Template>
                                         <ControlTemplate TargetType="RepeatButton">
-                                            <Border Height="6" CornerRadius="3" Background="{DynamicResource Theme.Accent}"/>
+                                            <Border Height="6" CornerRadius="3" Background="{DynamicResource Theme.Data}"/>
                                         </ControlTemplate>
                                     </RepeatButton.Template>
                                 </RepeatButton>
@@ -178,7 +184,7 @@
                                     <Thumb.Template>
                                         <ControlTemplate TargetType="Thumb">
                                             <Grid>
-                                                <Ellipse Fill="{DynamicResource Theme.Accent}" Width="16" Height="16"/>
+                                                <Ellipse Fill="{DynamicResource Theme.Data}" Width="16" Height="16"/>
                                                 <Ellipse Fill="#FFFFFF" Width="10" Height="10"/>
                                             </Grid>
                                         </ControlTemplate>

@@ -87,17 +87,18 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- Usage Ring Gauge -->
+                        <!-- Usage Ring Gauge (Cyan Data with glow) -->
                         <Grid Width="50" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <Ellipse Width="46" Height="46" Stroke="{DynamicResource Theme.Border}" StrokeThickness="4"/>
-                            <Path x:Name="CpuRingPath" Stroke="{DynamicResource Theme.Accent}" StrokeThickness="4"
+                            <Path x:Name="CpuRingPath" Stroke="{DynamicResource Theme.Data}" StrokeThickness="4"
+                                  Effect="{DynamicResource Theme.DataGlow}"
                                   StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
                             <TextBlock Text="{Binding CpuUsageFormatted}" FontSize="13" FontWeight="Bold"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular"/>
                         </Grid>
 
-                        <!-- Per-Core Bars -->
+                        <!-- Per-Core Bars (Cyan Data) -->
                         <ItemsControl Grid.Column="2" ItemsSource="{Binding CpuCores}" VerticalAlignment="Center" HorizontalAlignment="Left">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
@@ -108,7 +109,7 @@
                                 <DataTemplate>
                                     <Grid Width="4" Height="20" Margin="1,1" VerticalAlignment="Bottom" ToolTip="{Binding Tooltip}">
                                         <Border CornerRadius="1.5" Background="{DynamicResource Theme.Border}"/>
-                                        <Border CornerRadius="1.5" Background="{DynamicResource Theme.Accent}"
+                                        <Border CornerRadius="1.5" Background="{DynamicResource Theme.Data}"
                                                 VerticalAlignment="Bottom" Height="{Binding Height}"/>
                                     </Grid>
                                 </DataTemplate>
@@ -137,7 +138,7 @@
                         <TextBlock Text="Memory" FontSize="{StaticResource FontSize.SectionTitle}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="1" Text="{Binding RamPercentFormatted}" FontSize="{StaticResource FontSize.Value}"
-                                   FontWeight="SemiBold" Foreground="{DynamicResource Theme.Accent}"
+                                   FontWeight="SemiBold" Foreground="{DynamicResource Theme.Data}"
                                    VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
                     </Grid>
 
@@ -185,7 +186,7 @@
                                    Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock Text="{Binding GpuUsageFormatted}" FontSize="{StaticResource FontSize.Value}"
-                                       FontWeight="SemiBold" Foreground="{DynamicResource Theme.Accent}"
+                                       FontWeight="SemiBold" Foreground="{DynamicResource Theme.Data}"
                                        Typography.NumeralAlignment="Tabular"/>
                             <TextBlock Text="{Binding GpuTempFormatted, StringFormat=' · {0}'}" FontSize="{StaticResource FontSize.Secondary}"
                                        Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"
@@ -228,13 +229,13 @@
                         <TextBlock Text="Power" FontSize="{StaticResource FontSize.SectionTitle}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="1" Text="{Binding PowerWattsFormatted}" FontSize="{StaticResource FontSize.Value}"
-                                   FontWeight="SemiBold" Foreground="{DynamicResource Theme.Accent}"
+                                   FontWeight="SemiBold" Foreground="{DynamicResource Theme.Data}"
                                    VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
                     </Grid>
 
                     <!-- Row 2: Sparkline Curve -->
                     <Canvas Grid.Row="2" Height="26" HorizontalAlignment="Stretch" ClipToBounds="True">
-                        <Polyline Points="{Binding PowerPoints}" Stroke="{DynamicResource Theme.Accent}"
+                        <Polyline Points="{Binding PowerPoints}" Stroke="{DynamicResource Theme.Data}"
                                   StrokeThickness="1.5" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
                     </Canvas>
 
@@ -246,7 +247,7 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock FontFamily="{StaticResource Font.Icons}" Text="{Binding BatteryGlyph}"
-                                   FontSize="14" Foreground="{DynamicResource Theme.Accent}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                   FontSize="14" Foreground="{DynamicResource Theme.Data}" VerticalAlignment="Center" Margin="0,0,6,0"/>
                         <TextBlock Grid.Column="1" Text="{Binding BatteryPercentFormatted}" FontSize="{StaticResource FontSize.Secondary}"
                                    FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
                         <TextBlock Grid.Column="2" Text="{Binding PowerMeanFormatted}" FontSize="{StaticResource FontSize.Label}"
@@ -284,7 +285,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="↓" FontSize="{StaticResource FontSize.Body}" Foreground="{DynamicResource Theme.Accent}" Margin="0,0,4,0"/>
+                            <TextBlock Text="↓" FontSize="{StaticResource FontSize.Body}" Foreground="{DynamicResource Theme.Data}" Margin="0,0,4,0"/>
                             <TextBlock Text="{Binding DownSpeedFormatted}" FontSize="{StaticResource FontSize.Body}" FontWeight="SemiBold"
                                        Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular"/>
                         </StackPanel>

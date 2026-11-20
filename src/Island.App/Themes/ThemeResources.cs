@@ -12,13 +12,15 @@ public sealed class ThemeResources(ResourceDictionary applicationResources, Them
     private string currentStyle = "Opaque";
     private double currentBgTransp = -1;
     private double currentCollapsedTransp = -1;
+    private double currentNeonIntensity = -1;
 
-    public void Apply(string name, string surfaceStyle = "Opaque", double? backgroundTransparency = null, double? collapsedTransparency = null)
+    public void Apply(string name, string surfaceStyle = "Opaque", double? backgroundTransparency = null, double? collapsedTransparency = null, double? neonIntensity = null)
     {
         var palette = catalog.Resolve(name);
         double bgTransp = backgroundTransparency ?? (surfaceStyle == "Clear" ? 55.0 : surfaceStyle == "Translucent" ? 20.0 : 0.0);
         double colTransp = collapsedTransparency ?? 0.0;
-        if (palette == current && surfaceStyle == currentStyle && bgTransp == currentBgTransp && colTransp == currentCollapsedTransp) return;
+        double intensity = Math.Clamp(neonIntensity ?? 0.6, 0.0, 1.0);
+        if (palette == current && surfaceStyle == currentStyle && bgTransp == currentBgTransp && colTransp == currentCollapsedTransp && intensity == currentNeonIntensity) return;
 
         byte alpha = surfaceStyle switch
         {
@@ -29,6 +31,27 @@ public sealed class ThemeResources(ResourceDictionary applicationResources, Them
         byte collapsedAlpha = (byte)Math.Clamp(Math.Round(255.0 * (1.0 - colTransp / 100.0)), 60, 255);
         byte cardAlpha = palette.IsDark ? (byte)14 : (byte)24; // ~5.5% white on dark, subtle tint on light
 
+        var accentColor = (Color)ColorConverter.ConvertFromString(palette.Accent);
+        var dataColor = (Color)ColorConverter.ConvertFromString(palette.EffectiveData);
+
+        var glow = new System.Windows.Media.Effects.DropShadowEffect
+        {
+            Color = accentColor,
+            BlurRadius = 14 * intensity,
+            ShadowDepth = 0,
+            Opacity = 0.85 * intensity
+        };
+        glow.Freeze();
+
+        var dataGlow = new System.Windows.Media.Effects.DropShadowEffect
+        {
+            Color = dataColor,
+            BlurRadius = 12 * intensity,
+            ShadowDepth = 0,
+            Opacity = 0.8 * intensity
+        };
+        dataGlow.Freeze();
+
         var next = new ResourceDictionary
         {
             ["Theme.Background"] = Brush(palette.Background),
@@ -38,18 +61,24 @@ public sealed class ThemeResources(ResourceDictionary applicationResources, Them
             ["Theme.SurfaceHover"] = palette.IsDark ? BrushWithAlpha("#FFFFFF", 25) : BrushWithAlpha(palette.EffectiveSurfaceHover, alpha),
             ["Theme.Border"] = Brush(palette.EffectiveBorder),
             ["Theme.BorderStrong"] = Brush(palette.EffectiveBorderStrong),
+            ["Theme.CardRestBorder"] = Brushes.Transparent,
             ["Theme.Foreground"] = Brush(palette.Foreground),
             ["Theme.TextPrimary"] = Brush(palette.Foreground),
             ["Theme.TextSecondary"] = Brush(palette.EffectiveTextSecondary),
             ["Theme.TextTertiary"] = Brush(palette.EffectiveTextTertiary),
             [AccentKey] = Brush(palette.Accent),
             ["Theme.AccentSoft"] = Brush(palette.EffectiveAccentSoft),
+            ["Theme.Data"] = Brush(palette.EffectiveData),
+            ["Theme.DataSoft"] = BrushWithAlpha(palette.EffectiveData, 45),
+            ["Theme.NeonLine"] = Brush(palette.EffectiveNeonLine),
             ["Theme.Success"] = Brush(palette.EffectiveSuccess),
             ["Theme.Warning"] = Brush(palette.EffectiveWarning),
             ["Theme.Danger"] = Brush(palette.EffectiveDanger),
             ["Theme.Shadow"] = Brush(palette.EffectiveShadow),
             ["Theme.InnerRim"] = Brush("#14FFFFFF"),
-            ["Theme.CardHighlight"] = Brush("#18FFFFFF")
+            ["Theme.CardHighlight"] = Brush("#18FFFFFF"),
+            ["Theme.NeonGlow"] = glow,
+            ["Theme.DataGlow"] = dataGlow
         };
 
         var dictionaries = applicationResources.MergedDictionaries;
@@ -63,6 +92,7 @@ public sealed class ThemeResources(ResourceDictionary applicationResources, Them
         currentStyle = surfaceStyle;
         currentBgTransp = bgTransp;
         currentCollapsedTransp = colTransp;
+        currentNeonIntensity = intensity;
     }
 
     private static SolidColorBrush Brush(string hex)

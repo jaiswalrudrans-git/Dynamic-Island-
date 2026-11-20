@@ -199,7 +199,7 @@
                             <Grid Height="20" Background="Transparent" Cursor="Hand">
                                 <Track x:Name="PART_Track" VerticalAlignment="Center">
                                     <Track.DecreaseRepeatButton>
-                                        <RepeatButton Style="{StaticResource SeekRail}" Background="{DynamicResource Theme.Accent}"
+                                        <RepeatButton Style="{StaticResource SeekRail}" Background="{DynamicResource Theme.Data}"
                                                       Command="Slider.DecreaseLarge"/>
                                     </Track.DecreaseRepeatButton>
                                     <Track.Thumb>
@@ -241,10 +241,14 @@
                 <Button Style="{StaticResource Transport}" Tag="Previous" Click="Transport" Content="&#xE892;"
                         IsEnabled="{Binding CanPrevious}" ToolTip="Previous track" Margin="8,0,0,0"/>
 
-                <!-- Play / Pause Main Button -->
+                <!-- Play / Pause Main Button (Primary action with glow) -->
                 <Button Style="{StaticResource Transport}" Tag="Toggle" Click="Transport" Content="{Binding PlayGlyph}"
                         IsEnabled="{Binding CanToggle}" Background="{DynamicResource Theme.Accent}" Foreground="#121620"
-                        Width="48" Height="48" Margin="12,0" ToolTip="{Binding PlayHint}" FontSize="18"/>
+                        Width="48" Height="48" Margin="12,0" ToolTip="{Binding PlayHint}" FontSize="18">
+                    <Button.Effect>
+                        <DropShadowEffect Color="#FFFF2E97" BlurRadius="10" ShadowDepth="0" Opacity="0.75"/>
+                    </Button.Effect>
+                </Button>
 
                 <Button Style="{StaticResource Transport}" Tag="Next" Click="Transport" Content="&#xE893;"
                         IsEnabled="{Binding CanNext}" ToolTip="Next track" Margin="0,0,8,0"/>

@@ -59,6 +59,7 @@ public sealed class ClockFace : FrameworkElement
     private bool blinkingColon;
     private bool leadingZero = true;
     private double sizeScale = 1.0;
+    private double neonIntensity = 0.6;
     private DropShadowEffect? neonEffect;
 
     public ClockFace()
@@ -186,6 +187,17 @@ public sealed class ClockFace : FrameworkElement
         }
     }
 
+    public double NeonIntensity
+    {
+        get => neonIntensity;
+        set
+        {
+            neonIntensity = Math.Clamp(value, 0.0, 1.0);
+            UpdateGlowEffect();
+            InvalidateVisual();
+        }
+    }
+
     public void ApplySettings(AppSettings settings, Color? cover = null)
     {
         style = settings.ClockStyle;
@@ -196,6 +208,7 @@ public sealed class ClockFace : FrameworkElement
         blinkingColon = settings.ClockBlinkingColon;
         leadingZero = settings.ClockLeadingZero;
         sizeScale = settings.ClockSizeScale;
+        neonIntensity = settings.NeonIntensity;
         coverColor = cover;
         UpdateGlowEffect();
         InvalidateMeasure();
@@ -204,15 +217,15 @@ public sealed class ClockFace : FrameworkElement
 
     private void UpdateGlowEffect()
     {
-        if (style == "Neon")
+        if (style is "Neon" or "Segment" && neonIntensity > 0.05)
         {
             Color glow = ResolveColor();
             neonEffect = new DropShadowEffect
             {
                 Color = glow,
                 ShadowDepth = 0,
-                BlurRadius = 8 * sizeScale,
-                Opacity = 0.85
+                BlurRadius = (style == "Neon" ? 8 : 4) * sizeScale * neonIntensity,
+                Opacity = (style == "Neon" ? 0.85 : 0.6) * neonIntensity
             };
             Effect = neonEffect;
         }

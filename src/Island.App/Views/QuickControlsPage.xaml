@@ -5,14 +5,14 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="Visible"/>
 
-        <!-- ACTION TILE STYLE -->
+        <!-- ACTION TILE STYLE (No border at rest, border on hover) -->
         <Style x:Key="QuickTileBtn" TargetType="Button">
             <Setter Property="Height" Value="54"/>
             <Setter Property="Focusable" Value="False"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Background" Value="{DynamicResource Theme.SurfaceRaised}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Theme.CardRestBorder}"/>
             <Setter Property="Padding" Value="10,6"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -27,7 +27,7 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Box" Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
-                                <Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource Theme.BorderStrong}"/>
+                                <Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="Box" Property="Opacity" Value="0.85"/>

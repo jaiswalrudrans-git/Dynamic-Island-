@@ -42,14 +42,14 @@
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Box" CornerRadius="6"
                                 Background="{DynamicResource Theme.SurfaceRaised}" Padding="{TemplateBinding Padding}"
-                                BorderThickness="1" BorderBrush="{DynamicResource Theme.Border}">
+                                BorderThickness="1" BorderBrush="{DynamicResource Theme.CardRestBorder}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Box" Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
                                 <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimary}"/>
-                                <Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource Theme.BorderStrong}"/>
+                                <Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

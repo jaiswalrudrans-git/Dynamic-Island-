@@ -70,7 +70,36 @@
                         <TextBlock Text="Fine UI scale"/>
                         <TextBlock Text="{Binding Value, ElementName=UiScaleSlider, StringFormat={}{0:P0}}" HorizontalAlignment="Right"/>
                     </DockPanel>
-                    <Slider x:Name="UiScaleSlider" Minimum="0.9" Maximum="1.5" TickFrequency="0.05" IsSnapToTickEnabled="True"/>
+                    <Slider x:Name="UiScaleSlider" Minimum="0.9" Maximum="1.5" TickFrequency="0.05" IsSnapToTickEnabled="True" Margin="0,0,0,8"/>
+
+                    <!-- Neon Intensity -->
+                    <DockPanel Margin="0,4,0,2">
+                        <TextBlock Text="Neon intensity" VerticalAlignment="Center"/>
+                        <Border HorizontalAlignment="Right" Background="{DynamicResource Theme.SurfaceRaised}"
+                                BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="6"
+                                Padding="4,2">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBox x:Name="NeonIntensityBox" Width="28" BorderThickness="0" Background="Transparent"
+                                         Foreground="{DynamicResource Theme.Foreground}" TextAlignment="Right"
+                                         VerticalAlignment="Center" FontSize="12"/>
+                                <TextBlock Text="%" Foreground="{DynamicResource Theme.TextSecondary}" FontSize="11"
+                                           VerticalAlignment="Center" Margin="1,0,5,0"/>
+                                <Border Width="1" Height="14" Background="{DynamicResource Theme.Border}" VerticalAlignment="Center"/>
+                                <Button x:Name="NeonIntensityMinus" Content="−" Width="20" Height="20" Margin="3,0,1,0"
+                                        Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
+                                        BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                                <Button x:Name="NeonIntensityPlus" Content="+" Width="20" Height="20" Margin="1,0,2,0"
+                                        Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
+                                        BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </DockPanel>
+                    <Slider x:Name="NeonIntensitySlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,0,0,10"/>
+
+                    <!-- Bottom Neon Line Toggles -->
+                    <CheckBox x:Name="BottomNeonLineCheck" Content="Bottom-edge neon line" Foreground="{DynamicResource Theme.Foreground}" Margin="0,4,0,6"/>
+                    <CheckBox x:Name="NeonMusicReactiveCheck" Content="Music-reactive pulse while playing" Foreground="{DynamicResource Theme.Foreground}" Margin="18,0,0,6"/>
+                    <CheckBox x:Name="NeonLoadReactiveCheck" Content="Shift to yellow/red warning on high load or temp" Foreground="{DynamicResource Theme.Foreground}" Margin="18,0,0,4"/>
                 </StackPanel>
             </Border>
 

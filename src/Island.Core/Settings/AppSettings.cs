@@ -22,6 +22,10 @@ public sealed record AppSettings
     public bool ClockLeadingZero { get; init; } = true;
     public double ClockSizeScale { get; init; } = 1.0;
     public bool ShowNotchClock { get; init; } = true;
+    public double NeonIntensity { get; init; } = 0.6; // 0.0 to 1.0 (default 60%)
+    public bool BottomNeonLine { get; init; } = true;
+    public bool NeonMusicReactive { get; init; } = true;
+    public bool NeonLoadReactive { get; init; } = true;
     public string? MonitorDeviceName { get; init; }
     public string? PreferredPlayer { get; init; }
     public bool ShowMusicPreview { get; init; } = true;
@@ -75,6 +79,7 @@ public sealed record AppSettings
         ClockStyle = ClockStyle is "Simple" or "WithDate" or "Stacked" or "DotMatrix" or "Segment" or "Neon" or "Serif" or "Wide" or "Condensed" or "Pixel" or "Compact" or "Terminal" or "Gradient" or "Outline" ? ClockStyle : "Simple",
         ClockColor = ClockColor is "White" or "Amber" or "Cyan" or "Pink" or "Green" or "Violet" or "Gradient" or "Cover" or "Custom" ? ClockColor : "White",
         ClockCustomColor = string.IsNullOrWhiteSpace(ClockCustomColor) ? "#00E5FF" : ClockCustomColor.Trim(),
-        ClockSizeScale = double.IsFinite(ClockSizeScale) ? Math.Clamp(ClockSizeScale, 0.8, 1.5) : 1.0
+        ClockSizeScale = double.IsFinite(ClockSizeScale) ? Math.Clamp(ClockSizeScale, 0.8, 1.5) : 1.0,
+        NeonIntensity = double.IsFinite(NeonIntensity) ? Math.Clamp(NeonIntensity, 0.0, 1.0) : 0.6
     };
 }

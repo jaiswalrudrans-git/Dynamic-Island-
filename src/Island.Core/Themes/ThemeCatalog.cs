@@ -14,6 +14,8 @@ public sealed record ThemePalette(
     string? TextSecondary = null,
     string? TextTertiary = null,
     string? AccentSoft = null,
+    string? Data = null,
+    string? NeonLine = null,
     string? Success = null,
     string? Warning = null,
     string? Danger = null,
@@ -28,6 +30,8 @@ public sealed record ThemePalette(
     public string EffectiveTextSecondary => TextSecondary ?? "#8E9DAE";
     public string EffectiveTextTertiary => TextTertiary ?? "#5E6D7E";
     public string EffectiveAccentSoft => AccentSoft ?? "#2A" + Accent.TrimStart('#');
+    public string EffectiveData => Data ?? (IsDark ? "#00E5FF" : Accent);
+    public string EffectiveNeonLine => NeonLine ?? Accent;
     public string EffectiveSuccess => Success ?? "#4CAF50";
     public string EffectiveWarning => Warning ?? "#FFA726";
     public string EffectiveDanger => Danger ?? "#FF5252";

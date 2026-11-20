@@ -1,6 +1,37 @@
 # Milestone progress
 
-## M-Transparency-Clock-Polish (Phases 1 & 2 Complete + Music Seek Polished) · 2026-11-20
+## M-Transparency-Clock-Polish (Phases 1, 2 & 5 Complete) · 2026-11-20
+
+### Phase 5: Neon / Cyberpunk Polish
+- **Color Roles & Token System**:
+  - **Pink (`#FF2E97`)**: Reserved strictly for ACTIVE states (active tab indicator pill with neon glow, active playback button, active toggle switches).
+  - **Cyan (`#00E5FF`)**: Dedicated strictly to DATA (progress bars, CPU ring gauge, per-core bars, memory bars, sparkline power curves, seek progress).
+  - **Yellow (`#FCEE0A`)**: Dedicated to WARNINGS (high CPU/GPU temperature, excessive load alerts).
+  - **Secondary Text (`#B8B0C8`)**: Lavender-gray readability floor providing >= 5:1 contrast against dark surfaces (never purple on purple).
+- **Outlines Removed & Subtle Card Depth**:
+  - Removed outlines around cards, tiles, and tab bars at rest.
+  - Cards use subtle surface fill (`Theme.SurfaceRaised`) plus a 1 px top highlight (`Theme.CardHighlight`).
+  - Borders appear subtly only on hover or keyboard focus (`Theme.CardRestBorder` -> `Theme.Border`).
+- **Targeted Glow Effects & Neon Intensity**:
+  - Glow effects applied strictly to:
+    1. Active tab pill (`PillGlow`)
+    2. Primary transport action button (Play/Pause)
+    3. Progress rings (`CpuRingPath`, `RingPath`)
+    4. Key live hero numbers
+  - **Settings > Appearance: "Neon intensity" slider** (0% to 100%, default 60%) with numeric text box and `-`/`+` steppers that dynamically scales glow blur radius and opacity live across all elements.
+- **Bottom-Edge Reactive Neon Line**:
+  - 1.5 DIP neon line along the bottom perimeter of the active notch/island (`OverlayWindow.xaml: BottomEdge`).
+  - **Music Reactive**: Pulses dynamically in sync with the audio spectrum/energy level when music plays.
+  - **Load Reactive**: Automatically shifts to warning yellow (`#FCEE0A`) or critical red when CPU load > 85% or temperature alerts fire.
+  - Configurable in Settings > Appearance with toggles for enabling/disabling the line, music reactivity, and load reactivity.
+- **5 New Built-In Themed Token Palettes**:
+  - `Cyberpunk`: Night City violet-black surface (`#0C0616`), `#00E5FF` data, `#FF2E97` active, `#FCEE0A` warning/clock.
+  - `Aurora`: Northern lights theme (`#07151D` deep night, `#00FFC2` mint cyan data, `#7B61FF` purple active).
+  - `Amber Terminal`: Retro CRT phosphor (`#0F0C05` surface, `#FFB300` amber data, `#FFD54F` active).
+  - `Mono White`: High-contrast minimalist tech (`#0A0A0A` surface, `#FFFFFF` text, `#00E5FF` cyan active, `#E0E0E0` data).
+  - `Sakura`: Tokyo dusk plum (`#160B1A` surface, `#FF6584` blossom pink active, `#72DEC2` aqua data).
+- **Test Suite**:
+  - All 100 unit, layout, and theme tests pass (`dotnet test -c Release`).
 
 ### Music Playback Seek Fix (BrimDeck-Style Seek & Timeline Hold)
 - **Eliminated Slider Pullback / Snapping**:

@@ -124,10 +124,10 @@ public partial class OverlayWindow : Window
     private void Place()
     {
         if (source is null) return;
-        double pixel = 1 / VisualTreeHelper.GetDpi(this).DpiScaleY;
-        if (BottomEdge.Height != pixel)
+        double lineH = Math.Max(1.5, 1 / VisualTreeHelper.GetDpi(this).DpiScaleY);
+        if (BottomEdge.Height != lineH)
         {
-            BottomEdge.Height = pixel;
+            BottomEdge.Height = lineH;
             lastShape = double.NaN;
             DrawPanel();
         }

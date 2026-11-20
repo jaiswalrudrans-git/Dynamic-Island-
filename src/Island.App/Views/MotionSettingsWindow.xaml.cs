@@ -16,7 +16,7 @@ public partial class MotionSettingsWindow : Window
         Title = AppIdentity.Name + " settings";
 
         // Appearance
-        ThemeSelector.ItemsSource = new[] { "Midnight", "Dark", "Graphite", "Pure Black", "Light", "One Dark Pro", "GitHub Dark", "Dracula", "Night Owl", "Cyberpunk" };
+        ThemeSelector.ItemsSource = new[] { "Midnight", "Dark", "Graphite", "Pure Black", "Light", "One Dark Pro", "GitHub Dark", "Dracula", "Night Owl", "Cyberpunk", "Aurora", "Amber Terminal", "Mono White", "Sakura" };
         ThemeSelector.SelectedItem = current.Theme;
         SurfaceSelector.ItemsSource = new[] { "Opaque", "Translucent", "Clear" };
         SurfaceSelector.SelectedItem = current.SurfaceStyle;
@@ -24,6 +24,11 @@ public partial class MotionSettingsWindow : Window
         BgTranspBox.Text = ((int)Math.Round(current.BackgroundTransparency)).ToString();
         ColTranspSlider.Value = current.CollapsedTransparency;
         ColTranspBox.Text = ((int)Math.Round(current.CollapsedTransparency)).ToString();
+        NeonIntensitySlider.Value = Math.Round(current.NeonIntensity * 100);
+        NeonIntensityBox.Text = ((int)Math.Round(current.NeonIntensity * 100)).ToString();
+        BottomNeonLineCheck.IsChecked = current.BottomNeonLine;
+        NeonMusicReactiveCheck.IsChecked = current.NeonMusicReactive;
+        NeonLoadReactiveCheck.IsChecked = current.NeonLoadReactive;
         InterfaceSizeSelector.ItemsSource = new[] { "Auto", "Compact", "Comfortable", "Large" };
         InterfaceSizeSelector.SelectedItem = current.InterfaceSize;
         UiScaleSlider.Value = current.UiScale;
@@ -354,6 +359,37 @@ public partial class MotionSettingsWindow : Window
         {
             if (e.Key == Key.Enter) { CommitColTransp(); e.Handled = true; }
         };
+
+        NeonIntensitySlider.ValueChanged += (_, _) =>
+        {
+            int val = (int)Math.Round(NeonIntensitySlider.Value);
+            NeonIntensityBox.Text = val.ToString();
+            save(s => s with { NeonIntensity = val / 100.0 });
+        };
+        NeonIntensityMinus.Click += (_, _) =>
+        {
+            NeonIntensitySlider.Value = Math.Clamp(Math.Round(NeonIntensitySlider.Value) - 5, 0, 100);
+        };
+        NeonIntensityPlus.Click += (_, _) =>
+        {
+            NeonIntensitySlider.Value = Math.Clamp(Math.Round(NeonIntensitySlider.Value) + 5, 0, 100);
+        };
+        void CommitNeonIntensity()
+        {
+            if (double.TryParse(NeonIntensityBox.Text, out var v))
+                NeonIntensitySlider.Value = Math.Clamp(Math.Round(v), 0, 100);
+            else
+                NeonIntensityBox.Text = ((int)Math.Round(NeonIntensitySlider.Value)).ToString();
+        }
+        NeonIntensityBox.LostKeyboardFocus += (_, _) => CommitNeonIntensity();
+        NeonIntensityBox.KeyDown += (_, e) =>
+        {
+            if (e.Key == Key.Enter) { CommitNeonIntensity(); e.Handled = true; }
+        };
+        BottomNeonLineCheck.Click += (_, _) => save(s => s with { BottomNeonLine = BottomNeonLineCheck.IsChecked == true });
+        NeonMusicReactiveCheck.Click += (_, _) => save(s => s with { NeonMusicReactive = NeonMusicReactiveCheck.IsChecked == true });
+        NeonLoadReactiveCheck.Click += (_, _) => save(s => s with { NeonLoadReactive = NeonLoadReactiveCheck.IsChecked == true });
+
         InterfaceSizeSelector.SelectionChanged += (_, _) =>
         {
             if (InterfaceSizeSelector.SelectedItem is string size) save(s => s with { InterfaceSize = size });

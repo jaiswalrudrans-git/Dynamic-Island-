@@ -21,6 +21,10 @@ public sealed class LayoutTests : TestFolder
     [InlineData("Dracula")]
     [InlineData("Night Owl")]
     [InlineData("Cyberpunk")]
+    [InlineData("Aurora")]
+    [InlineData("Amber Terminal")]
+    [InlineData("Mono White")]
+    [InlineData("Sakura")]
     public void ShippedThemesResolveAndContainDesignTokens(string themeName)
     {
         var catalog = new ThemeCatalog(Folder, Messages.Add);

@@ -121,7 +121,7 @@ internal sealed class PanelNavigation
     {
         if (active)
         {
-            buttons[index].SetResourceReference(Control.ForegroundProperty, "Theme.Accent");
+            buttons[index].SetResourceReference(Control.ForegroundProperty, "Theme.Background");
         }
         else
         {

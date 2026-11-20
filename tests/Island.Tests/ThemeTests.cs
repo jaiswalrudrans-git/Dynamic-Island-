@@ -16,7 +16,11 @@ public sealed class ThemeTests : TestFolder
     [InlineData("GitHub Dark", "#58A6FF")]
     [InlineData("Dracula", "#BD93F9")]
     [InlineData("Night Owl", "#82AAFF")]
-    [InlineData("Cyberpunk", "#FF58D4")]
+    [InlineData("Cyberpunk", "#FF2E97")]
+    [InlineData("Aurora", "#7B61FF")]
+    [InlineData("Amber Terminal", "#FFD54F")]
+    [InlineData("Mono White", "#00E5FF")]
+    [InlineData("Sakura", "#FF6584")]
     public void BundledPaletteHasExpectedAccent(string name, string accent)
     {
         var catalog = new ThemeCatalog(Folder, Messages.Add);
@@ -82,6 +86,30 @@ public sealed class ThemeTests : TestFolder
         var cardFill = Assert.IsType<SolidColorBrush>(root["Theme.SurfaceRaised"]);
         Assert.True(cardFill.IsFrozen);
         Assert.True(cardFill.Color.A <= 25); // Subtle card overlay
+    }
+
+    [Fact]
+    public void CyberpunkThemeProvidesDataTokensAndGlowScalesWithIntensity()
+    {
+        var catalog = new ThemeCatalog(Folder, Messages.Add);
+        var root = new ResourceDictionary();
+        var resources = new ThemeResources(root, catalog);
+
+        // Cyberpunk with 80% neon intensity
+        resources.Apply("Cyberpunk", "Opaque", 12.0, 0.0, 0.8);
+
+        var dataBrush = Assert.IsType<SolidColorBrush>(root["Theme.Data"]);
+        Assert.True(dataBrush.IsFrozen);
+        Assert.Equal(Color.FromRgb(0x00, 0xE5, 0xFF), dataBrush.Color);
+
+        var neonLine = Assert.IsType<SolidColorBrush>(root["Theme.NeonLine"]);
+        Assert.True(neonLine.IsFrozen);
+        Assert.Equal(Color.FromRgb(0xFF, 0x2E, 0x97), neonLine.Color);
+
+        var glow = Assert.IsType<System.Windows.Media.Effects.DropShadowEffect>(root["Theme.NeonGlow"]);
+        Assert.True(glow.IsFrozen);
+        Assert.Equal(Color.FromRgb(0xFF, 0x2E, 0x97), glow.Color);
+        Assert.Equal(14 * 0.8, glow.BlurRadius, 2);
     }
 
     private void WriteCustom(string input)

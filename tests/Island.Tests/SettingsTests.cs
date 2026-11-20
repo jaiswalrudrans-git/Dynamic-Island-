@@ -106,4 +106,22 @@ public sealed class SettingsTests : TestFolder
         Assert.Equal(25.0, normal.BackgroundTransparency);
         Assert.Equal(15.0, normal.CollapsedTransparency);
     }
+
+    [Fact]
+    public void NeonSettingsNormalizeCorrectly()
+    {
+        var settings = new AppSettings
+        {
+            NeonIntensity = 1.8
+        }.Normalize();
+
+        Assert.Equal(1.0, settings.NeonIntensity);
+
+        var negative = new AppSettings
+        {
+            NeonIntensity = -0.5
+        }.Normalize();
+
+        Assert.Equal(0.0, negative.NeonIntensity);
+    }
 }

@@ -451,6 +451,51 @@ public partial class OverlayWindow
         BodyY.Y = reduced ? 0 : 6 * (1 - Body.Opacity);
         Header.IsHitTestVisible = motion.Expanded && Header.Opacity > .15;
         Body.IsHitTestVisible = motion.Expanded && Body.Opacity > .15;
+        UpdateBottomNeonLine();
+    }
+
+    private void UpdateBottomNeonLine()
+    {
+        double intensity = settings.Current.NeonIntensity;
+        var activeNeonColor = (Color)ColorConverter.ConvertFromString(settings.Current.Theme == "Cyberpunk" ? "#FF2E97" : "#00E5FF");
+        if (PillGlow != null)
+        {
+            PillGlow.Color = activeNeonColor;
+            PillGlow.BlurRadius = 10 * intensity;
+            PillGlow.Opacity = 0.8 * intensity;
+        }
+
+        if (!settings.Current.BottomNeonLine)
+        {
+            BottomEdge.Visibility = Visibility.Collapsed;
+            return;
+        }
+        BottomEdge.Visibility = Visibility.Visible;
+
+        if (settings.Current.NeonLoadReactive && system != null && (system.CpuPercent > 85 || alerts.HasActiveAlert))
+        {
+            BottomEdge.Background = (Brush)FindResource("Theme.Warning");
+            BottomNeonGlow.Color = (Color)ColorConverter.ConvertFromString(settings.Current.Theme == "Cyberpunk" ? "#FCEE0A" : "#FFA726");
+            BottomNeonGlow.BlurRadius = 12 * intensity;
+            BottomNeonGlow.Opacity = 0.9 * intensity;
+            return;
+        }
+
+        if (settings.Current.NeonMusicReactive && music != null && music.Playing)
+        {
+            BottomEdge.Background = (Brush)FindResource("Theme.NeonLine");
+            BottomNeonGlow.Color = activeNeonColor;
+            double energy = music.Spectrum?.Levels is { Length: > 0 } lvls ? lvls.Average() : 0.2;
+            double pulse = Math.Clamp(energy * 2.5, 0.1, 1.0);
+            BottomNeonGlow.BlurRadius = (8 + 10 * pulse) * intensity;
+            BottomNeonGlow.Opacity = Math.Clamp(0.5 + 0.5 * pulse, 0.4, 1.0) * intensity;
+            return;
+        }
+
+        BottomEdge.Background = (Brush)FindResource("Theme.NeonLine");
+        BottomNeonGlow.Color = activeNeonColor;
+        BottomNeonGlow.BlurRadius = 8 * intensity;
+        BottomNeonGlow.Opacity = 0.75 * intensity;
     }
 
     private void StopFrames()

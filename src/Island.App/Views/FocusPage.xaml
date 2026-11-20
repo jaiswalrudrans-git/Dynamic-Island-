@@ -102,6 +102,7 @@
             <Setter Property="FontSize" Value="20"/>
             <Setter Property="Focusable" Value="False"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Effect" Value="{DynamicResource Theme.NeonGlow}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -201,8 +202,9 @@
                              StrokeThickness="5" HorizontalAlignment="Center" VerticalAlignment="Center"
                              Visibility="{Binding ShowProgress, Converter={StaticResource Visible}}"/>
 
-                    <!-- Active Progress Arc -->
-                    <Path x:Name="RingPath" Stroke="{DynamicResource Theme.Accent}" StrokeThickness="5"
+                    <!-- Active Progress Arc (Cyan Data with Glow) -->
+                    <Path x:Name="RingPath" Stroke="{DynamicResource Theme.Data}" StrokeThickness="5"
+                          Effect="{DynamicResource Theme.DataGlow}"
                           StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                           HorizontalAlignment="Center" VerticalAlignment="Center"
                           Visibility="{Binding ShowProgress, Converter={StaticResource Visible}}"/>
