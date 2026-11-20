@@ -165,33 +165,65 @@ internal sealed class PanelNavigation
     public Size GetDesiredSize(int tabIndex)
     {
         if (tabIndex < 0 || tabIndex >= pages.Length)
-            return new Size(760, 420);
+            return new Size(480, 200);
 
-        // Standardized spacious 760 DIP width matching BrimDeck: zero congestion, luxurious breathing room
-        double islandW = 760;
-        double islandH = tabIndex switch
-        {
-            0 => 400, // Music
-            1 => 460, // System
-            2 => 420, // Tasks
-            3 => 400, // Quick Controls
-            4 => 410, // Focus
-            5 => 460, // Calendar & Weather
-            _ => 420
-        };
+        var page = pages[tabIndex];
 
-        // Constraints: max 62% width, max 70% height
         double screenW = SystemParameters.WorkArea.Width > 0 ? SystemParameters.WorkArea.Width : 1920;
         double screenH = SystemParameters.WorkArea.Height > 0 ? SystemParameters.WorkArea.Height : 1080;
+        double minIslandW = 480.0;
+        double maxIslandW = Math.Max(minIslandW, screenW * 0.62);
+        double maxIslandH = Math.Max(180, screenH * 0.70);
 
-        islandW = Math.Clamp(islandW, 520, Math.Max(520, screenW * 0.62));
-        islandH = Math.Clamp(islandH, 200, Math.Max(300, screenH * 0.70));
+        // Pass 1: Measure unconstrained to determine content's natural desired width
+        page.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        double desiredContentW = page.DesiredSize.Width;
 
-        // Snap to 8 DIP grid
-        islandW = Math.Ceiling(islandW / 8.0) * 8.0;
-        islandH = Math.Ceiling(islandH / 8.0) * 8.0;
+        // Fallback default widths per tab if measure returns 0 before first layout
+        if (desiredContentW < 100)
+        {
+            desiredContentW = tabIndex switch
+            {
+                0 => 520, // Music
+                1 => 660, // System
+                2 => 480, // Tasks
+                3 => 520, // Quick Controls
+                4 => 500, // Focus
+                5 => 660, // Calendar & Weather
+                _ => 480
+            };
+        }
 
-        return new Size(islandW, islandH);
+        // Horizontal padding: 12 left + 12 right = 24 DIP
+        double targetContentW = Math.Clamp(desiredContentW, minIslandW - 24.0, maxIslandW - 24.0);
+        double targetIslandW = Math.Ceiling((targetContentW + 24.0) / 8.0) * 8.0;
+        targetIslandW = Math.Clamp(targetIslandW, minIslandW, maxIslandW);
+        targetContentW = targetIslandW - 24.0;
+
+        // Pass 2: Measure with the target content width so text wrapping & reflow compute exact height
+        page.Measure(new Size(targetContentW, double.PositiveInfinity));
+        double desiredContentH = page.DesiredSize.Height;
+
+        // Fallback default heights per tab if measure returns 0 before first layout
+        if (desiredContentH < 40)
+        {
+            desiredContentH = tabIndex switch
+            {
+                0 => 170, // Music
+                1 => 320, // System
+                2 => 180, // Tasks
+                3 => 240, // Quick Controls
+                4 => 200, // Focus
+                5 => 310, // Calendar & Weather
+                _ => 180
+            };
+        }
+
+        // Vertical overhead: 12 top + 44 header + 8 gap + 12 bottom = 76 DIP
+        double targetIslandH = Math.Ceiling((desiredContentH + 76.0) / 8.0) * 8.0;
+        targetIslandH = Math.Clamp(targetIslandH, 120.0, maxIslandH);
+
+        return new Size(targetIslandW, targetIslandH);
     }
 
     public bool Advance(double seconds, bool reduced)

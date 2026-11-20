@@ -53,6 +53,7 @@ public sealed record AppSettings
     public bool AlertMicOsdEnabled { get; init; } = true;
     public bool AlertSoundEnabled { get; init; } = true;
     public int AlertDurationSeconds { get; init; } = 4;
+    public bool LayoutDebug { get; init; } = false;
 
     [JsonExtensionData]
     public IDictionary<string, JsonElement>? AdditionalSettings { get; init; }

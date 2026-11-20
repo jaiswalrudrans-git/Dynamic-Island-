@@ -58,6 +58,11 @@ public partial class App : Application
             MainWindow = overlay;
             overlay.Show();
 
+            if (e.Args.Contains("--layout-debug") || e.Args.Contains("-layout-debug"))
+            {
+                settings.Update(s => s with { LayoutDebug = true });
+            }
+
             if (e.Args.Contains("--open") || e.Args.Contains("-open"))
             {
                 overlay.OpenPanel();

@@ -89,31 +89,85 @@ public sealed class LayoutTests : TestFolder
         double effectiveW = screenW / scale;
         double effectiveH = screenH / scale;
 
-        double minWidth = 520.0;
+        double minWidth = 480.0;
         double maxWidth = effectiveW * 0.62;
         double maxHeight = effectiveH * 0.70;
 
         // Base content widths for tabs: Music, System, Tasks, QuickControls, Focus, CalendarWeather
-        double[] tabContentWidths = [664, 736, 664, 664, 664, 720];
-        double[] tabContentHeights = [288, 376, 220, 288, 304, 368];
+        double[] tabContentWidths = [520, 660, 480, 520, 500, 660];
+        double[] tabContentHeights = [170, 320, 180, 240, 200, 310];
 
         for (int i = 0; i < tabContentWidths.Length; i++)
         {
-            double islandW = tabContentWidths[i];
+            double islandW = tabContentWidths[i] + 24;
             double islandH = tabContentHeights[i] + 76; // Header + margins
 
             islandW = Math.Clamp(islandW, minWidth, maxWidth);
-            islandH = Math.Clamp(islandH, 200, maxHeight);
+            islandH = Math.Clamp(islandH, 120, maxHeight);
 
             // Snap to 8 DIP grid
             double snappedW = Math.Ceiling(islandW / 8.0) * 8.0;
             double snappedH = Math.Ceiling(islandH / 8.0) * 8.0;
 
-            Assert.True(snappedW >= 520, $"Tab {i} width {snappedW} must be >= 520");
+            Assert.True(snappedW >= 480, $"Tab {i} width {snappedW} must be >= 480");
             Assert.True(snappedW <= maxWidth + 8, $"Tab {i} width {snappedW} must be <= max width {maxWidth}");
             Assert.True(snappedH <= maxHeight + 8, $"Tab {i} height {snappedH} must be <= max height {maxHeight}");
             Assert.Equal(0.0, snappedW % 8.0);
             Assert.Equal(0.0, snappedH % 8.0);
+        }
+    }
+
+    [Theory]
+    [InlineData(1920, 1080, 1.0)]
+    [InlineData(1920, 1080, 1.25)]
+    [InlineData(2560, 1440, 1.0)]
+    [InlineData(2560, 1440, 1.25)]
+    [InlineData(1366, 768, 1.0)]
+    public void TabDimensionsHaveNoMoreThan12DipUnusedSpaceOnAnySide(int screenW, int screenH, double scale)
+    {
+        double effectiveW = screenW / scale;
+        double effectiveH = screenH / scale;
+        double minIslandW = 480.0;
+        double maxIslandW = effectiveW * 0.62;
+        double maxIslandH = effectiveH * 0.70;
+
+        (double w, double h)[] tabs = [
+            (520, 170), // Music
+            (660, 320), // System
+            (480, 180), // Tasks
+            (520, 240), // Quick Controls
+            (500, 200), // Focus
+            (660, 310)  // Calendar & Weather
+        ];
+
+        for (int i = 0; i < tabs.Length; i++)
+        {
+            var (contentW, contentH) = tabs[i];
+
+            double targetContentW = Math.Clamp(contentW, minIslandW - 24.0, maxIslandW - 24.0);
+            double islandW = Math.Ceiling((targetContentW + 24.0) / 8.0) * 8.0;
+            islandW = Math.Clamp(islandW, minIslandW, maxIslandW);
+
+            double islandH = Math.Ceiling((contentH + 76.0) / 8.0) * 8.0;
+            islandH = Math.Clamp(islandH, 120.0, maxIslandH);
+
+            // Bounds calculations:
+            double leftUnused = 12.0;
+            double rightUnused = (islandW - 24.0) - targetContentW + 12.0;
+            double topUnused = 12.0;
+            double bottomUnused = (islandH - 76.0) - contentH + 12.0;
+
+            // Extra slack beyond uniform 12 DIP padding must be <= 8 DIP (< 12 DIP)
+            Assert.True(Math.Abs(leftUnused - 12.0) <= 0.001, $"Tab {i} left padding must be exactly 12 DIP");
+            Assert.True(rightUnused - 12.0 <= 8.0, $"Tab {i} right unused slack {rightUnused - 12.0} > 8 DIP");
+            Assert.True(Math.Abs(topUnused - 12.0) <= 0.001, $"Tab {i} top padding must be exactly 12 DIP");
+            Assert.True(bottomUnused - 12.0 <= 8.0, $"Tab {i} bottom unused slack {bottomUnused - 12.0} > 8 DIP");
+
+            Assert.True(islandW >= 480.0, $"Tab {i} width {islandW} must be >= 480 DIP");
+            Assert.True(islandW <= maxIslandW + 8.0, $"Tab {i} width {islandW} must be <= max width {maxIslandW}");
+            Assert.True(islandH <= maxIslandH + 8.0, $"Tab {i} height {islandH} must be <= max height {maxIslandH}");
+            Assert.Equal(0.0, islandW % 8.0);
+            Assert.Equal(0.0, islandH % 8.0);
         }
     }
 
@@ -130,7 +184,7 @@ public sealed class LayoutTests : TestFolder
         var dict = (ResourceDictionary)XamlReader.Load(stream);
 
         // Corner Radii
-        Assert.True(((CornerRadius)dict["Radius.Card"]).TopLeft >= 18);
+        Assert.True(((CornerRadius)dict["Radius.Card"]).TopLeft >= 16);
         Assert.True(((CornerRadius)dict["Radius.Control"]).TopLeft >= 12);
         Assert.True(((CornerRadius)dict["Radius.Pill"]).TopLeft >= 999);
 

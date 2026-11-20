@@ -150,13 +150,13 @@
                 <local:ClockFace x:Name="CompactClock" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Grid>
 
-            <!-- Expanded Island Header (Slimmer ~48 DIP, tab icon bar, time 20px, date 12px, pin & settings) -->
-            <Grid x:Name="Header" Height="48" Margin="0,14,0,0" HorizontalAlignment="Center" VerticalAlignment="Top"
+            <!-- Expanded Island Header (Slimmer 44 DIP, tab icon bar, time 20px, date 12px, pin & settings) -->
+            <Grid x:Name="Header" Height="44" Margin="0,12,0,0" HorizontalAlignment="Center" VerticalAlignment="Top"
                   Opacity="0" IsHitTestVisible="False">
                 <Grid.RenderTransform><TranslateTransform x:Name="HeaderY"/></Grid.RenderTransform>
 
                 <!-- Left: Tab Icon Bar with Selected Tab Gliding Indicator -->
-                <Border HorizontalAlignment="Left" VerticalAlignment="Center" Margin="16,0,0,0"
+                <Border HorizontalAlignment="Left" VerticalAlignment="Center" Margin="12,0,0,0"
                         Background="{DynamicResource Theme.SurfaceRaised}" BorderBrush="{DynamicResource Theme.CardRestBorder}"
                         BorderThickness="1" CornerRadius="6" Padding="2" ClipToBounds="True">
                     <Grid>
@@ -179,7 +179,7 @@
                 </StackPanel>
 
                 <!-- Right: Pin & Settings Buttons -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,16,0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0">
                     <Button x:Name="PinButton" Style="{StaticResource IconButton}" Click="PinClick" Content="&#xE718;"/>
                     <Button x:Name="GearButton" Style="{StaticResource IconButton}" Click="SettingsClick" Content="&#xE713;"
                             Margin="4,0,0,0" ToolTip="Settings" AutomationProperties.Name="Settings"/>
@@ -187,11 +187,21 @@
             </Grid>
 
             <!-- Expanded Island Body: Content sits DIRECTLY on island surface (No double boxing!) -->
-            <Border x:Name="Body" Margin="0,72,0,0" HorizontalAlignment="Center" VerticalAlignment="Top"
+            <Border x:Name="Body" Margin="0,64,0,0" HorizontalAlignment="Center" VerticalAlignment="Top"
                     Opacity="0" Background="Transparent" CornerRadius="0" IsHitTestVisible="False">
                 <Border.RenderTransform><TranslateTransform x:Name="BodyY"/></Border.RenderTransform>
                 <Grid x:Name="Pages" ClipToBounds="True"/>
             </Border>
+
+            <!-- Dev-Only Layout Debug Overlay -->
+            <Canvas x:Name="LayoutDebugOverlay" IsHitTestVisible="False" Visibility="Collapsed">
+                <Rectangle x:Name="DebugIslandBounds" Stroke="#00FF66" StrokeThickness="1" StrokeDashArray="3 3"/>
+                <Rectangle x:Name="DebugHeaderBounds" Stroke="#00E5FF" StrokeThickness="1" StrokeDashArray="3 3"/>
+                <Rectangle x:Name="DebugContentBounds" Stroke="#FF2E97" StrokeThickness="1" StrokeDashArray="3 3"/>
+                <Border x:Name="DebugHud" Background="#EE080512" BorderBrush="#00FF66" BorderThickness="1" CornerRadius="4" Padding="6,3">
+                    <TextBlock x:Name="DebugHudText" FontFamily="Consolas, Cascadia Code, Courier New" FontSize="11" Foreground="#00FF66"/>
+                </Border>
+            </Canvas>
         </Grid>
     </Grid>
 </Window>

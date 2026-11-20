@@ -285,6 +285,7 @@ public partial class MotionSettingsWindow : Window
         AlertTempCheck.IsChecked = current.AlertTemperatureEnabled;
         AlertSoundCheck.IsChecked = current.AlertSoundEnabled;
         AlertDurationSlider.Value = current.AlertDurationSeconds;
+        LayoutDebugCheck.IsChecked = current.LayoutDebug;
 
         // Event hooks
         ThemeSelector.SelectionChanged += (_, _) =>
@@ -409,6 +410,7 @@ public partial class MotionSettingsWindow : Window
         AlertBatteryCheck.Click += (_, _) => save(s => s with { AlertBatteryEnabled = AlertBatteryCheck.IsChecked == true });
         AlertTempCheck.Click += (_, _) => save(s => s with { AlertTemperatureEnabled = AlertTempCheck.IsChecked == true });
         AlertSoundCheck.Click += (_, _) => save(s => s with { AlertSoundEnabled = AlertSoundCheck.IsChecked == true });
+        LayoutDebugCheck.Click += (_, _) => save(s => s with { LayoutDebug = LayoutDebugCheck.IsChecked == true });
         Reduced.Click += (_, _) => save(s => s with { ReduceMotion = Reduced.IsChecked == true });
 
         // Commit slider edits live

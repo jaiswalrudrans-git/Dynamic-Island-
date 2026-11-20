@@ -175,9 +175,11 @@ public partial class OverlayWindow
         var initSize = navigation.GetDesiredSize(0);
         targetIslandWidth = initSize.Width;
         targetIslandHeight = initSize.Height;
-        Header.Width = Math.Max(480, Math.Round(initSize.Width - 32));
-        Body.Width = Math.Max(480, Math.Round(initSize.Width - 32));
-        Body.Height = Math.Max(180, Math.Round(initSize.Height - 88));
+        double initContentW = Math.Max(480 - 24, Math.Round(initSize.Width - 24));
+        double initContentH = Math.Max(60, Math.Round(initSize.Height - 76));
+        Header.Width = initContentW;
+        Body.Width = initContentW;
+        Body.Height = initContentH;
         currentWidthSpring.Set(targetIslandWidth);
         currentHeightSpring.Set(targetIslandHeight);
 
@@ -223,8 +225,8 @@ public partial class OverlayWindow
         var size = navigation.GetDesiredSize(navigation.SelectedIndex);
         targetIslandWidth = size.Width;
         targetIslandHeight = size.Height;
-        double contentW = Math.Max(480, Math.Round(size.Width - 32));
-        double contentH = Math.Max(180, Math.Round(size.Height - 88));
+        double contentW = Math.Max(480 - 24, Math.Round(size.Width - 24));
+        double contentH = Math.Max(60, Math.Round(size.Height - 76));
         if (Header.Width != contentW) Header.Width = contentW;
         if (Body.Width != contentW) Body.Width = contentW;
         if (Body.Height != contentH) Body.Height = contentH;
@@ -452,6 +454,43 @@ public partial class OverlayWindow
         Header.IsHitTestVisible = motion.Expanded && Header.Opacity > .15;
         Body.IsHitTestVisible = motion.Expanded && Body.Opacity > .15;
         UpdateBottomNeonLine();
+
+        if (LayoutDebugOverlay != null)
+        {
+            if (settings.Current.LayoutDebug && shape > 0.1)
+            {
+                LayoutDebugOverlay.Visibility = Visibility.Visible;
+                double centerX = ActualWidth > 0 ? ActualWidth / 2.0 : 520.0;
+                double iLeft = centerX - curW / 2.0;
+                Canvas.SetLeft(DebugIslandBounds, iLeft);
+                Canvas.SetTop(DebugIslandBounds, 0);
+                DebugIslandBounds.Width = curW;
+                DebugIslandBounds.Height = curH;
+
+                double cLeft = centerX - Body.Width / 2.0;
+                Canvas.SetLeft(DebugHeaderBounds, cLeft);
+                Canvas.SetTop(DebugHeaderBounds, 12);
+                DebugHeaderBounds.Width = Header.Width;
+                DebugHeaderBounds.Height = 44;
+
+                Canvas.SetLeft(DebugContentBounds, cLeft);
+                Canvas.SetTop(DebugContentBounds, 64);
+                DebugContentBounds.Width = Body.Width;
+                DebugContentBounds.Height = Body.Height;
+
+                Canvas.SetLeft(DebugHud, iLeft + 8);
+                Canvas.SetTop(DebugHud, curH + 6);
+
+                double slackX = Math.Max(0, (curW - 24) - Body.Width);
+                double slackY = Math.Max(0, (curH - 76) - Body.Height);
+                string tabName = navigation != null ? PanelTab.All[navigation.SelectedIndex].Name : "Tab";
+                DebugHudText.Text = $"Tab: {tabName} | Island: {curW:0}x{curH:0} | Content: {Body.Width:0}x{Body.Height:0} | Margins: 12 DIP | Slack: X={slackX:0} Y={slackY:0} DIP";
+            }
+            else
+            {
+                LayoutDebugOverlay.Visibility = Visibility.Collapsed;
+            }
+        }
     }
 
     private void UpdateBottomNeonLine()
