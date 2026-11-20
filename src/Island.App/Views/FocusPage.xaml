@@ -67,8 +67,6 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimary}"/>
             <Setter Property="Focusable" Value="False"/>
-            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"/>
-            <Setter Property="FontSize" Value="15"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -77,11 +75,7 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}">
-                            <TextBlock Text="{TemplateBinding Content}"
-                                       FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
-                                       FontSize="{TemplateBinding FontSize}"
-                                       Foreground="{TemplateBinding Foreground}"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -102,8 +96,6 @@
             <Setter Property="Height" Value="48"/>
             <Setter Property="Background" Value="{DynamicResource Theme.Accent}"/>
             <Setter Property="Foreground" Value="#121620"/>
-            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"/>
-            <Setter Property="FontSize" Value="20"/>
             <Setter Property="Focusable" Value="False"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Effect" Value="{DynamicResource Theme.NeonGlow}"/>
@@ -111,11 +103,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Box" CornerRadius="12" Background="{TemplateBinding Background}">
-                            <TextBlock Text="{TemplateBinding Content}"
-                                       FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
-                                       FontSize="{TemplateBinding FontSize}"
-                                       Foreground="{TemplateBinding Foreground}"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -192,11 +180,12 @@
             </StackPanel>
         </Border>
 
-        <!-- ROW 1: Mode Title & Cycle Dots ("Work · 1 of 4") -->
+        <!-- ROW 1: Mode Title & Cycle Dots ("Work · 1 of 4" - Only in Pomodoro mode) -->
         <TextBlock Grid.Row="1" Text="{Binding CycleSubtitle}" FontSize="{DynamicResource Typography.Size.Secondary}"
                    FontFamily="{DynamicResource Typography.Family.Heading}"
                    FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextSecondary}"
-                   HorizontalAlignment="Center" Margin="0,8,0,6"/>
+                   HorizontalAlignment="Center" Margin="0,8,0,6"
+                   Visibility="{Binding IsPomodoro, Converter={StaticResource Visible}}"/>
 
         <!-- ROW 2: Circular Progress Ring with Responsive Digital Timer -->
         <Grid Grid.Row="2" x:Name="RingGrid" Height="150" HorizontalAlignment="Center">
@@ -212,15 +201,16 @@
                   HorizontalAlignment="Center" VerticalAlignment="Center"
                   Visibility="{Binding ShowProgress, Converter={StaticResource Visible}}"/>
 
-            <!-- Digital Timer (Lining tabular figures, auto-scaled with Viewbox so it never clips) -->
-            <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center" Height="50">
+            <!-- Digital Timer (Lining tabular figures, gracefully sized with comfortable margin from circle) -->
+            <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Viewbox.Style>
                     <Style TargetType="Viewbox">
-                        <Setter Property="MaxWidth" Value="122"/>
+                        <Setter Property="MaxWidth" Value="92"/>
+                        <Setter Property="MaxHeight" Value="32"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsStopwatch}" Value="True">
-                                <Setter Property="MaxWidth" Value="240"/>
-                                <Setter Property="Height" Value="56"/>
+                                <Setter Property="MaxWidth" Value="220"/>
+                                <Setter Property="MaxHeight" Value="52"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
@@ -245,17 +235,33 @@
         <!-- ROW 4: Action Controls Row (Reset, Play/Pause, Skip/Lap) -->
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,8,0,4">
             <!-- Reset -->
-            <Button Style="{StaticResource FocusControlBtn}" Content="&#xE777;" Click="ResetClick" ToolTip="Reset"/>
+            <Button Style="{StaticResource FocusControlBtn}" Click="ResetClick" ToolTip="Reset">
+                <TextBlock Text="&#xE777;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
+                           FontSize="15" Foreground="{DynamicResource Theme.TextPrimary}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Button>
 
             <!-- Play / Pause -->
-            <Button Style="{StaticResource PlayBtn}" Content="{Binding PlayPauseGlyph}" Click="PlayPauseClick"
-                    Margin="16,0" ToolTip="{Binding PlayPauseText}"/>
+            <Button Style="{StaticResource PlayBtn}" Click="PlayPauseClick"
+                    Margin="16,0" ToolTip="{Binding PlayPauseText}">
+                <TextBlock Text="{Binding PlayPauseGlyph}" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
+                           FontSize="20" Foreground="#121620"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Button>
 
             <!-- Skip (Pomodoro) or Lap (Stopwatch) -->
-            <Button Style="{StaticResource FocusControlBtn}" Content="&#xE893;" Click="SkipClick" ToolTip="Skip Stage"
-                    Visibility="{Binding IsPomodoro, Converter={StaticResource Visible}}"/>
-            <Button Style="{StaticResource FocusControlBtn}" Content="&#xE7C0;" Click="LapClick" ToolTip="Lap"
-                    Visibility="{Binding IsStopwatch, Converter={StaticResource Visible}}"/>
+            <Button Style="{StaticResource FocusControlBtn}" Click="SkipClick" ToolTip="Skip Stage"
+                    Visibility="{Binding IsPomodoro, Converter={StaticResource Visible}}">
+                <TextBlock Text="&#xE893;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
+                           FontSize="15" Foreground="{DynamicResource Theme.TextPrimary}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Button>
+            <Button Style="{StaticResource FocusControlBtn}" Click="LapClick" ToolTip="Lap"
+                    Visibility="{Binding IsStopwatch, Converter={StaticResource Visible}}">
+                <TextBlock Text="&#xE7C0;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
+                           FontSize="15" Foreground="{DynamicResource Theme.TextPrimary}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Button>
         </StackPanel>
     </Grid>
 </UserControl>

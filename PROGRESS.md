@@ -21,6 +21,23 @@
   - Automated layout test `TabDimensionsHaveNoMoreThan12DipUnusedSpaceOnAnySide` verifies slack <= 8 DIP.
 
 ### Part B: Clock-Synced Typography System
+- **Latest Visual & Layout Polish (Header, Focus, Bento Grid, Glyph Isolation)**:
+  - **Tab Navigation Bar Restoration**: Restored `<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>` inside `IconButton` style so WPF renders tab `iconBlock` directly as a UIElement instead of coercing it to a string (`.ToString()`), fully restoring all 6 Segoe Fluent Icons (`\uE8D6`, `\uE950`, `\uE9D5`, `\uE713`, `\uE916`, `\uE787`).
+  - **Pin & Settings Button Protection**: Embedded explicit child TextBlocks with `Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji` to eliminate missing glyph vertical boxes.
+  - **Focus Timer Arc Clearance & Subtitle Cleanup**:
+    - Constrained Pomodoro and Timer Viewbox to `MaxWidth="92"` and `MaxHeight="32"`, ensuring 23 DIP of clearance on every side from the 138 DIP circular progress arc in wide fonts (e.g. Doto/Dot Matrix).
+    - Stopwatch Viewbox constrained to `MaxWidth="220"`, `MaxHeight="52"`.
+    - Bound `CycleSubtitle` visibility to `{Binding IsPomodoro, ...}` so redundant "Countdown Timer" and "Stopwatch" labels are hidden in Timer and Stopwatch modes.
+    - Updated `FocusControlBtn` and `PlayBtn` to use `<ContentPresenter/>` with explicit child icon TextBlocks for Reset (`\uE777`), Play/Pause (`\uE768`/`\uE769`), Skip (`\uE893`), and Lap (`\uE7C0`).
+  - **System Bento Grid Architecture**:
+    - Restructured `SystemPage.xaml` into a unified 3-column x 2-row Bento Grid (`Grid Margin="12,4,12,14"`). Row 0 cards (CPU, GPU, Network) share Row 0 height; Row 2 cards (Memory, Power, Top Apps) share Row 2 height.
+    - Top Apps process rows set to 19 DIP with 14 DIP bottom margin, guaranteeing all 5 processes (including `msedgewebview2`) render with abundant clearance above the bottom-right curved corner.
+  - **Quick Controls Text Truncation Fix**:
+    - Replaced "Screenshot" with "Capture" so tile 5 never truncates to "Screensho".
+    - Verified all 8 tiles reflow with zero truncation at 620 DIP.
+  - **Synchronized Header & Body Widths During Spring Motion**:
+    - In `OverlayWindow.Panel.cs`, `DrawPanel()` dynamically updates `Header.Width` and `Body.Width` to track `curW - 24` at every frame, keeping the Header Clock centered in the notch at all times.
+  - **134 Automated Tests Passing**: All unit, typography, layout, and glyph isolation tests green.
 - **5-Role Typography System**:
   - `Display` (clock, hero numbers, big titles)
   - `Heading` (card titles, tab labels)

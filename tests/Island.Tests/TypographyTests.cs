@@ -352,6 +352,39 @@ public sealed class TypographyTests
         Assert.Contains("Typography.Family.Label", xaml);
         Assert.Contains("Typography.Size.SectionTitle", xaml);
         Assert.Contains("Typography.Size.Value", xaml);
+        Assert.Contains("BALANCED BENTO GRID", xaml);
+    }
+
+    [Fact]
+    public void FocusPageProtectsButtonGlyphsAndGracefullyConstrainsTimer()
+    {
+        string? projectRoot = FindProjectRoot();
+        Assert.NotNull(projectRoot);
+
+        string focusXamlPath = Path.Combine(projectRoot, "src", "Island.App", "Views", "FocusPage.xaml");
+        string focusXaml = File.ReadAllText(focusXamlPath);
+
+        // Buttons must use Segoe Fluent Icons text blocks directly
+        Assert.Contains("&#xE777;", focusXaml); // Reset glyph
+        Assert.Contains("Segoe Fluent Icons", focusXaml);
+        Assert.Contains("Property=\"MaxWidth\" Value=\"92\"", focusXaml); // Safe margin inside ring
+        Assert.Contains("Property=\"MaxHeight\" Value=\"32\"", focusXaml);
+        Assert.Contains("IsPomodoro", focusXaml); // Subtitle hidden in timer/stopwatch
+    }
+
+    [Fact]
+    public void OverlayWindowIconButtonUsesContentPresenterForDirectUIRendering()
+    {
+        string? projectRoot = FindProjectRoot();
+        Assert.NotNull(projectRoot);
+
+        string overlayXamlPath = Path.Combine(projectRoot, "src", "Island.App", "Views", "OverlayWindow.xaml");
+        string overlayXaml = File.ReadAllText(overlayXamlPath);
+
+        // IconButton must use ContentPresenter so WPF renders UIElement iconBlock directly without .ToString()
+        Assert.Contains("<ContentPresenter HorizontalAlignment=\"Center\" VerticalAlignment=\"Center\"/>", overlayXaml);
+        Assert.Contains("&#xE718;", overlayXaml); // Pin
+        Assert.Contains("&#xE713;", overlayXaml); // Settings
     }
 
     private static string? FindProjectRoot()

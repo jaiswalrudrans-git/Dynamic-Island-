@@ -303,7 +303,7 @@
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
                         <TextBlock Text="Snip" FontFamily="{DynamicResource Typography.Family.Heading}"
                                    FontSize="{DynamicResource Typography.Size.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
-                        <TextBlock Text="Screenshot" FontFamily="{DynamicResource Typography.Family.Label}"
+                        <TextBlock Text="Capture" FontFamily="{DynamicResource Typography.Family.Label}"
                                    FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
                     </StackPanel>
                 </Grid>

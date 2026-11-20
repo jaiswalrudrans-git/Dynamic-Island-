@@ -40,408 +40,386 @@
         </Style>
     </UserControl.Resources>
 
-    <!-- 3-COLUMN / 2-ROW RESPONSIVE LAYOUT -->
-    <Grid Margin="12,4,12,10">
+    <!-- 3-COLUMN x 2-ROW BALANCED BENTO GRID -->
+    <Grid Margin="12,4,12,14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="12"/>
+            <ColumnDefinition Width="10"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="12"/>
+            <ColumnDefinition Width="10"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- COLUMN 0: CPU & MEMORY -->
-        <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="12"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <!-- ROW 0, COLUMN 0: Card 1 - CPU -->
+        <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource IslandCard}" ToolTip="{Binding CpuTooltip}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-            <!-- Card 1: CPU -->
-            <Border Grid.Row="0" Style="{StaticResource IslandCard}" ToolTip="{Binding CpuTooltip}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="8"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <!-- Header Row: Label Left, Temp Right -->
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="CPU" FontFamily="{DynamicResource Typography.Family.Heading}"
-                                   FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="1" Text="{Binding CpuTempFormatted}"
-                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
-                                   FontSize="{DynamicResource Typography.Size.Secondary}"
-                                   Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"
-                                   Typography.NumeralAlignment="Tabular"
-                                   Visibility="{Binding HasCpuTemp, Converter={StaticResource Visible}}"/>
-                    </Grid>
-
-                    <!-- Body Row: Ring Gauge Left, Cores Right -->
-                    <Grid Grid.Row="2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="54"/>
-                            <ColumnDefinition Width="12"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <!-- Usage Ring Gauge (Cyan Data with glow) -->
-                        <Grid Width="50" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <Ellipse Width="46" Height="46" Stroke="{DynamicResource Theme.Border}" StrokeThickness="4"/>
-                            <Path x:Name="CpuRingPath" Stroke="{DynamicResource Theme.Data}" StrokeThickness="4"
-                                  Effect="{DynamicResource Theme.DataGlow}"
-                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
-                            <TextBlock Text="{Binding CpuUsageFormatted}"
-                                       FontFamily="{DynamicResource Typography.Family.Numeric}"
-                                       FontSize="{DynamicResource Typography.Size.Secondary}" FontWeight="Bold"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                                       Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular"/>
-                        </Grid>
-
-                        <!-- Per-Core Bars (Cyan Data - Single Horizontal Row, Never Wraps) -->
-                        <ItemsControl Grid.Column="2" ItemsSource="{Binding CpuCores}" VerticalAlignment="Center" HorizontalAlignment="Left">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal"/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid Width="3.5" Height="22" Margin="1,0" VerticalAlignment="Center" ToolTip="{Binding Tooltip}">
-                                        <Border CornerRadius="1.5" Background="{DynamicResource Theme.Border}"/>
-                                        <Border CornerRadius="1.5" Background="{DynamicResource Theme.Data}"
-                                                VerticalAlignment="Bottom" Height="{Binding Height}"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </Grid>
+                <!-- Header Row: Label Left, Temp Right -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="CPU" FontFamily="{DynamicResource Typography.Family.Heading}"
+                               FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="{Binding CpuTempFormatted}"
+                               FontFamily="{DynamicResource Typography.Family.Numeric}"
+                               FontSize="{DynamicResource Typography.Size.Secondary}"
+                               Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"
+                               Typography.NumeralAlignment="Tabular"
+                               Visibility="{Binding HasCpuTemp, Converter={StaticResource Visible}}"/>
                 </Grid>
-            </Border>
 
-            <!-- Card 2: Memory -->
-            <Border Grid.Row="2" Style="{StaticResource IslandCard}" ToolTip="{Binding RamTooltip}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="8"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="6"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+                <!-- Body Row: Ring Gauge Left, Cores Right -->
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="54"/>
+                        <ColumnDefinition Width="12"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Memory" FontFamily="{DynamicResource Typography.Family.Heading}"
-                                   FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="1" Text="{Binding RamPercentFormatted}"
+                    <!-- Usage Ring Gauge (Cyan Data with glow) -->
+                    <Grid Width="50" Height="50" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Ellipse Width="46" Height="46" Stroke="{DynamicResource Theme.Border}" StrokeThickness="4"/>
+                        <Path x:Name="CpuRingPath" Stroke="{DynamicResource Theme.Data}" StrokeThickness="4"
+                              Effect="{DynamicResource Theme.DataGlow}"
+                              StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                        <TextBlock Text="{Binding CpuUsageFormatted}"
                                    FontFamily="{DynamicResource Typography.Family.Numeric}"
-                                   FontSize="{DynamicResource Typography.Size.Value}"
-                                   FontWeight="SemiBold" Foreground="{DynamicResource Theme.Data}"
-                                   VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
+                                   FontSize="{DynamicResource Typography.Size.Secondary}" FontWeight="Bold"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular"/>
                     </Grid>
 
-                    <ProgressBar Grid.Row="2" Style="{StaticResource IslandProgressBar}" Value="{Binding RamPercent, Mode=OneWay}"/>
-
-                    <Grid Grid.Row="4">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="In Use" FontFamily="{DynamicResource Typography.Family.Label}"
-                                   FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding RamText}"
-                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
-                                   FontSize="{DynamicResource Typography.Size.Label}"
-                                   Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
-                    </Grid>
+                    <!-- Per-Core Bars (Cyan Data - Single Horizontal Row, Never Wraps) -->
+                    <ItemsControl Grid.Column="2" ItemsSource="{Binding CpuCores}" VerticalAlignment="Center" HorizontalAlignment="Left">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Width="3.5" Height="22" Margin="1,0" VerticalAlignment="Center" ToolTip="{Binding Tooltip}">
+                                    <Border CornerRadius="1.5" Background="{DynamicResource Theme.Border}"/>
+                                    <Border CornerRadius="1.5" Background="{DynamicResource Theme.Data}"
+                                            VerticalAlignment="Bottom" Height="{Binding Height}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Grid>
-            </Border>
-        </Grid>
+            </Grid>
+        </Border>
 
-        <!-- COLUMN 1: GPU & POWER -->
-        <Grid Grid.Column="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="12"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <!-- ROW 2, COLUMN 0: Card 2 - Memory -->
+        <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource IslandCard}" ToolTip="{Binding RamTooltip}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="6"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-            <!-- Card 3: GPU -->
-            <Border Grid.Row="0" Style="{StaticResource IslandCard}" ToolTip="{Binding GpuTooltip}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="6"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="6"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding GpuShortName}" MaxWidth="105" Margin="0,0,8,0" TextTrimming="CharacterEllipsis"
-                                   FontFamily="{DynamicResource Typography.Family.Heading}"
-                                   FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding GpuUsageFormatted}"
-                                       FontFamily="{DynamicResource Typography.Family.Numeric}"
-                                       FontSize="{DynamicResource Typography.Size.Value}"
-                                       FontWeight="SemiBold" Foreground="{DynamicResource Theme.Data}"
-                                       Typography.NumeralAlignment="Tabular"/>
-                            <TextBlock Text="{Binding GpuTempFormatted, StringFormat=' · {0}'}"
-                                       FontFamily="{DynamicResource Typography.Family.Numeric}"
-                                       FontSize="{DynamicResource Typography.Size.Secondary}"
-                                       Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"
-                                       Typography.NumeralAlignment="Tabular"
-                                       Visibility="{Binding HasGpuTemp, Converter={StaticResource Visible}}"/>
-                        </StackPanel>
-                    </Grid>
-
-                    <ProgressBar Grid.Row="2" Style="{StaticResource IslandProgressBar}" Value="{Binding VramPercent, Mode=OneWay}"
-                                 Visibility="{Binding HasVram, Converter={StaticResource Visible}}"/>
-
-                    <Grid Grid.Row="4" Visibility="{Binding HasVram, Converter={StaticResource Visible}}">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="VRAM" FontFamily="{DynamicResource Typography.Family.Label}"
-                                   FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding VramText}"
-                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
-                                   FontSize="{DynamicResource Typography.Size.Label}"
-                                   Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
-                    </Grid>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Memory" FontFamily="{DynamicResource Typography.Family.Heading}"
+                               FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="{Binding RamPercentFormatted}"
+                               FontFamily="{DynamicResource Typography.Family.Numeric}"
+                               FontSize="{DynamicResource Typography.Size.Value}"
+                               FontWeight="SemiBold" Foreground="{DynamicResource Theme.Data}"
+                               VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
                 </Grid>
-            </Border>
 
-            <!-- Card 4: Power & Battery -->
-            <Border Grid.Row="2" Style="{StaticResource IslandCard}" ToolTip="{Binding PowerTooltip}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="6"/>
-                        <RowDefinition Height="28"/>
-                        <RowDefinition Height="6"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+                <ProgressBar Grid.Row="2" Style="{StaticResource IslandProgressBar}" Value="{Binding RamPercent, Mode=OneWay}"/>
 
-                    <!-- Row 0: Power label & Watts -->
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Power" FontFamily="{DynamicResource Typography.Family.Heading}"
-                                   FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="1" Text="{Binding PowerWattsFormatted}"
-                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
-                                   FontSize="{DynamicResource Typography.Size.Value}"
-                                   FontWeight="SemiBold" Foreground="{DynamicResource Theme.Data}"
-                                   VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
-                    </Grid>
-
-                    <!-- Row 2: Sparkline Curve -->
-                    <Canvas Grid.Row="2" Height="26" HorizontalAlignment="Stretch" ClipToBounds="True">
-                        <Polyline Points="{Binding PowerPoints}" Stroke="{DynamicResource Theme.Data}"
-                                  StrokeThickness="1.5" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
-                    </Canvas>
-
-                    <!-- Row 4: Battery & Mean -->
-                    <Grid Grid.Row="4">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock FontFamily="{StaticResource Font.Icons}" Text="{Binding BatteryGlyph}"
-                                   FontSize="14" Foreground="{DynamicResource Theme.Data}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                        <TextBlock Grid.Column="1" Text="{Binding BatteryPercentFormatted}"
-                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
-                                   FontSize="{DynamicResource Typography.Size.Secondary}"
-                                   FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"
-                                   Typography.NumeralAlignment="Tabular"/>
-                        <TextBlock Grid.Column="2" Text="{Binding PowerMeanFormatted}"
-                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
-                                   FontSize="{DynamicResource Typography.Size.Label}"
-                                   Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"
-                                   Typography.NumeralAlignment="Tabular"
-                                   Visibility="{Binding HasPowerMean, Converter={StaticResource Visible}}"/>
-                    </Grid>
-                </Grid>
-            </Border>
-        </Grid>
-
-        <!-- COLUMN 2: NETWORK, STORAGE & TOP PROCESSES -->
-        <Grid Grid.Column="4">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="12"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-
-            <!-- Card 5: Network & Storage -->
-            <Border Grid.Row="0" Style="{StaticResource IslandCard}" ToolTip="{Binding NetworkTooltip}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="6"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="8"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <!-- Network Speeds -->
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="10"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="↓" FontFamily="{DynamicResource Typography.Family.Body}"
-                                       FontSize="{DynamicResource Typography.Size.Body}" Foreground="{DynamicResource Theme.Data}" Margin="0,0,4,0"/>
-                            <TextBlock Text="{Binding DownSpeedFormatted}"
-                                       FontFamily="{DynamicResource Typography.Family.Numeric}"
-                                       FontSize="{DynamicResource Typography.Size.Body}" FontWeight="SemiBold"
-                                       Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
-                            <TextBlock Text="↑" FontFamily="{DynamicResource Typography.Family.Body}"
-                                       FontSize="{DynamicResource Typography.Size.Body}" Foreground="{DynamicResource Theme.TextSecondary}" Margin="0,0,4,0"/>
-                            <TextBlock Text="{Binding UpSpeedFormatted}"
-                                       FontFamily="{DynamicResource Typography.Family.Numeric}"
-                                       FontSize="{DynamicResource Typography.Size.Body}" FontWeight="SemiBold"
-                                       Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular"/>
-                        </StackPanel>
-                    </Grid>
-
-                    <!-- Daily Totals -->
-                    <TextBlock Grid.Row="2" Text="{Binding TodayTotalsFormatted}"
-                               FontFamily="{DynamicResource Typography.Family.Label}"
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="In Use" FontFamily="{DynamicResource Typography.Family.Label}"
+                               FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding RamText}"
+                               FontFamily="{DynamicResource Typography.Family.Numeric}"
                                FontSize="{DynamicResource Typography.Size.Label}"
                                Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
-
-                    <!-- Drives List -->
-                    <ItemsControl Grid.Row="4" ItemsSource="{Binding Drives}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Margin="0,2" ToolTip="{Binding Tooltip}">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="4"/>
-                                        <RowDefinition Height="Auto"/>
-                                    </Grid.RowDefinitions>
-                                    <Grid Grid.Row="0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="{Binding Name}"
-                                                   FontFamily="{DynamicResource Typography.Family.Heading}"
-                                                   FontSize="{DynamicResource Typography.Size.Label}" FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource Theme.TextSecondary}"/>
-                                        <TextBlock Grid.Column="1" Text="{Binding UsageText}"
-                                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
-                                                   FontSize="{DynamicResource Typography.Size.Label}"
-                                                   Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
-                                    </Grid>
-                                    <ProgressBar Grid.Row="2" Style="{StaticResource IslandProgressBar}" Height="4" Value="{Binding Percent, Mode=OneWay}"/>
-                                </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
                 </Grid>
-            </Border>
+            </Grid>
+        </Border>
 
-            <!-- Card 6: Top Processes -->
-            <Border Grid.Row="2" Style="{StaticResource IslandCard}" Padding="12,10,12,12">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="8"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+        <!-- ROW 0, COLUMN 2: Card 3 - GPU -->
+        <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource IslandCard}" ToolTip="{Binding GpuTooltip}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="6"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="6"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-                    <!-- Header Row: Title & CPU/RAM Toggle -->
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Top Apps" FontFamily="{DynamicResource Typography.Family.Heading}"
-                                   FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal">
-                            <Button Content="CPU" Click="SortCpuClick">
-                                <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource SegmentSortBtn}">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SortByCpu}" Value="True">
-                                                <Setter Property="Foreground" Value="{DynamicResource Theme.Accent}"/>
-                                                <Setter Property="FontWeight" Value="Bold"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
-                            </Button>
-                            <Button Content="RAM" Click="SortMemoryClick" Margin="4,0,0,0">
-                                <Button.Style>
-                                    <Style TargetType="Button" BasedOn="{StaticResource SegmentSortBtn}">
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding SortByMemory}" Value="True">
-                                                <Setter Property="Foreground" Value="{DynamicResource Theme.Accent}"/>
-                                                <Setter Property="FontWeight" Value="Bold"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Button.Style>
-                            </Button>
-                        </StackPanel>
-                    </Grid>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding GpuShortName}" MaxWidth="105" Margin="0,0,8,0" TextTrimming="CharacterEllipsis"
+                               FontFamily="{DynamicResource Typography.Family.Heading}"
+                               FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding GpuUsageFormatted}"
+                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                   FontSize="{DynamicResource Typography.Size.Value}"
+                                   FontWeight="SemiBold" Foreground="{DynamicResource Theme.Data}"
+                                   Typography.NumeralAlignment="Tabular"/>
+                        <TextBlock Text="{Binding GpuTempFormatted, StringFormat=' · {0}'}"
+                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                   FontSize="{DynamicResource Typography.Size.Secondary}"
+                                   Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"
+                                   Typography.NumeralAlignment="Tabular"
+                                   Visibility="{Binding HasGpuTemp, Converter={StaticResource Visible}}"/>
+                    </StackPanel>
+                </Grid>
 
-                    <!-- 5 Process Rows -->
-                    <ItemsControl Grid.Row="2" ItemsSource="{Binding TopProcesses}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Grid Height="20" Margin="0,1" ToolTip="{Binding Tooltip}">
+                <ProgressBar Grid.Row="2" Style="{StaticResource IslandProgressBar}" Value="{Binding VramPercent, Mode=OneWay}"
+                             Visibility="{Binding HasVram, Converter={StaticResource Visible}}"/>
+
+                <Grid Grid.Row="4" Visibility="{Binding HasVram, Converter={StaticResource Visible}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="VRAM" FontFamily="{DynamicResource Typography.Family.Label}"
+                               FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding VramText}"
+                               FontFamily="{DynamicResource Typography.Family.Numeric}"
+                               FontSize="{DynamicResource Typography.Size.Label}"
+                               Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- ROW 2, COLUMN 2: Card 4 - Power & Battery -->
+        <Border Grid.Row="2" Grid.Column="2" Style="{StaticResource IslandCard}" ToolTip="{Binding PowerTooltip}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="6"/>
+                    <RowDefinition Height="28"/>
+                    <RowDefinition Height="6"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Row 0: Power label & Watts -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Power" FontFamily="{DynamicResource Typography.Family.Heading}"
+                               FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="{Binding PowerWattsFormatted}"
+                               FontFamily="{DynamicResource Typography.Family.Numeric}"
+                               FontSize="{DynamicResource Typography.Size.Value}"
+                               FontWeight="SemiBold" Foreground="{DynamicResource Theme.Data}"
+                               VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
+                </Grid>
+
+                <!-- Row 2: Sparkline Curve -->
+                <Canvas Grid.Row="2" Height="26" HorizontalAlignment="Stretch" ClipToBounds="True">
+                    <Polyline Points="{Binding PowerPoints}" Stroke="{DynamicResource Theme.Data}"
+                              StrokeThickness="1.5" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                </Canvas>
+
+                <!-- Row 4: Battery & Mean -->
+                <Grid Grid.Row="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock FontFamily="{StaticResource Font.Icons}" Text="{Binding BatteryGlyph}"
+                               FontSize="14" Foreground="{DynamicResource Theme.Data}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                    <TextBlock Grid.Column="1" Text="{Binding BatteryPercentFormatted}"
+                               FontFamily="{DynamicResource Typography.Family.Numeric}"
+                               FontSize="{DynamicResource Typography.Size.Secondary}"
+                               FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"
+                               Typography.NumeralAlignment="Tabular"/>
+                    <TextBlock Grid.Column="2" Text="{Binding PowerMeanFormatted}"
+                               FontFamily="{DynamicResource Typography.Family.Numeric}"
+                               FontSize="{DynamicResource Typography.Size.Label}"
+                               Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"
+                               Typography.NumeralAlignment="Tabular"
+                               Visibility="{Binding HasPowerMean, Converter={StaticResource Visible}}"/>
+                </Grid>
+            </Grid>
+        </Border>
+
+        <!-- ROW 0, COLUMN 4: Card 5 - Network & Storage -->
+        <Border Grid.Row="0" Grid.Column="4" Style="{StaticResource IslandCard}" ToolTip="{Binding NetworkTooltip}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="6"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Network Speeds -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="↓" FontFamily="{DynamicResource Typography.Family.Body}"
+                                   FontSize="{DynamicResource Typography.Size.Body}" Foreground="{DynamicResource Theme.Data}" Margin="0,0,4,0"/>
+                        <TextBlock Text="{Binding DownSpeedFormatted}"
+                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                   FontSize="{DynamicResource Typography.Size.Body}" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                        <TextBlock Text="↑" FontFamily="{DynamicResource Typography.Family.Body}"
+                                   FontSize="{DynamicResource Typography.Size.Body}" Foreground="{DynamicResource Theme.TextSecondary}" Margin="0,0,4,0"/>
+                        <TextBlock Text="{Binding UpSpeedFormatted}"
+                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                   FontSize="{DynamicResource Typography.Size.Body}" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Daily Totals -->
+                <TextBlock Grid.Row="2" Text="{Binding TodayTotalsFormatted}"
+                           FontFamily="{DynamicResource Typography.Family.Label}"
+                           FontSize="{DynamicResource Typography.Size.Label}"
+                           Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
+
+                <!-- Drives List -->
+                <ItemsControl Grid.Row="4" ItemsSource="{Binding Drives}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,2" ToolTip="{Binding Tooltip}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="4"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="10"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{Binding Name}" MaxWidth="140" TextTrimming="CharacterEllipsis"
-                                               FontFamily="{DynamicResource Typography.Family.Body}"
-                                               FontSize="{DynamicResource Typography.Size.Secondary}" Foreground="{DynamicResource Theme.TextPrimary}"
-                                               VerticalAlignment="Center"/>
-                                    <TextBlock Grid.Column="2" Text="{Binding MetricText}"
+                                    <TextBlock Text="{Binding Name}"
+                                               FontFamily="{DynamicResource Typography.Family.Heading}"
+                                               FontSize="{DynamicResource Typography.Size.Label}" FontWeight="SemiBold"
+                                               Foreground="{DynamicResource Theme.TextSecondary}"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding UsageText}"
                                                FontFamily="{DynamicResource Typography.Family.Numeric}"
-                                               FontSize="{DynamicResource Typography.Size.Secondary}"
-                                               FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextSecondary}"
-                                               VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
+                                               FontSize="{DynamicResource Typography.Size.Label}"
+                                               Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
                                 </Grid>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                                <ProgressBar Grid.Row="2" Style="{StaticResource IslandProgressBar}" Height="4" Value="{Binding Percent, Mode=OneWay}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </Border>
+
+        <!-- ROW 2, COLUMN 4: Card 6 - Top Processes -->
+        <Border Grid.Row="2" Grid.Column="4" Style="{StaticResource IslandCard}" Padding="12,10,12,10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="8"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header Row: Title & CPU/RAM Toggle -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Top Apps" FontFamily="{DynamicResource Typography.Family.Heading}"
+                               FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
+                               Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                        <Button Content="CPU" Click="SortCpuClick">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource SegmentSortBtn}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SortByCpu}" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource Theme.Accent}"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button Content="RAM" Click="SortMemoryClick" Margin="4,0,0,0">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource SegmentSortBtn}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SortByMemory}" Value="True">
+                                            <Setter Property="Foreground" Value="{DynamicResource Theme.Accent}"/>
+                                            <Setter Property="FontWeight" Value="Bold"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
                 </Grid>
-            </Border>
-        </Grid>
+
+                <!-- 5 Process Rows (Comfortable 19 DIP height, never clipped) -->
+                <ItemsControl Grid.Row="2" ItemsSource="{Binding TopProcesses}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Height="19" Margin="0,1" ToolTip="{Binding Tooltip}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Name}" MaxWidth="130" TextTrimming="CharacterEllipsis"
+                                           FontFamily="{DynamicResource Typography.Family.Body}"
+                                           FontSize="{DynamicResource Typography.Size.Secondary}" Foreground="{DynamicResource Theme.TextPrimary}"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="{Binding MetricText}"
+                                           FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                           FontSize="{DynamicResource Typography.Size.Secondary}"
+                                           FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextSecondary}"
+                                           VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>

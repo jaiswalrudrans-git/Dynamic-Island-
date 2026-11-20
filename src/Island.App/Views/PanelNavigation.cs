@@ -47,7 +47,7 @@ internal sealed class PanelNavigation
             var iconBlock = new TextBlock
             {
                 Text = tab.Glyph,
-                FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets"),
+                FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"),
                 FontSize = 13,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center

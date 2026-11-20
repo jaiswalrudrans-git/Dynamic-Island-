@@ -458,6 +458,10 @@ public partial class OverlayWindow
             double shadowTop = bottom - 5 * shape;
             EdgeOffset.Y = shadowTop - BottomEdge.Height;
             lastShape = shape;
+
+            double liveContentW = Math.Max(300, Math.Round(curW - 24));
+            if (Header.Width != liveContentW) Header.Width = liveContentW;
+            if (Body.Width != liveContentW) Body.Width = liveContentW;
         }
         IslandBackground.Opacity = shape;
         CollapsedBackground.Opacity = Math.Max(0, 1.0 - shape);
