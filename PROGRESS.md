@@ -28,6 +28,18 @@
   - `Label` (small badges, uppercase labels)
   - `Numeric` (metrics, stats, tabular figures)
   - Role tokens in `DesignTokens.xaml` and dynamic resources in `TypographyResources.cs`.
+- **Icon Isolation & Button Protection**:
+  - Removed global implicit `<Style TargetType="TextBlock">` from `DesignTokens.xaml` that previously overrode button icon glyphs with body fonts (Inter, Doto), restoring pristine Segoe Fluent Icons (`\uE718` pin, `\uE713` settings, `\uE768` play, `\uE777` reset, `\uE893` skip, etc.).
+  - Explicitly anchored `FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"` in control templates for `IconButton`, `FocusControlBtn`, `PlayBtn`, `IslandIconButton`, and `Transport`.
+- **System / Resource Monitor Typography & Layout Integration**:
+  - Applied dynamic font roles across all cards: Headings on card titles, Numeric on stats (CPU %, RAM %, GPU %, speeds, watts, drives, process metrics), Labels on secondary notes.
+  - Resolved GPU card collision by setting `MaxWidth="105"` and `Margin="0,0,8,0"` on `GpuShortName` so `"RTX 4050 Laptop"` and `"0% · 60°C"` never mash together.
+  - Adjusted Top Apps rows to 20 DIP with 12 DIP card bottom padding and telemetry debounced re-measurement, ensuring all 5 process rows are visible without clipping by the 24 DIP bottom-right notch curve.
+- **Focus Tab Responsive Timer Scaling**:
+  - Replaced fixed-width ring timer text with a dynamic `Viewbox`, scaling text seamlessly inside the 150 DIP circular progress ring in Pomodoro/Timer modes (`MaxWidth="122"`, `MaxHeight="44"`).
+  - Expanded stopwatch text container (`MaxWidth="240"`, `MaxHeight="56"`), completely fixing truncated millisecond digits (`:0:00.+` -> clean, centered `00:00.0` in any font).
+- **Legibility Guard Strict Enforcement**:
+  - Guard ensures decorative display fonts (Doto, Silkscreen, Bebas Neue, Caveat) are never applied to headings or labels below 18 DIP, automatically falling back to clean companion fonts (Inter).
 - **Clock-Sync Engine (Default ON: "Match typography to clock style")**:
   - Synchronizes the typography of the entire dynamic island to the active clock style:
     - *Simple / With date*: Segoe UI Variable

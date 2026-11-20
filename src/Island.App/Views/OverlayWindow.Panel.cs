@@ -173,6 +173,14 @@ public partial class OverlayWindow
             contentDebounceTimer.Stop();
             contentDebounceTimer.Start();
         };
+        system.SnapshotUpdated += _ =>
+        {
+            if (navigation.SystemSelected)
+            {
+                contentDebounceTimer.Stop();
+                contentDebounceTimer.Start();
+            }
+        };
 
         var initSize = navigation.GetDesiredSize(0);
         targetIslandWidth = initSize.Width;

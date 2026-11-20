@@ -324,4 +324,44 @@ public sealed class TypographyTests
             }
         }
     }
+
+    [Fact]
+    public void DesignTokensDoesNotContainImplicitTextBlockStyleToProtectIconButtons()
+    {
+        string? projectRoot = FindProjectRoot();
+        Assert.NotNull(projectRoot);
+
+        string xamlPath = Path.Combine(projectRoot, "src", "Island.App", "Themes", "DesignTokens.xaml");
+        string xaml = File.ReadAllText(xamlPath);
+
+        // An implicit style <Style TargetType="TextBlock"> overrides button icon textblocks and breaks glyphs!
+        Assert.DoesNotContain("<Style TargetType=\"TextBlock\">", xaml);
+    }
+
+    [Fact]
+    public void SystemPageBindsTypographyTokensToHeadingsNumericsAndLabels()
+    {
+        string? projectRoot = FindProjectRoot();
+        Assert.NotNull(projectRoot);
+
+        string xamlPath = Path.Combine(projectRoot, "src", "Island.App", "Views", "SystemPage.xaml");
+        string xaml = File.ReadAllText(xamlPath);
+
+        Assert.Contains("Typography.Family.Heading", xaml);
+        Assert.Contains("Typography.Family.Numeric", xaml);
+        Assert.Contains("Typography.Family.Label", xaml);
+        Assert.Contains("Typography.Size.SectionTitle", xaml);
+        Assert.Contains("Typography.Size.Value", xaml);
+    }
+
+    private static string? FindProjectRoot()
+    {
+        string dir = AppContext.BaseDirectory;
+        while (!string.IsNullOrEmpty(dir))
+        {
+            if (File.Exists(Path.Combine(dir, "Island.sln"))) return dir;
+            dir = Path.GetDirectoryName(dir)!;
+        }
+        return null;
+    }
 }

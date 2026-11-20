@@ -128,11 +128,15 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
 
         if (guard)
         {
-            // Decorative fonts never used for Body or small Label
+            // Decorative fonts never used for Body or Label
             if (IsDecorative(body)) body = InterFamily;
-            if (IsDecorative(label) && (12.5 * scale) < 15.0) label = InterFamily;
-            if (IsDecorative(heading) && (16.0 * scale) < 15.0) heading = InterFamily;
-            if (IsDecorative(numeric) && (17.0 * scale) < 14.0) numeric = InterFamily;
+            if (IsDecorative(label)) label = InterFamily;
+
+            // Headings below 18px threshold must never use decorative fonts (Doto/Silkscreen/Bebas/Caveat)
+            if (IsDecorative(heading) && (16.0 * scale) < 18.0) heading = InterFamily;
+
+            // Small numerals below 16px must use companion font
+            if (IsDecorative(numeric) && (17.0 * scale) < 16.0) numeric = InterFamily;
         }
 
         // Font Weights
@@ -278,7 +282,6 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
         return source.Contains("Doto", StringComparison.OrdinalIgnoreCase) ||
                source.Contains("Silkscreen", StringComparison.OrdinalIgnoreCase) ||
                source.Contains("Bebas", StringComparison.OrdinalIgnoreCase) ||
-               source.Contains("Caveat", StringComparison.OrdinalIgnoreCase) ||
-               source.Contains("Share Tech", StringComparison.OrdinalIgnoreCase);
+               source.Contains("Caveat", StringComparison.OrdinalIgnoreCase);
     }
 }

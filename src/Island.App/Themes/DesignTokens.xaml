@@ -84,11 +84,6 @@
     <FontFamily x:Key="Font.Text">Segoe UI Variable Text, Segoe UI</FontFamily>
     <FontFamily x:Key="Font.Icons">Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji</FontFamily>
 
-    <!-- GLOBAL TEXTBLOCK STYLE -->
-    <Style TargetType="TextBlock">
-        <Setter Property="FontFamily" Value="{DynamicResource Typography.Family.Body}"/>
-    </Style>
-
     <!-- CARD STYLE (Subtle fill, 1px top highlight, outline only on hover/focus) -->
     <Style x:Key="IslandCard" TargetType="Border">
         <Setter Property="Background" Value="{DynamicResource Theme.SurfaceRaised}"/>
@@ -155,7 +150,11 @@
                 <ControlTemplate TargetType="Button">
                     <Border x:Name="IconBox" CornerRadius="{StaticResource Radius.Control}"
                             Background="{TemplateBinding Background}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock Text="{TemplateBinding Content}"
+                                   FontFamily="{StaticResource Font.Icons}"
+                                   FontSize="{TemplateBinding FontSize}"
+                                   Foreground="{TemplateBinding Foreground}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">

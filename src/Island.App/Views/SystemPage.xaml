@@ -16,7 +16,8 @@
         <Style x:Key="SegmentSortBtn" TargetType="Button">
             <Setter Property="Height" Value="24"/>
             <Setter Property="Padding" Value="8,2"/>
-            <Setter Property="FontSize" Value="{StaticResource FontSize.Label}"/>
+            <Setter Property="FontSize" Value="{DynamicResource Typography.Size.Label}"/>
+            <Setter Property="FontFamily" Value="{DynamicResource Typography.Family.Label}"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Focusable" Value="False"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -40,7 +41,7 @@
     </UserControl.Resources>
 
     <!-- 3-COLUMN / 2-ROW RESPONSIVE LAYOUT -->
-    <Grid Margin="12,4">
+    <Grid Margin="12,4,12,10">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="12"/>
@@ -72,10 +73,14 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="CPU" FontSize="{StaticResource FontSize.SectionTitle}" FontWeight="SemiBold"
+                        <TextBlock Text="CPU" FontFamily="{DynamicResource Typography.Family.Heading}"
+                                   FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="1" Text="{Binding CpuTempFormatted}" FontSize="{StaticResource FontSize.Secondary}"
+                        <TextBlock Grid.Column="1" Text="{Binding CpuTempFormatted}"
+                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                   FontSize="{DynamicResource Typography.Size.Secondary}"
                                    Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"
+                                   Typography.NumeralAlignment="Tabular"
                                    Visibility="{Binding HasCpuTemp, Converter={StaticResource Visible}}"/>
                     </Grid>
 
@@ -93,7 +98,9 @@
                             <Path x:Name="CpuRingPath" Stroke="{DynamicResource Theme.Data}" StrokeThickness="4"
                                   Effect="{DynamicResource Theme.DataGlow}"
                                   StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
-                            <TextBlock Text="{Binding CpuUsageFormatted}" FontSize="13" FontWeight="Bold"
+                            <TextBlock Text="{Binding CpuUsageFormatted}"
+                                       FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                       FontSize="{DynamicResource Typography.Size.Secondary}" FontWeight="Bold"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular"/>
                         </Grid>
@@ -135,9 +142,12 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Memory" FontSize="{StaticResource FontSize.SectionTitle}" FontWeight="SemiBold"
+                        <TextBlock Text="Memory" FontFamily="{DynamicResource Typography.Family.Heading}"
+                                   FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="1" Text="{Binding RamPercentFormatted}" FontSize="{StaticResource FontSize.Value}"
+                        <TextBlock Grid.Column="1" Text="{Binding RamPercentFormatted}"
+                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                   FontSize="{DynamicResource Typography.Size.Value}"
                                    FontWeight="SemiBold" Foreground="{DynamicResource Theme.Data}"
                                    VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
                     </Grid>
@@ -149,8 +159,11 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="In Use" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding RamText}" FontSize="{StaticResource FontSize.Label}"
+                        <TextBlock Text="In Use" FontFamily="{DynamicResource Typography.Family.Label}"
+                                   FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding RamText}"
+                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                   FontSize="{DynamicResource Typography.Size.Label}"
                                    Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
                     </Grid>
                 </Grid>
@@ -181,15 +194,21 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding GpuShortName}" MaxWidth="120" TextTrimming="CharacterEllipsis"
-                                   FontSize="{StaticResource FontSize.SectionTitle}" FontWeight="SemiBold"
+                        <TextBlock Text="{Binding GpuShortName}" MaxWidth="105" Margin="0,0,8,0" TextTrimming="CharacterEllipsis"
+                                   FontFamily="{DynamicResource Typography.Family.Heading}"
+                                   FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
-                            <TextBlock Text="{Binding GpuUsageFormatted}" FontSize="{StaticResource FontSize.Value}"
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="{Binding GpuUsageFormatted}"
+                                       FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                       FontSize="{DynamicResource Typography.Size.Value}"
                                        FontWeight="SemiBold" Foreground="{DynamicResource Theme.Data}"
                                        Typography.NumeralAlignment="Tabular"/>
-                            <TextBlock Text="{Binding GpuTempFormatted, StringFormat=' · {0}'}" FontSize="{StaticResource FontSize.Secondary}"
+                            <TextBlock Text="{Binding GpuTempFormatted, StringFormat=' · {0}'}"
+                                       FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                       FontSize="{DynamicResource Typography.Size.Secondary}"
                                        Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"
+                                       Typography.NumeralAlignment="Tabular"
                                        Visibility="{Binding HasGpuTemp, Converter={StaticResource Visible}}"/>
                         </StackPanel>
                     </Grid>
@@ -202,8 +221,11 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="VRAM" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding VramText}" FontSize="{StaticResource FontSize.Label}"
+                        <TextBlock Text="VRAM" FontFamily="{DynamicResource Typography.Family.Label}"
+                                   FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding VramText}"
+                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                   FontSize="{DynamicResource Typography.Size.Label}"
                                    Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
                     </Grid>
                 </Grid>
@@ -226,9 +248,12 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Power" FontSize="{StaticResource FontSize.SectionTitle}" FontWeight="SemiBold"
+                        <TextBlock Text="Power" FontFamily="{DynamicResource Typography.Family.Heading}"
+                                   FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="1" Text="{Binding PowerWattsFormatted}" FontSize="{StaticResource FontSize.Value}"
+                        <TextBlock Grid.Column="1" Text="{Binding PowerWattsFormatted}"
+                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                   FontSize="{DynamicResource Typography.Size.Value}"
                                    FontWeight="SemiBold" Foreground="{DynamicResource Theme.Data}"
                                    VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
                     </Grid>
@@ -248,10 +273,16 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock FontFamily="{StaticResource Font.Icons}" Text="{Binding BatteryGlyph}"
                                    FontSize="14" Foreground="{DynamicResource Theme.Data}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                        <TextBlock Grid.Column="1" Text="{Binding BatteryPercentFormatted}" FontSize="{StaticResource FontSize.Secondary}"
-                                   FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
-                        <TextBlock Grid.Column="2" Text="{Binding PowerMeanFormatted}" FontSize="{StaticResource FontSize.Label}"
+                        <TextBlock Grid.Column="1" Text="{Binding BatteryPercentFormatted}"
+                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                   FontSize="{DynamicResource Typography.Size.Secondary}"
+                                   FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"
+                                   Typography.NumeralAlignment="Tabular"/>
+                        <TextBlock Grid.Column="2" Text="{Binding PowerMeanFormatted}"
+                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                   FontSize="{DynamicResource Typography.Size.Label}"
                                    Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"
+                                   Typography.NumeralAlignment="Tabular"
                                    Visibility="{Binding HasPowerMean, Converter={StaticResource Visible}}"/>
                     </Grid>
                 </Grid>
@@ -285,19 +316,27 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="↓" FontSize="{StaticResource FontSize.Body}" Foreground="{DynamicResource Theme.Data}" Margin="0,0,4,0"/>
-                            <TextBlock Text="{Binding DownSpeedFormatted}" FontSize="{StaticResource FontSize.Body}" FontWeight="SemiBold"
+                            <TextBlock Text="↓" FontFamily="{DynamicResource Typography.Family.Body}"
+                                       FontSize="{DynamicResource Typography.Size.Body}" Foreground="{DynamicResource Theme.Data}" Margin="0,0,4,0"/>
+                            <TextBlock Text="{Binding DownSpeedFormatted}"
+                                       FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                       FontSize="{DynamicResource Typography.Size.Body}" FontWeight="SemiBold"
                                        Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
-                            <TextBlock Text="↑" FontSize="{StaticResource FontSize.Body}" Foreground="{DynamicResource Theme.TextSecondary}" Margin="0,0,4,0"/>
-                            <TextBlock Text="{Binding UpSpeedFormatted}" FontSize="{StaticResource FontSize.Body}" FontWeight="SemiBold"
+                            <TextBlock Text="↑" FontFamily="{DynamicResource Typography.Family.Body}"
+                                       FontSize="{DynamicResource Typography.Size.Body}" Foreground="{DynamicResource Theme.TextSecondary}" Margin="0,0,4,0"/>
+                            <TextBlock Text="{Binding UpSpeedFormatted}"
+                                       FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                       FontSize="{DynamicResource Typography.Size.Body}" FontWeight="SemiBold"
                                        Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular"/>
                         </StackPanel>
                     </Grid>
 
                     <!-- Daily Totals -->
-                    <TextBlock Grid.Row="2" Text="{Binding TodayTotalsFormatted}" FontSize="{StaticResource FontSize.Label}"
+                    <TextBlock Grid.Row="2" Text="{Binding TodayTotalsFormatted}"
+                               FontFamily="{DynamicResource Typography.Family.Label}"
+                               FontSize="{DynamicResource Typography.Size.Label}"
                                Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
 
                     <!-- Drives List -->
@@ -315,9 +354,13 @@
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSize.Label}" FontWeight="SemiBold"
+                                        <TextBlock Text="{Binding Name}"
+                                                   FontFamily="{DynamicResource Typography.Family.Heading}"
+                                                   FontSize="{DynamicResource Typography.Size.Label}" FontWeight="SemiBold"
                                                    Foreground="{DynamicResource Theme.TextSecondary}"/>
-                                        <TextBlock Grid.Column="1" Text="{Binding UsageText}" FontSize="{StaticResource FontSize.Label}"
+                                        <TextBlock Grid.Column="1" Text="{Binding UsageText}"
+                                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                                   FontSize="{DynamicResource Typography.Size.Label}"
                                                    Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
                                     </Grid>
                                     <ProgressBar Grid.Row="2" Style="{StaticResource IslandProgressBar}" Height="4" Value="{Binding Percent, Mode=OneWay}"/>
@@ -329,7 +372,7 @@
             </Border>
 
             <!-- Card 6: Top Processes -->
-            <Border Grid.Row="2" Style="{StaticResource IslandCard}">
+            <Border Grid.Row="2" Style="{StaticResource IslandCard}" Padding="12,10,12,12">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -343,7 +386,8 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Top Apps" FontSize="{StaticResource FontSize.SectionTitle}" FontWeight="SemiBold"
+                        <TextBlock Text="Top Apps" FontFamily="{DynamicResource Typography.Family.Heading}"
+                                   FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
                         <StackPanel Grid.Column="1" Orientation="Horizontal">
                             <Button Content="CPU" Click="SortCpuClick">
@@ -377,16 +421,19 @@
                     <ItemsControl Grid.Row="2" ItemsSource="{Binding TopProcesses}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Grid Height="22" Margin="0,1" ToolTip="{Binding Tooltip}">
+                                <Grid Height="20" Margin="0,1" ToolTip="{Binding Tooltip}">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="10"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="{Binding Name}" MaxWidth="140" TextTrimming="CharacterEllipsis"
-                                               FontSize="{StaticResource FontSize.Secondary}" Foreground="{DynamicResource Theme.TextPrimary}"
+                                               FontFamily="{DynamicResource Typography.Family.Body}"
+                                               FontSize="{DynamicResource Typography.Size.Secondary}" Foreground="{DynamicResource Theme.TextPrimary}"
                                                VerticalAlignment="Center"/>
-                                    <TextBlock Grid.Column="2" Text="{Binding MetricText}" FontSize="{StaticResource FontSize.Secondary}"
+                                    <TextBlock Grid.Column="2" Text="{Binding MetricText}"
+                                               FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                               FontSize="{DynamicResource Typography.Size.Secondary}"
                                                FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextSecondary}"
                                                VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
                                 </Grid>

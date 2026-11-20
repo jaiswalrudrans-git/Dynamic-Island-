@@ -4,7 +4,8 @@
         xmlns:local="clr-namespace:Island.App.Views"
         Width="1040" Height="680" WindowStyle="None" ResizeMode="NoResize"
         WindowStartupLocation="Manual" Background="Transparent" AllowsTransparency="True"
-        Topmost="True" ShowActivated="False" ShowInTaskbar="False">
+        Topmost="True" ShowActivated="False" ShowInTaskbar="False"
+        FontFamily="{DynamicResource Typography.Family.Body}">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="Visible"/>
 
@@ -12,14 +13,18 @@
             <Setter Property="Width" Value="32"/><Setter Property="Height" Value="32"/>
             <Setter Property="Focusable" Value="False"/>
             <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimary}"/>
-            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Face" CornerRadius="8" Background="Transparent">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="{TemplateBinding Content}"
+                                       FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
+                                       FontSize="{TemplateBinding FontSize}"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">

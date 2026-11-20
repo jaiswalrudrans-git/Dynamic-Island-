@@ -72,7 +72,9 @@
                     <Slider Grid.Column="1" Style="{StaticResource IslandFullSlider}" Minimum="0" Maximum="1"
                             Value="{Binding VolumeFraction, Mode=TwoWay}" Margin="12,0" AutomationProperties.Name="Volume"/>
 
-                    <TextBlock Grid.Column="2" Text="{Binding VolumePercentText}" FontSize="{StaticResource FontSize.Value}"
+                    <TextBlock Grid.Column="2" Text="{Binding VolumePercentText}"
+                               FontFamily="{DynamicResource Typography.Family.Numeric}"
+                               FontSize="{DynamicResource Typography.Size.Value}"
                                FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"
                                VerticalAlignment="Center" HorizontalAlignment="Right" Typography.NumeralAlignment="Tabular"/>
                 </Grid>
@@ -83,7 +85,9 @@
                     <StackPanel Orientation="Horizontal">
                         <TextBlock FontFamily="{StaticResource Font.Icons}" Text="&#xE767;" FontSize="10"
                                    Foreground="{DynamicResource Theme.Accent}" Margin="0,0,4,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding OutputDeviceName}" FontSize="{StaticResource FontSize.Label}"
+                        <TextBlock Text="{Binding OutputDeviceName}"
+                                   FontFamily="{DynamicResource Typography.Family.Label}"
+                                   FontSize="{DynamicResource Typography.Size.Label}"
                                    Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"
                                    TextTrimming="CharacterEllipsis" MaxWidth="320"/>
                     </StackPanel>
@@ -106,7 +110,9 @@
                 <Slider Grid.Column="1" Style="{StaticResource IslandFullSlider}" Minimum="0" Maximum="100"
                         Value="{Binding Brightness, Mode=TwoWay}" Margin="12,0" AutomationProperties.Name="Brightness"/>
 
-                <TextBlock Grid.Column="2" Text="{Binding BrightnessText}" FontSize="{StaticResource FontSize.Value}"
+                <TextBlock Grid.Column="2" Text="{Binding BrightnessText}"
+                           FontFamily="{DynamicResource Typography.Family.Numeric}"
+                           FontSize="{DynamicResource Typography.Size.Value}"
                            FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"
                            VerticalAlignment="Center" HorizontalAlignment="Right" Typography.NumeralAlignment="Tabular"/>
             </Grid>
@@ -158,8 +164,10 @@
                         </TextBlock>
                     </Border>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
-                        <TextBlock Text="Mic" FontSize="{StaticResource FontSize.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
-                        <TextBlock Text="{Binding MicStatusText}" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <TextBlock Text="Mic" FontFamily="{DynamicResource Typography.Family.Heading}"
+                                   FontSize="{DynamicResource Typography.Size.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                        <TextBlock Text="{Binding MicStatusText}" FontFamily="{DynamicResource Typography.Family.Label}"
+                                   FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
                     </StackPanel>
                 </Grid>
             </Button>
@@ -197,8 +205,10 @@
                         </TextBlock>
                     </Border>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
-                        <TextBlock Text="Wi-Fi" FontSize="{StaticResource FontSize.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
-                        <TextBlock Text="{Binding WifiStatusText}" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <TextBlock Text="Wi-Fi" FontFamily="{DynamicResource Typography.Family.Heading}"
+                                   FontSize="{DynamicResource Typography.Size.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                        <TextBlock Text="{Binding WifiStatusText}" FontFamily="{DynamicResource Typography.Family.Label}"
+                                   FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
                     </StackPanel>
                 </Grid>
             </Button>
@@ -236,8 +246,10 @@
                         </TextBlock>
                     </Border>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
-                        <TextBlock Text="Bluetooth" FontSize="{StaticResource FontSize.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
-                        <TextBlock Text="{Binding BluetoothStatusText}" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <TextBlock Text="Bluetooth" FontFamily="{DynamicResource Typography.Family.Heading}"
+                                   FontSize="{DynamicResource Typography.Size.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                        <TextBlock Text="{Binding BluetoothStatusText}" FontFamily="{DynamicResource Typography.Family.Label}"
+                                   FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
                     </StackPanel>
                 </Grid>
             </Button>
@@ -255,8 +267,10 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Theme.Accent}"/>
                     </Border>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
-                        <TextBlock Text="Focus" FontSize="{StaticResource FontSize.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
-                        <TextBlock Text="{Binding FocusAssistStatusText}" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <TextBlock Text="Focus" FontFamily="{DynamicResource Typography.Family.Heading}"
+                                   FontSize="{DynamicResource Typography.Size.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                        <TextBlock Text="{Binding FocusAssistStatusText}" FontFamily="{DynamicResource Typography.Family.Label}"
+                                   FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
                     </StackPanel>
                 </Grid>
             </Button>
@@ -287,8 +301,10 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextPrimary}"/>
                     </Border>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
-                        <TextBlock Text="Snip" FontSize="{StaticResource FontSize.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
-                        <TextBlock Text="Screenshot" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <TextBlock Text="Snip" FontFamily="{DynamicResource Typography.Family.Heading}"
+                                   FontSize="{DynamicResource Typography.Size.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                        <TextBlock Text="Screenshot" FontFamily="{DynamicResource Typography.Family.Label}"
+                                   FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
                     </StackPanel>
                 </Grid>
             </Button>
@@ -306,8 +322,10 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextPrimary}"/>
                     </Border>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
-                        <TextBlock Text="Lock" FontSize="{StaticResource FontSize.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
-                        <TextBlock Text="PC" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <TextBlock Text="Lock" FontFamily="{DynamicResource Typography.Family.Heading}"
+                                   FontSize="{DynamicResource Typography.Size.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                        <TextBlock Text="PC" FontFamily="{DynamicResource Typography.Family.Label}"
+                                   FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
                     </StackPanel>
                 </Grid>
             </Button>
@@ -325,8 +343,10 @@
                                    HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextPrimary}"/>
                     </Border>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
-                        <TextBlock Text="Sleep" FontSize="{StaticResource FontSize.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
-                        <TextBlock Text="Suspend" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <TextBlock Text="Sleep" FontFamily="{DynamicResource Typography.Family.Heading}"
+                                   FontSize="{DynamicResource Typography.Size.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                        <TextBlock Text="Suspend" FontFamily="{DynamicResource Typography.Family.Label}"
+                                   FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
                     </StackPanel>
                 </Grid>
             </Button>
@@ -341,11 +361,13 @@
                     <Border Width="30" Height="30" CornerRadius="8" Background="{DynamicResource Theme.SurfaceHover}"
                             VerticalAlignment="Center" HorizontalAlignment="Center">
                         <TextBlock FontFamily="{StaticResource Font.Icons}" Text="&#xE9D9;" FontSize="13"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                                    HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextPrimary}"/>
                     </Border>
                     <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,0,0">
-                        <TextBlock Text="Tasks" FontSize="{StaticResource FontSize.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
-                        <TextBlock Text="Manager" FontSize="{StaticResource FontSize.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <TextBlock Text="Tasks" FontFamily="{DynamicResource Typography.Family.Heading}"
+                                   FontSize="{DynamicResource Typography.Size.Secondary}" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                        <TextBlock Text="Manager" FontFamily="{DynamicResource Typography.Family.Label}"
+                                   FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
                     </StackPanel>
                 </Grid>
             </Button>

@@ -67,7 +67,7 @@
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimary}"/>
             <Setter Property="Focusable" Value="False"/>
-            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"/>
             <Setter Property="FontSize" Value="15"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
@@ -77,7 +77,11 @@
                                 Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="{TemplateBinding Content}"
+                                       FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
+                                       FontSize="{TemplateBinding FontSize}"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -98,7 +102,7 @@
             <Setter Property="Height" Value="48"/>
             <Setter Property="Background" Value="{DynamicResource Theme.Accent}"/>
             <Setter Property="Foreground" Value="#121620"/>
-            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"/>
             <Setter Property="FontSize" Value="20"/>
             <Setter Property="Focusable" Value="False"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -107,7 +111,11 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Box" CornerRadius="12" Background="{TemplateBinding Background}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <TextBlock Text="{TemplateBinding Content}"
+                                       FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
+                                       FontSize="{TemplateBinding FontSize}"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -190,8 +198,8 @@
                    FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextSecondary}"
                    HorizontalAlignment="Center" Margin="0,8,0,6"/>
 
-        <!-- ROW 2: Circular Progress Ring (150x150) with Digital Timer -->
-        <Grid Grid.Row="2" x:Name="RingGrid" Width="150" Height="150" HorizontalAlignment="Center">
+        <!-- ROW 2: Circular Progress Ring with Responsive Digital Timer -->
+        <Grid Grid.Row="2" x:Name="RingGrid" Height="150" HorizontalAlignment="Center">
             <!-- Background Track Ring -->
             <Ellipse Width="138" Height="138" Stroke="{DynamicResource Theme.Border}"
                      StrokeThickness="5" HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -204,13 +212,25 @@
                   HorizontalAlignment="Center" VerticalAlignment="Center"
                   Visibility="{Binding ShowProgress, Converter={StaticResource Visible}}"/>
 
-            <!-- Digital Timer (Lining tabular figures) -->
-            <TextBlock Text="{Binding DisplayTime}" FontSize="44" FontWeight="Bold"
-                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                       Foreground="{DynamicResource Theme.TextPrimary}"
-                       FontFamily="{DynamicResource Typography.Family.Display}"
-                       Effect="{DynamicResource Typography.TextGlow}"
-                       Typography.NumeralAlignment="Tabular" Typography.NumeralStyle="Lining"/>
+            <!-- Digital Timer (Lining tabular figures, auto-scaled with Viewbox so it never clips) -->
+            <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center" Height="50">
+                <Viewbox.Style>
+                    <Style TargetType="Viewbox">
+                        <Setter Property="MaxWidth" Value="122"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsStopwatch}" Value="True">
+                                <Setter Property="MaxWidth" Value="240"/>
+                                <Setter Property="Height" Value="56"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Viewbox.Style>
+                <TextBlock Text="{Binding DisplayTime}" FontWeight="Bold"
+                           Foreground="{DynamicResource Theme.TextPrimary}"
+                           FontFamily="{DynamicResource Typography.Family.Display}"
+                           Effect="{DynamicResource Typography.TextGlow}"
+                           Typography.NumeralAlignment="Tabular" Typography.NumeralStyle="Lining"/>
+            </Viewbox>
         </Grid>
 
         <!-- ROW 3: Preset Chips for Timer Mode (15m, 25m, 45m, 60m) -->
