@@ -94,7 +94,7 @@
                     <DockPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="{Binding AlertGlyph}"
                                    FontSize="14" Foreground="{Binding AlertAccentBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                        <TextBlock Text="{Binding AlertTitle}" FontFamily="Segoe UI" FontSize="{StaticResource Font.Label}" FontWeight="SemiBold"
+                        <TextBlock Text="{Binding AlertTitle}" FontFamily="{DynamicResource Typography.Family.Label}" FontSize="{DynamicResource Font.Label}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
                         <ProgressBar Style="{StaticResource AlertProgressBar}" Value="{Binding AlertProgress, Mode=OneWay}"
                                      Width="48" Height="4" Margin="10,0,0,0" VerticalAlignment="Center"
@@ -123,13 +123,13 @@
                 <!-- Compact Stat Preview -->
                 <Grid x:Name="CompactStat" Width="210" HorizontalAlignment="Center" Visibility="Hidden" IsHitTestVisible="False">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding Time}" FontFamily="Segoe UI" FontSize="16" FontWeight="SemiBold"
+                        <TextBlock Text="{Binding Time}" FontFamily="{DynamicResource Typography.Family.Numeric}" FontSize="16" FontWeight="SemiBold"
                                    Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular"
                                    VerticalAlignment="Center"/>
                         <Border Width="1" Height="10" Background="{DynamicResource Theme.Border}" Margin="8,0" VerticalAlignment="Center"/>
                         <TextBlock Text="{Binding CollapsedStatGlyph}" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
                                    FontSize="12" Foreground="{DynamicResource Theme.Accent}" Margin="0,0,5,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding CollapsedStatLabel}" FontFamily="Segoe UI" FontSize="{StaticResource Font.Label}" FontWeight="SemiBold"
+                        <TextBlock Text="{Binding CollapsedStatLabel}" FontFamily="{DynamicResource Typography.Family.Label}" FontSize="{DynamicResource Font.Label}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Grid>
@@ -139,7 +139,7 @@
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE916;"
                                    FontSize="12" Foreground="{DynamicResource Theme.Accent}" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding DisplayTime}" FontFamily="Segoe UI" FontSize="{StaticResource Font.Secondary}" FontWeight="SemiBold"
+                        <TextBlock Text="{Binding DisplayTime}" FontFamily="{DynamicResource Typography.Family.Numeric}" FontSize="{DynamicResource Font.Secondary}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular" VerticalAlignment="Center"/>
                         <ProgressBar Style="{StaticResource AlertProgressBar}" Value="{Binding Progress, Mode=OneWay}"
                                      Width="42" Height="4" Margin="8,0,0,0" VerticalAlignment="Center"/>
@@ -175,7 +175,7 @@
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                     <local:ClockFace x:Name="HeaderClock" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     <TextBlock x:Name="HeaderDate" Text="{Binding Date}" HorizontalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"
-                               FontSize="12" Margin="0,2,0,0"/>
+                               FontFamily="{DynamicResource Typography.Family.Body}" FontSize="{DynamicResource Typography.Size.Secondary}" Margin="0,2,0,0"/>
                 </StackPanel>
 
                 <!-- Right: Pin & Settings Buttons -->

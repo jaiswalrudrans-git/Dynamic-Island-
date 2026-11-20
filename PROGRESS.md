@@ -1,5 +1,66 @@
 # Milestone progress
 
+## M-Density-Typography (Parts A & B Complete) · 2026-11-20
+
+### Part A: Space Efficiency & Dynamic Content-Fitted Island
+- **Dynamic 2-Pass WPF Content Measurement Engine**:
+  - Replaced hardcoded dimensions in `PanelNavigation.cs` with dynamic two-pass layout calculation (`Measure` with infinity for unconstrained reflow width, then pass 2 with target width for exact content height).
+  - Uniform spacing tokens: Island padding 12 DIP, Header height 44 DIP, Card padding 12 DIP, inter-card gap 8 DIP, Card radius 16 DIP (`Padding.Island`, `Padding.Card`, `Padding.Page`, `Margin.Card`, `Radius.Card`, `Height.Header`).
+  - Island dimensions are clamped within minimum width (580 DIP) and maximum (62% work area width, 70% work area height) and snapped to an 8 DIP grid.
+  - Eliminated nested duplicate panels: tabs sit directly on island background surface with zero double boxing.
+- **Per-Tab Refinements**:
+  - **Centered Header**: Replaced asymmetric 3-column header grid with full-width container and `HorizontalAlignment="Center"`, keeping the clock dead center across all tabs.
+  - **Music**: Compact 170 DIP content height, clean track seeker, cover art, and transport row.
+  - **System**: Expanded content height floor to 360 DIP so all 5 process rows in Top Apps sit with abundant breathing room and zero bottom clipping; CPU per-core bars aligned on single horizontal baseline without orphan line wrap.
+  - **Focus**: Spacious, elegant vertical design with mode segment selector, subtitle, 150x150 circular progress ring, preset duration chips, and 48x48 rounded Play/Pause pill.
+  - **Calendar & Weather**: Fixed month header truncation ("Nov 2026"), daily forecast strictly starts with Today.
+  - **Quick Controls**: Reflowed tiles with no empty slots and clean labels ("Focus" / "Off", "Lock" / "PC").
+- **Dev-Only Layout Debug Overlay**:
+  - Toggled via `--layout-debug` or Settings > Developer & Diagnostics.
+  - Displays HUD with exact content and island bounds in DIPs.
+  - Automated layout test `TabDimensionsHaveNoMoreThan12DipUnusedSpaceOnAnySide` verifies slack <= 8 DIP.
+
+### Part B: Clock-Synced Typography System
+- **5-Role Typography System**:
+  - `Display` (clock, hero numbers, big titles)
+  - `Heading` (card titles, tab labels)
+  - `Body` (normal text)
+  - `Label` (small badges, uppercase labels)
+  - `Numeric` (metrics, stats, tabular figures)
+  - Role tokens in `DesignTokens.xaml` and dynamic resources in `TypographyResources.cs`.
+- **Clock-Sync Engine (Default ON: "Match typography to clock style")**:
+  - Synchronizes the typography of the entire dynamic island to the active clock style:
+    - *Simple / With date*: Segoe UI Variable
+    - *Stacked*: Space Grotesk + Inter
+    - *Dot matrix*: Doto + Inter
+    - *LED italic*: Share Tech Mono / DSEG + Inter
+    - *Neon glow*: Orbitron + Rajdhani (+ soft glow tied to clock color)
+    - *Serif italic*: Instrument Serif + Inter
+    - *Wide bold*: Unbounded + Chakra Petch
+    - *Condensed bold*: Bebas Neue + Barlow Condensed
+    - *Pixel*: Silkscreen + Share Tech Mono + Inter
+    - *Compact bold*: Fredoka + Inter
+    - *Terminal mono*: JetBrains Mono
+    - *Gradient / Outline*: Space Grotesk + Inter
+  - 180 ms cross-fade transition without layout jump.
+  - Dynamic 2-pass re-measure ensures wide fonts (Orbitron, Unbounded, Doto, Silkscreen) expand the island smoothly without truncation.
+- **Match Accent Color to Clock Color (Default ON)**:
+  - Dynamically updates active accent brushes, neon glow, and progress indicators to match the active clock color.
+- **Legibility Guard (Default ON)**:
+  - Enforces minimum size thresholds for decorative fonts (Doto >= 18 px, Silkscreen >= 18 px, Bebas Neue >= 16 px, Caveat >= 18 px).
+  - Automatically falls back to companion font (`Inter` / `Segoe UI`) below threshold; Body and small Label never use decorative fonts.
+- **Settings > Typography Studio**:
+  - 12 interactive preset tiles with live preview card (`"14:32 · CPU 29% · Now Playing"`).
+  - Unlink toggle ("Match typography to clock style"), Legibility guard toggle, and Match accent toggle.
+  - Font size scale slider (90% to 130%), weight picker (Regular / Medium / Bold), tabular numerals toggle, uppercase labels toggle, text glow intensity slider.
+  - Per-role override dropdowns for Display, Heading, Body, Label, and Numeric.
+- **10 Bundled OFL 1.1 Fonts**:
+  - Embedded in `src/Island.App/Assets/Fonts/`: `Inter`, `Doto`, `Silkscreen`, `Space Grotesk`, `Share Tech Mono`, `Rajdhani`, `Chakra Petch`, `JetBrains Mono`, `Barlow Condensed`, `Caveat` (alongside `Bebas Neue`, `Fredoka`, `Instrument Serif`, `Orbitron`, `Unbounded`).
+  - Documented in `ThirdPartyNotices.txt`.
+- **Automated Verification**:
+  - All 130 unit, layout, and typography tests pass (`dotnet test -c Release`).
+  - 21 verification screenshots generated for Music, System, and Focus across Dot Matrix, LED, Serif, Wide, Condensed, Pixel, and Neon clock styles.
+
 ## M-Transparency-Clock-Polish (Phases 1, 2 & 5 Complete) · 2026-11-20
 
 ### Phase 5: Neon / Cyberpunk Polish

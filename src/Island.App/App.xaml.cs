@@ -1,6 +1,7 @@
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Media;
 using Island.App.Themes;
 using Island.App.Views;
 using Island.App.Interop;
@@ -47,11 +48,20 @@ public partial class App : Application
             settings.Load();
             var catalog = new ThemeCatalog(directory, log.Write);
             var resources = new ThemeResources(Resources, catalog);
-            resources.Apply(settings.Current.Theme, settings.Current.SurfaceStyle, settings.Current.BackgroundTransparency, settings.Current.CollapsedTransparency, settings.Current.NeonIntensity);
+            var typography = new TypographyResources(Resources);
+
+            void UpdateThemeAndTypography(AppSettings cur)
+            {
+                Color? clockCol = cur.MatchAccentToClock ? ClockFace.ResolveClockColor(cur) : null;
+                resources.Apply(cur.Theme, cur.SurfaceStyle, cur.BackgroundTransparency, cur.CollapsedTransparency, cur.NeonIntensity, clockCol);
+                typography.Apply(cur, clockCol ?? ClockFace.ResolveClockColor(cur));
+            }
+
+            UpdateThemeAndTypography(settings.Current);
             settings.PropertyChanged += (_, args) =>
             {
                 if (args.PropertyName == nameof(SettingsStore.Current))
-                    resources.Apply(settings.Current.Theme, settings.Current.SurfaceStyle, settings.Current.BackgroundTransparency, settings.Current.CollapsedTransparency, settings.Current.NeonIntensity);
+                    UpdateThemeAndTypography(settings.Current);
             };
 
             var overlay = new OverlayWindow(settings, log.Write) { Title = AppIdentity.Name };
@@ -66,6 +76,14 @@ public partial class App : Application
             if (e.Args.Contains("--open") || e.Args.Contains("-open"))
             {
                 overlay.OpenPanel();
+            }
+
+            for (int i = 0; i < e.Args.Length; i++)
+            {
+                if ((e.Args[i] == "--tab" || e.Args[i] == "-tab") && i + 1 < e.Args.Length && int.TryParse(e.Args[i + 1], out int tabIdx))
+                {
+                    overlay.SelectTab(tabIdx);
+                }
             }
 
             var tray = new IslandTray(overlay);

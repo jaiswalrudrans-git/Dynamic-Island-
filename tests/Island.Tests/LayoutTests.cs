@@ -195,6 +195,15 @@ public sealed class LayoutTests : TestFolder
         Assert.True((double)dict["Font.HeaderTime"] >= 20.0);
         Assert.True((double)dict["Font.HeaderDate"] >= 13.0);
         Assert.True((double)dict["Font.CollapsedClock"] >= 16.0);
+
+        // Typography 5-Role System Tokens
+        Assert.NotNull(dict["Typography.Family.Display"]);
+        Assert.NotNull(dict["Typography.Family.Heading"]);
+        Assert.NotNull(dict["Typography.Family.Body"]);
+        Assert.NotNull(dict["Typography.Family.Label"]);
+        Assert.NotNull(dict["Typography.Family.Numeric"]);
+        Assert.True((double)dict["Typography.Size.Body"] >= 14.0);
+        Assert.True((double)dict["Typography.Size.HeaderTime"] >= 20.0);
     }
 
     private static string? FindProjectRoot()

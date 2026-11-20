@@ -13,14 +13,15 @@ public sealed class ThemeResources(ResourceDictionary applicationResources, Them
     private double currentBgTransp = -1;
     private double currentCollapsedTransp = -1;
     private double currentNeonIntensity = -1;
+    private Color? currentAccentOverride;
 
-    public void Apply(string name, string surfaceStyle = "Opaque", double? backgroundTransparency = null, double? collapsedTransparency = null, double? neonIntensity = null)
+    public void Apply(string name, string surfaceStyle = "Opaque", double? backgroundTransparency = null, double? collapsedTransparency = null, double? neonIntensity = null, Color? accentOverride = null)
     {
         var palette = catalog.Resolve(name);
         double bgTransp = backgroundTransparency ?? (surfaceStyle == "Clear" ? 55.0 : surfaceStyle == "Translucent" ? 20.0 : 0.0);
         double colTransp = collapsedTransparency ?? 0.0;
         double intensity = Math.Clamp(neonIntensity ?? 0.6, 0.0, 1.0);
-        if (palette == current && surfaceStyle == currentStyle && bgTransp == currentBgTransp && colTransp == currentCollapsedTransp && intensity == currentNeonIntensity) return;
+        if (palette == current && surfaceStyle == currentStyle && bgTransp == currentBgTransp && colTransp == currentCollapsedTransp && intensity == currentNeonIntensity && accentOverride == currentAccentOverride) return;
 
         byte alpha = surfaceStyle switch
         {
@@ -31,8 +32,8 @@ public sealed class ThemeResources(ResourceDictionary applicationResources, Them
         byte collapsedAlpha = (byte)Math.Clamp(Math.Round(255.0 * (1.0 - colTransp / 100.0)), 60, 255);
         byte cardAlpha = palette.IsDark ? (byte)14 : (byte)24; // ~5.5% white on dark, subtle tint on light
 
-        var accentColor = (Color)ColorConverter.ConvertFromString(palette.Accent);
-        var dataColor = (Color)ColorConverter.ConvertFromString(palette.EffectiveData);
+        var accentColor = accentOverride ?? (Color)ColorConverter.ConvertFromString(palette.Accent);
+        var dataColor = accentOverride ?? (Color)ColorConverter.ConvertFromString(palette.EffectiveData);
 
         var glow = new System.Windows.Media.Effects.DropShadowEffect
         {
@@ -93,6 +94,7 @@ public sealed class ThemeResources(ResourceDictionary applicationResources, Them
         currentBgTransp = bgTransp;
         currentCollapsedTransp = colTransp;
         currentNeonIntensity = intensity;
+        currentAccentOverride = accentOverride;
     }
 
     private static SolidColorBrush Brush(string hex)

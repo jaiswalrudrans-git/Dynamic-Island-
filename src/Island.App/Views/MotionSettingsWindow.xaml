@@ -151,6 +151,80 @@
                 </StackPanel>
             </Border>
 
+            <!-- Typography Studio Section -->
+            <TextBlock Text="Typography Studio" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
+            <Border Margin="0,14,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+                <StackPanel>
+                    <CheckBox x:Name="MatchTypographyCheck" Content="Match typography to clock style (automatic pairing)"
+                              Foreground="{DynamicResource Theme.Foreground}" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                    <CheckBox x:Name="MatchAccentCheck" Content="Match accent color to clock color"
+                              Foreground="{DynamicResource Theme.Foreground}" Margin="0,0,0,6"/>
+                    <CheckBox x:Name="LegibilityGuardCheck" Content="Legibility guard (prevents unreadable small decorative text)"
+                              Foreground="{DynamicResource Theme.Foreground}" Margin="0,0,0,12"/>
+
+                    <!-- Heading -->
+                    <DockPanel Margin="0,4,0,8">
+                        <TextBlock Text="Typography Theme" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Foreground}"/>
+                        <TextBlock x:Name="CurrentTypographyLabel" Text="Classic" Foreground="{DynamicResource Theme.Accent}" HorizontalAlignment="Right" FontSize="12"/>
+                    </DockPanel>
+
+                    <!-- Typography Preset Tiles Grid -->
+                    <UniformGrid x:Name="TypographyPresetsGrid" Columns="3" Margin="-4,0,-4,8"/>
+
+                    <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,8,0,12"/>
+
+                    <!-- Size Scale Slider (90% - 130%) -->
+                    <DockPanel Margin="0,4,0,4">
+                        <TextBlock Text="Font size scale" VerticalAlignment="Center" Foreground="{DynamicResource Theme.Foreground}"/>
+                        <TextBlock Text="{Binding Value, ElementName=TypographyScaleSlider, StringFormat={}{0:P0}}" HorizontalAlignment="Right" Foreground="{DynamicResource Theme.Accent}"/>
+                    </DockPanel>
+                    <Slider x:Name="TypographyScaleSlider" Minimum="0.9" Maximum="1.3" TickFrequency="0.05" IsSnapToTickEnabled="True" Margin="0,0,0,10"/>
+
+                    <!-- Weight Picker -->
+                    <DockPanel Margin="0,4,0,8">
+                        <TextBlock Text="Typography weight" VerticalAlignment="Center" Foreground="{DynamicResource Theme.Foreground}"/>
+                        <ComboBox x:Name="TypographyWeightCombo" HorizontalAlignment="Right" MinWidth="110"/>
+                    </DockPanel>
+
+                    <!-- Formatting Options -->
+                    <CheckBox x:Name="TypographyUppercaseCheck" Content="Uppercase small labels" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                    <CheckBox x:Name="TypographyTabularCheck" Content="Tabular numeric figures" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                    <CheckBox x:Name="TypographyGlowCheck" Content="Text glow effect" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,4"/>
+
+                    <!-- Glow Intensity -->
+                    <DockPanel x:Name="TypographyGlowRow" Margin="18,4,0,10" Visibility="Collapsed">
+                        <TextBlock Text="Glow intensity" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <Slider x:Name="TypographyGlowSlider" Minimum="0.1" Maximum="1.0" TickFrequency="0.05" Width="140" HorizontalAlignment="Right"/>
+                    </DockPanel>
+
+                    <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,4,0,12"/>
+
+                    <!-- Per-Role Font Overrides -->
+                    <TextBlock Text="Per-Role Overrides" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Foreground}" Margin="0,0,0,8"/>
+                    
+                    <DockPanel Margin="0,2,0,6">
+                        <TextBlock Text="Display (Clock, Hero)" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <ComboBox x:Name="RoleDisplayCombo" HorizontalAlignment="Right" MinWidth="150"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,2,0,6">
+                        <TextBlock Text="Heading (Cards, Tabs)" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <ComboBox x:Name="RoleHeadingCombo" HorizontalAlignment="Right" MinWidth="150"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,2,0,6">
+                        <TextBlock Text="Body (Standard Text)" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <ComboBox x:Name="RoleBodyCombo" HorizontalAlignment="Right" MinWidth="150"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,2,0,6">
+                        <TextBlock Text="Label (Small Badges)" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <ComboBox x:Name="RoleLabelCombo" HorizontalAlignment="Right" MinWidth="150"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,2,0,4">
+                        <TextBlock Text="Numeric (Metrics, Stats)" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                        <ComboBox x:Name="RoleNumericCombo" HorizontalAlignment="Right" MinWidth="150"/>
+                    </DockPanel>
+                </StackPanel>
+            </Border>
+
             <!-- Motion Section -->
             <TextBlock Text="Motion" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
             <Border Margin="0,14,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">

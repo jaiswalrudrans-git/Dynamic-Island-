@@ -153,10 +153,10 @@
 
                 <!-- Title, Artist & Lyrics -->
                 <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding Title}" FontSize="20" FontWeight="SemiBold"
+                    <TextBlock Text="{Binding Title}" FontFamily="{DynamicResource Typography.Family.Heading}" FontSize="20" FontWeight="SemiBold"
                                Foreground="{DynamicResource Theme.TextPrimary}"
                                TextTrimming="CharacterEllipsis" ToolTip="{Binding Title}"/>
-                    <TextBlock Text="{Binding Artist}" FontSize="{StaticResource Font.Body}"
+                    <TextBlock Text="{Binding Artist}" FontFamily="{DynamicResource Typography.Family.Body}" FontSize="{DynamicResource Font.Body}"
                                Foreground="{DynamicResource Theme.TextSecondary}" Margin="0,3,0,0"
                                TextTrimming="CharacterEllipsis"/>
 
@@ -188,7 +188,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding Elapsed}" VerticalAlignment="Center" FontSize="{StaticResource Font.Label}"
+                <TextBlock Text="{Binding Elapsed}" VerticalAlignment="Center" FontFamily="{DynamicResource Typography.Family.Numeric}" FontSize="{DynamicResource Font.Label}"
                            Foreground="{DynamicResource Theme.TextTertiary}" Typography.NumeralAlignment="Tabular"/>
                 <Slider x:Name="Seek" Grid.Column="1" Minimum="0" Maximum="1" Margin="10,0"
                         Value="{Binding Fraction, Mode=OneWay}" IsEnabled="{Binding CanSeek}"
@@ -220,7 +220,7 @@
                         </ControlTemplate>
                     </Slider.Template>
                 </Slider>
-                <TextBlock Grid.Column="2" Text="{Binding Duration}" VerticalAlignment="Center" FontSize="{StaticResource Font.Label}"
+                <TextBlock Grid.Column="2" Text="{Binding Duration}" VerticalAlignment="Center" FontFamily="{DynamicResource Typography.Family.Numeric}" FontSize="{DynamicResource Font.Label}"
                            Foreground="{DynamicResource Theme.TextTertiary}" Typography.NumeralAlignment="Tabular"/>
             </Grid>
 

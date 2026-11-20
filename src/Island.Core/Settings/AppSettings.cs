@@ -54,6 +54,21 @@ public sealed record AppSettings
     public bool AlertSoundEnabled { get; init; } = true;
     public int AlertDurationSeconds { get; init; } = 4;
     public bool LayoutDebug { get; init; } = false;
+    public bool MatchTypographyToClock { get; init; } = true;
+    public bool MatchAccentToClock { get; init; } = true;
+    public string TypographyPreset { get; init; } = "Classic";
+    public double TypographySizeScale { get; init; } = 1.0;
+    public string TypographyWeight { get; init; } = "Regular";
+    public bool TypographyUppercaseLabels { get; init; } = false;
+    public bool TypographyTabularNumerals { get; init; } = true;
+    public bool TypographyTextGlow { get; init; } = false;
+    public double TypographyGlowStrength { get; init; } = 0.5;
+    public bool LegibilityGuard { get; init; } = true;
+    public string? FontFamilyDisplay { get; init; }
+    public string? FontFamilyHeading { get; init; }
+    public string? FontFamilyBody { get; init; }
+    public string? FontFamilyLabel { get; init; }
+    public string? FontFamilyNumeric { get; init; }
 
     [JsonExtensionData]
     public IDictionary<string, JsonElement>? AdditionalSettings { get; init; }
@@ -81,6 +96,10 @@ public sealed record AppSettings
         ClockColor = ClockColor is "White" or "Amber" or "Cyan" or "Pink" or "Green" or "Violet" or "Gradient" or "Cover" or "Custom" ? ClockColor : "White",
         ClockCustomColor = string.IsNullOrWhiteSpace(ClockCustomColor) ? "#00E5FF" : ClockCustomColor.Trim(),
         ClockSizeScale = double.IsFinite(ClockSizeScale) ? Math.Clamp(ClockSizeScale, 0.8, 1.5) : 1.0,
-        NeonIntensity = double.IsFinite(NeonIntensity) ? Math.Clamp(NeonIntensity, 0.0, 1.0) : 0.6
+        NeonIntensity = double.IsFinite(NeonIntensity) ? Math.Clamp(NeonIntensity, 0.0, 1.0) : 0.6,
+        TypographyPreset = string.IsNullOrWhiteSpace(TypographyPreset) ? "Classic" : TypographyPreset.Trim(),
+        TypographySizeScale = double.IsFinite(TypographySizeScale) ? Math.Clamp(TypographySizeScale, 0.9, 1.3) : 1.0,
+        TypographyWeight = TypographyWeight is "Medium" or "Bold" ? TypographyWeight : "Regular",
+        TypographyGlowStrength = double.IsFinite(TypographyGlowStrength) ? Math.Clamp(TypographyGlowStrength, 0.0, 1.0) : 0.5
     };
 }

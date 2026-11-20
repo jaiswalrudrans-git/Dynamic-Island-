@@ -236,7 +236,7 @@ public sealed class ClockFace : FrameworkElement
         }
     }
 
-    public Color ResolveColor() => colorName switch
+    public static Color ResolveClockColor(AppSettings settings, Color? coverColor = null) => settings.ClockColor switch
     {
         "Amber" => Color.FromRgb(0xFF, 0xB3, 0x00),
         "Cyan" => Color.FromRgb(0x00, 0xE5, 0xFF),
@@ -244,9 +244,11 @@ public sealed class ClockFace : FrameworkElement
         "Green" => Color.FromRgb(0x00, 0xE6, 0x76),
         "Violet" => Color.FromRgb(0xB3, 0x88, 0xFF),
         "Cover" => coverColor ?? Color.FromRgb(0xF5, 0xF5, 0xF7),
-        "Custom" when !string.IsNullOrEmpty(customColorHex) => ParseColor(customColorHex),
-        _ => Color.FromRgb(0xF5, 0xF5, 0xF7) // White default
+        "Custom" when !string.IsNullOrEmpty(settings.ClockCustomColor) => ParseColor(settings.ClockCustomColor),
+        _ => Color.FromRgb(0xF5, 0xF5, 0xF7)
     };
+
+    public Color ResolveColor() => ResolveClockColor(new AppSettings { ClockColor = colorName, ClockCustomColor = customColorHex }, coverColor);
 
     private static Color ParseColor(string hex)
     {

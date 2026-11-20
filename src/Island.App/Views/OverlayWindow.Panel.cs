@@ -59,6 +59,8 @@ public partial class OverlayWindow
     private PowerAlertWatcher powerAlerts = null!;
     private TemperatureAlertWatcher tempAlerts = null!;
     private bool rendering, openingIntent, suppressHover, menuOpen, escapeRegistered, previousPin;
+    private string lastAppliedClockStyle = "";
+    private string lastAppliedPreset = "";
     internal bool Paused { get; private set; }
     internal bool Pinned => settings.Current.IsPinned;
 
@@ -214,6 +216,13 @@ public partial class OverlayWindow
         DrawPanel();
     }
 
+    public void SelectTab(int index)
+    {
+        navigation?.Select(index);
+        UpdateDemands();
+        UpdateIslandTargetSize();
+    }
+
     private void UpdateDemands()
     {
         music.Display(motion.Expanded && navigation.MusicSelected, !motion.Expanded, Paused);
@@ -301,6 +310,17 @@ public partial class OverlayWindow
         brightnessOsd?.Configure(settings.Current);
         powerAlerts?.Configure(settings.Current);
         tempAlerts?.Configure(settings.Current);
+
+        bool typographyChanged = lastAppliedClockStyle != settings.Current.ClockStyle ||
+                                 lastAppliedPreset != settings.Current.TypographyPreset;
+        lastAppliedClockStyle = settings.Current.ClockStyle;
+        lastAppliedPreset = settings.Current.TypographyPreset;
+        if (typographyChanged)
+        {
+            if (motion.Expanded) AnimateTypographyTransition();
+            UpdateIslandTargetSize();
+        }
+
         if (previousPin != Pinned)
         {
             previousPin = Pinned;
@@ -340,6 +360,16 @@ public partial class OverlayWindow
             : Math.Max(250, settings.Current.CollapseDelayMs);
         intent.Interval = TimeSpan.FromMilliseconds(delay);
         intent.Start();
+    }
+
+    private void AnimateTypographyTransition()
+    {
+        if (Body == null) return;
+        var anim = new System.Windows.Media.Animation.DoubleAnimation(0.3, 1.0, TimeSpan.FromMilliseconds(180))
+        {
+            EasingFunction = new System.Windows.Media.Animation.QuadraticEase { EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut }
+        };
+        Body.BeginAnimation(UIElement.OpacityProperty, anim);
     }
 
     private void IntentTick(object? sender, EventArgs e)

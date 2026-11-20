@@ -49,6 +49,32 @@
     <FontFamily x:Key="Font.FamilyMono">Cascadia Code, Consolas, Courier New</FontFamily>
     <FontFamily x:Key="Font.FamilyText">Segoe UI Variable Text, Segoe UI</FontFamily>
 
+    <!-- TYPOGRAPHY 5-ROLE SYSTEM TOKENS -->
+    <FontFamily x:Key="Typography.Family.Display">Segoe UI Variable Display, Segoe UI, Arial</FontFamily>
+    <FontFamily x:Key="Typography.Family.Heading">Segoe UI Variable Text, Segoe UI, Arial</FontFamily>
+    <FontFamily x:Key="Typography.Family.Body">Segoe UI Variable Text, Segoe UI, Arial</FontFamily>
+    <FontFamily x:Key="Typography.Family.Label">Segoe UI Variable Text, Segoe UI, Arial</FontFamily>
+    <FontFamily x:Key="Typography.Family.Numeric">Segoe UI Variable Text, Segoe UI, Arial</FontFamily>
+
+    <FontWeight x:Key="Typography.Weight.Display">Bold</FontWeight>
+    <FontWeight x:Key="Typography.Weight.Heading">SemiBold</FontWeight>
+    <FontWeight x:Key="Typography.Weight.Body">Normal</FontWeight>
+    <FontWeight x:Key="Typography.Weight.Label">Normal</FontWeight>
+    <FontWeight x:Key="Typography.Weight.Numeric">SemiBold</FontWeight>
+
+    <sys:Double x:Key="Typography.Size.HeroLarge">56</sys:Double>
+    <sys:Double x:Key="Typography.Size.Hero">32</sys:Double>
+    <sys:Double x:Key="Typography.Size.HeaderTime">20</sys:Double>
+    <sys:Double x:Key="Typography.Size.SectionTitle">16</sys:Double>
+    <sys:Double x:Key="Typography.Size.Value">17</sys:Double>
+    <sys:Double x:Key="Typography.Size.Body">14</sys:Double>
+    <sys:Double x:Key="Typography.Size.Secondary">13</sys:Double>
+    <sys:Double x:Key="Typography.Size.Label">12.5</sys:Double>
+    <sys:Double x:Key="Typography.Size.Mini">11</sys:Double>
+
+    <sys:Boolean x:Key="Typography.UppercaseLabels">False</sys:Boolean>
+    <sys:Boolean x:Key="Typography.TabularNumerals">True</sys:Boolean>
+
     <!-- TOUCH / CLICK TARGETS -->
     <sys:Double x:Key="Target.MinSize">36</sys:Double>
     <sys:Double x:Key="Target.IconSize">20</sys:Double>
@@ -57,6 +83,11 @@
     <FontFamily x:Key="Font.Display">pack://application:,,,/Fonts/#Orbitron, Segoe UI Variable Display, Segoe UI</FontFamily>
     <FontFamily x:Key="Font.Text">Segoe UI Variable Text, Segoe UI</FontFamily>
     <FontFamily x:Key="Font.Icons">Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji</FontFamily>
+
+    <!-- GLOBAL TEXTBLOCK STYLE -->
+    <Style TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{DynamicResource Typography.Family.Body}"/>
+    </Style>
 
     <!-- CARD STYLE (Subtle fill, 1px top highlight, outline only on hover/focus) -->
     <Style x:Key="IslandCard" TargetType="Border">

@@ -185,7 +185,8 @@
         </Border>
 
         <!-- ROW 1: Mode Title & Cycle Dots ("Work · 1 of 4") -->
-        <TextBlock Grid.Row="1" Text="{Binding CycleSubtitle}" FontSize="{StaticResource Font.Secondary}"
+        <TextBlock Grid.Row="1" Text="{Binding CycleSubtitle}" FontSize="{DynamicResource Typography.Size.Secondary}"
+                   FontFamily="{DynamicResource Typography.Family.Heading}"
                    FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextSecondary}"
                    HorizontalAlignment="Center" Margin="0,8,0,6"/>
 
@@ -207,7 +208,8 @@
             <TextBlock Text="{Binding DisplayTime}" FontSize="44" FontWeight="Bold"
                        HorizontalAlignment="Center" VerticalAlignment="Center"
                        Foreground="{DynamicResource Theme.TextPrimary}"
-                       FontFamily="{StaticResource Font.FamilyDisplay}"
+                       FontFamily="{DynamicResource Typography.Family.Display}"
+                       Effect="{DynamicResource Typography.TextGlow}"
                        Typography.NumeralAlignment="Tabular" Typography.NumeralStyle="Lining"/>
         </Grid>
 
