@@ -123,141 +123,132 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="16,8,16,12">
-        <Grid.RowDefinitions>
-            <!-- Row 0: Segment Control on its own row -->
-            <RowDefinition Height="Auto"/>
-            <!-- Row 1: Mode title and cycle dots on a separate row below -->
-            <RowDefinition Height="Auto"/>
-            <!-- Row 2: Timer, Progress Ring, Presets & Controls -->
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Grid Margin="12,4">
+        <Grid.ColumnDefinitions>
+            <!-- Left: Progress Ring + Digital Timer -->
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="20"/>
+            <!-- Right: Segment Switch, Mode Title/Dots, Preset Chips, Controls -->
+            <ColumnDefinition Width="*"/>
+            <!-- Optional Column for Stopwatch Laps -->
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
 
-        <!-- ROW 0: Segment Control -->
-        <Border Grid.Row="0" HorizontalAlignment="Center" Background="{DynamicResource Theme.SurfaceRaised}"
-                BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="6"
-                Padding="2" ClipToBounds="True">
-            <StackPanel Orientation="Horizontal">
-                <Button Content="Pomodoro" Click="PomodoroModeClick">
-                    <Button.Style>
-                        <Style TargetType="Button" BasedOn="{StaticResource SegmentButton}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsPomodoro}" Value="True">
-                                    <Setter Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource Theme.Accent}"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-                <Button Content="Timer" Click="TimerModeClick" Margin="3,0,0,0">
-                    <Button.Style>
-                        <Style TargetType="Button" BasedOn="{StaticResource SegmentButton}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsTimer}" Value="True">
-                                    <Setter Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource Theme.Accent}"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-                <Button Content="Stopwatch" Click="StopwatchModeClick" Margin="3,0,0,0">
-                    <Button.Style>
-                        <Style TargetType="Button" BasedOn="{StaticResource SegmentButton}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsStopwatch}" Value="True">
-                                    <Setter Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
-                                    <Setter Property="Foreground" Value="{DynamicResource Theme.Accent}"/>
-                                    <Setter Property="FontWeight" Value="Bold"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-            </StackPanel>
-        </Border>
+        <!-- LEFT: Circular Progress Ring (140x140) with Digital Timer -->
+        <Grid Grid.Column="0" x:Name="RingGrid" Width="140" Height="140" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <!-- Background Track Ring -->
+            <Ellipse Width="128" Height="128" Stroke="{DynamicResource Theme.Border}"
+                     StrokeThickness="5" HorizontalAlignment="Center" VerticalAlignment="Center"
+                     Visibility="{Binding ShowProgress, Converter={StaticResource Visible}}"/>
 
-        <!-- ROW 1: Mode Title & Cycle Dots ("Work · 1 of 4") -->
-        <StackPanel Grid.Row="1" HorizontalAlignment="Center" Margin="0,8,0,4" Orientation="Horizontal">
+            <!-- Active Progress Arc (Cyan Data with Glow) -->
+            <Path x:Name="RingPath" Stroke="{DynamicResource Theme.Data}" StrokeThickness="5"
+                  Effect="{DynamicResource Theme.DataGlow}"
+                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                  Visibility="{Binding ShowProgress, Converter={StaticResource Visible}}"/>
+
+            <!-- Digital Timer (Lining tabular figures) -->
+            <TextBlock Text="{Binding DisplayTime}" FontSize="36" FontWeight="Bold"
+                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                       Foreground="{DynamicResource Theme.TextPrimary}"
+                       FontFamily="{StaticResource Font.FamilyDisplay}"
+                       Typography.NumeralAlignment="Tabular" Typography.NumeralStyle="Lining"/>
+        </Grid>
+
+        <!-- RIGHT: Controls Column -->
+        <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left">
+            <!-- Row 0: Segment Control (Pomodoro | Timer | Stopwatch) -->
+            <Border HorizontalAlignment="Left" Background="{DynamicResource Theme.SurfaceRaised}"
+                    BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="6"
+                    Padding="2" ClipToBounds="True">
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Pomodoro" Click="PomodoroModeClick">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource SegmentButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsPomodoro}" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource Theme.Accent}"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Content="Timer" Click="TimerModeClick" Margin="3,0,0,0">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource SegmentButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsTimer}" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource Theme.Accent}"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Content="Stopwatch" Click="StopwatchModeClick" Margin="3,0,0,0">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource SegmentButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsStopwatch}" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource Theme.Accent}"/>
+                                        <Setter Property="FontWeight" Value="Bold"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </Border>
+
+            <!-- Row 1: Mode Title & Cycle Dots ("Work · 1 of 4") -->
             <TextBlock Text="{Binding CycleSubtitle}" FontSize="{StaticResource Font.Secondary}"
-                       FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextSecondary}" HorizontalAlignment="Center"/>
+                       FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextSecondary}" Margin="0,8,0,6"/>
+
+            <!-- Row 2: Preset Chips for Timer Mode (15m, 25m, 45m, 60m) -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8"
+                        Visibility="{Binding IsTimer, Converter={StaticResource Visible}}">
+                <Button Style="{StaticResource PresetChip}" Content="15m" Click="Timer15Click"/>
+                <Button Style="{StaticResource PresetChip}" Content="25m" Click="Timer25Click" Margin="6,0,0,0"/>
+                <Button Style="{StaticResource PresetChip}" Content="45m" Click="Timer45Click" Margin="6,0,0,0"/>
+                <Button Style="{StaticResource PresetChip}" Content="60m" Click="Timer60Click" Margin="6,0,0,0"/>
+            </StackPanel>
+
+            <!-- Row 3: Controls Row (Reset, Play/Pause, Skip/Lap) -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <!-- Reset -->
+                <Button Style="{StaticResource FocusControlBtn}" Content="&#xE777;" Click="ResetClick" ToolTip="Reset"/>
+
+                <!-- Play / Pause -->
+                <Button Style="{StaticResource PlayBtn}" Content="{Binding PlayPauseGlyph}" Click="PlayPauseClick"
+                        Margin="12,0" ToolTip="{Binding PlayPauseText}"/>
+
+                <!-- Skip (Pomodoro) or Lap (Stopwatch) -->
+                <Button Style="{StaticResource FocusControlBtn}" Content="&#xE893;" Click="SkipClick" ToolTip="Skip Stage"
+                        Visibility="{Binding IsPomodoro, Converter={StaticResource Visible}}"/>
+                <Button Style="{StaticResource FocusControlBtn}" Content="&#xE7C0;" Click="LapClick" ToolTip="Lap"
+                        Visibility="{Binding IsStopwatch, Converter={StaticResource Visible}}"/>
+            </StackPanel>
         </StackPanel>
 
-        <!-- ROW 2: Main Area -->
-        <Grid Grid.Row="2" Margin="0,6,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <!-- Center Clock & Progress Ring & Controls -->
-            <StackPanel Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <!-- Circular Progress Ring with Digital Timer Inside -->
-                <Grid Width="160" Height="160" HorizontalAlignment="Center">
-                    <!-- Background Track Ring -->
-                    <Ellipse Width="148" Height="148" Stroke="{DynamicResource Theme.Border}"
-                             StrokeThickness="5" HorizontalAlignment="Center" VerticalAlignment="Center"
-                             Visibility="{Binding ShowProgress, Converter={StaticResource Visible}}"/>
-
-                    <!-- Active Progress Arc (Cyan Data with Glow) -->
-                    <Path x:Name="RingPath" Stroke="{DynamicResource Theme.Data}" StrokeThickness="5"
-                          Effect="{DynamicResource Theme.DataGlow}"
-                          StrokeStartLineCap="Round" StrokeEndLineCap="Round"
-                          HorizontalAlignment="Center" VerticalAlignment="Center"
-                          Visibility="{Binding ShowProgress, Converter={StaticResource Visible}}"/>
-
-                    <!-- 56px Digital Timer (Lining tabular figures) -->
-                    <TextBlock Text="{Binding DisplayTime}" FontSize="46" FontWeight="Bold"
-                               HorizontalAlignment="Center" VerticalAlignment="Center"
-                               Foreground="{DynamicResource Theme.TextPrimary}"
-                               FontFamily="{StaticResource Font.FamilyDisplay}"
-                               Typography.NumeralAlignment="Tabular" Typography.NumeralStyle="Lining"/>
-                </Grid>
-
-                <!-- Preset Chips for Timer Mode (15 / 25 / 45 / 60) -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,4"
-                            Visibility="{Binding IsTimer, Converter={StaticResource Visible}}">
-                    <Button Style="{StaticResource PresetChip}" Content="15m" Click="Timer15Click"/>
-                    <Button Style="{StaticResource PresetChip}" Content="25m" Click="Timer25Click" Margin="6,0,0,0"/>
-                    <Button Style="{StaticResource PresetChip}" Content="45m" Click="Timer45Click" Margin="6,0,0,0"/>
-                    <Button Style="{StaticResource PresetChip}" Content="60m" Click="Timer60Click" Margin="6,0,0,0"/>
-                </StackPanel>
-
-                <!-- Controls Row (Reset, Play/Pause, Skip/Lap) -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,6,0,0">
-                    <!-- Reset -->
-                    <Button Style="{StaticResource FocusControlBtn}" Content="&#xE777;" Click="ResetClick" ToolTip="Reset"/>
-
-                    <!-- Play / Pause -->
-                    <Button Style="{StaticResource PlayBtn}" Content="{Binding PlayPauseGlyph}" Click="PlayPauseClick"
-                            Margin="16,0" ToolTip="{Binding PlayPauseText}"/>
-
-                    <!-- Skip (Pomodoro) or Lap (Stopwatch) -->
-                    <Button Style="{StaticResource FocusControlBtn}" Content="&#xE893;" Click="SkipClick" ToolTip="Skip Stage"
-                            Visibility="{Binding IsPomodoro, Converter={StaticResource Visible}}"/>
-                    <Button Style="{StaticResource FocusControlBtn}" Content="&#xE7C0;" Click="LapClick" ToolTip="Lap"
-                            Visibility="{Binding IsStopwatch, Converter={StaticResource Visible}}"/>
-                </StackPanel>
-            </StackPanel>
-
-            <!-- Stopwatch Laps Sidebar -->
-            <ScrollViewer Grid.Column="1" Width="140" MaxHeight="180" VerticalScrollBarVisibility="Auto" Focusable="False"
-                          Visibility="{Binding IsStopwatch, Converter={StaticResource Visible}}" Margin="16,0,0,0">
-                <ItemsControl ItemsSource="{Binding LapStrings}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Background="{DynamicResource Theme.SurfaceRaised}" CornerRadius="{StaticResource Radius.Control}"
-                                    BorderThickness="1" BorderBrush="{DynamicResource Theme.Border}" Padding="8,4" Margin="0,3">
-                                <TextBlock Text="{Binding}" FontSize="{StaticResource Font.Label}" Foreground="{DynamicResource Theme.TextSecondary}"
-                                           Typography.NumeralAlignment="Tabular"/>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-        </Grid>
+        <!-- Optional Column for Stopwatch Laps Sidebar -->
+        <ScrollViewer Grid.Column="3" Width="130" MaxHeight="140" VerticalScrollBarVisibility="Auto" Focusable="False"
+                      Visibility="{Binding IsStopwatch, Converter={StaticResource Visible}}" Margin="12,0,0,0">
+            <ItemsControl ItemsSource="{Binding LapStrings}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border Background="{DynamicResource Theme.SurfaceRaised}" CornerRadius="{StaticResource Radius.Control}"
+                                BorderThickness="1" BorderBrush="{DynamicResource Theme.Border}" Padding="8,4" Margin="0,3">
+                            <TextBlock Text="{Binding}" FontSize="{StaticResource Font.Label}" Foreground="{DynamicResource Theme.TextSecondary}"
+                                       Typography.NumeralAlignment="Tabular"/>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
     </Grid>
 </UserControl>

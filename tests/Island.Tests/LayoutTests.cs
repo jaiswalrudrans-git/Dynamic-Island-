@@ -89,13 +89,13 @@ public sealed class LayoutTests : TestFolder
         double effectiveW = screenW / scale;
         double effectiveH = screenH / scale;
 
-        double minWidth = 480.0;
+        double minWidth = 560.0;
         double maxWidth = effectiveW * 0.62;
         double maxHeight = effectiveH * 0.70;
 
         // Base content widths for tabs: Music, System, Tasks, QuickControls, Focus, CalendarWeather
-        double[] tabContentWidths = [520, 660, 480, 520, 500, 660];
-        double[] tabContentHeights = [170, 320, 180, 240, 200, 310];
+        double[] tabContentWidths = [560, 660, 560, 580, 560, 680];
+        double[] tabContentHeights = [170, 320, 180, 240, 180, 310];
 
         for (int i = 0; i < tabContentWidths.Length; i++)
         {
@@ -109,7 +109,7 @@ public sealed class LayoutTests : TestFolder
             double snappedW = Math.Ceiling(islandW / 8.0) * 8.0;
             double snappedH = Math.Ceiling(islandH / 8.0) * 8.0;
 
-            Assert.True(snappedW >= 480, $"Tab {i} width {snappedW} must be >= 480");
+            Assert.True(snappedW >= 560, $"Tab {i} width {snappedW} must be >= 560");
             Assert.True(snappedW <= maxWidth + 8, $"Tab {i} width {snappedW} must be <= max width {maxWidth}");
             Assert.True(snappedH <= maxHeight + 8, $"Tab {i} height {snappedH} must be <= max height {maxHeight}");
             Assert.Equal(0.0, snappedW % 8.0);
@@ -127,17 +127,17 @@ public sealed class LayoutTests : TestFolder
     {
         double effectiveW = screenW / scale;
         double effectiveH = screenH / scale;
-        double minIslandW = 480.0;
+        double minIslandW = 560.0;
         double maxIslandW = effectiveW * 0.62;
         double maxIslandH = effectiveH * 0.70;
 
         (double w, double h)[] tabs = [
-            (520, 170), // Music
+            (560, 170), // Music
             (660, 320), // System
-            (480, 180), // Tasks
-            (520, 240), // Quick Controls
-            (500, 200), // Focus
-            (660, 310)  // Calendar & Weather
+            (560, 180), // Tasks
+            (580, 240), // Quick Controls
+            (560, 180), // Focus
+            (680, 310)  // Calendar & Weather
         ];
 
         for (int i = 0; i < tabs.Length; i++)
@@ -163,7 +163,7 @@ public sealed class LayoutTests : TestFolder
             Assert.True(Math.Abs(topUnused - 12.0) <= 0.001, $"Tab {i} top padding must be exactly 12 DIP");
             Assert.True(bottomUnused - 12.0 <= 8.0, $"Tab {i} bottom unused slack {bottomUnused - 12.0} > 8 DIP");
 
-            Assert.True(islandW >= 480.0, $"Tab {i} width {islandW} must be >= 480 DIP");
+            Assert.True(islandW >= 560.0, $"Tab {i} width {islandW} must be >= 560 DIP");
             Assert.True(islandW <= maxIslandW + 8.0, $"Tab {i} width {islandW} must be <= max width {maxIslandW}");
             Assert.True(islandH <= maxIslandH + 8.0, $"Tab {i} height {islandH} must be <= max height {maxIslandH}");
             Assert.Equal(0.0, islandW % 8.0);

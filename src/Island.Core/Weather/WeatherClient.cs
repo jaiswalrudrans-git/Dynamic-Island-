@@ -69,7 +69,8 @@ public sealed class WeatherClient : IDisposable
                         {
                             double hTemp = temps[i].GetDouble();
                             int hCode = codes[i].GetInt32();
-                            var (_, hGlyph) = WmoWeatherCode.Describe(hCode, true);
+                            bool isDayHour = hTime.Hour >= 6 && hTime.Hour < 19;
+                            var (_, hGlyph) = WmoWeatherCode.Describe(hCode, isDayHour);
                             string hourDisplay = added == 0 ? "Now" : hTime.ToString("h tt", CultureInfo.InvariantCulture);
 
                             hourlyList.Add(new HourlyForecastItem(hTime, hourDisplay, hTemp, hCode, hGlyph, tempUnit));
@@ -96,6 +97,8 @@ public sealed class WeatherClient : IDisposable
                 {
                     if (DateTime.TryParse(dTimes[i].GetString(), out var dDate))
                     {
+                        if (dDate.Date < today) continue;
+
                         double max = maxTemps[i].GetDouble();
                         double min = minTemps[i].GetDouble();
                         int dCode = dCodes[i].GetInt32();

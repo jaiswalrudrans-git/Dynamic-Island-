@@ -42,9 +42,9 @@ public partial class FocusPage : UserControl
         double p = Math.Clamp(progress, 0, 0.9999);
         double angle = p * 2 * Math.PI;
 
-        double cx = 80;
-        double cy = 80;
-        double r = 74;
+        double cx = 70;
+        double cy = 70;
+        double r = 64;
 
         double startX = cx;
         double startY = cy - r;

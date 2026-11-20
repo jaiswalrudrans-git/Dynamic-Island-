@@ -58,7 +58,7 @@ public sealed class CalendarWeatherViewModel : ObservableObject, IDisposable
     private bool disposed;
 
     // --- Calendar Properties ---
-    public string MonthYearText => displayMonth.ToString("MMMM yyyy", CultureInfo.InvariantCulture);
+    public string MonthYearText => displayMonth.ToString("MMM yyyy", CultureInfo.InvariantCulture);
 
     public string SelectedDateHeader
     {

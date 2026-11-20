@@ -48,7 +48,7 @@ internal sealed class PanelNavigation
             {
                 Text = tab.Glyph,
                 FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets"),
-                FontSize = 14,
+                FontSize = 13,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
@@ -58,9 +58,9 @@ internal sealed class PanelNavigation
                 Content = iconBlock,
                 Style = style,
                 ToolTip = string.IsNullOrEmpty(tab.Description) ? tab.Name : tab.Description,
-                Height = 30,
-                Width = 32,
-                MinWidth = 32,
+                Height = 28,
+                Width = 28,
+                MinWidth = 28,
                 Padding = new Thickness(0),
                 Margin = new Thickness(0),
                 ClipToBounds = true
@@ -171,7 +171,7 @@ internal sealed class PanelNavigation
 
         double screenW = SystemParameters.WorkArea.Width > 0 ? SystemParameters.WorkArea.Width : 1920;
         double screenH = SystemParameters.WorkArea.Height > 0 ? SystemParameters.WorkArea.Height : 1080;
-        double minIslandW = 480.0;
+        double minIslandW = 560.0;
         double maxIslandW = Math.Max(minIslandW, screenW * 0.62);
         double maxIslandH = Math.Max(180, screenH * 0.70);
 
@@ -184,13 +184,13 @@ internal sealed class PanelNavigation
         {
             desiredContentW = tabIndex switch
             {
-                0 => 520, // Music
+                0 => 560, // Music
                 1 => 660, // System
-                2 => 480, // Tasks
-                3 => 520, // Quick Controls
-                4 => 500, // Focus
-                5 => 660, // Calendar & Weather
-                _ => 480
+                2 => 560, // Tasks
+                3 => 580, // Quick Controls
+                4 => 560, // Focus
+                5 => 680, // Calendar & Weather
+                _ => 560
             };
         }
 
@@ -213,7 +213,7 @@ internal sealed class PanelNavigation
                 1 => 320, // System
                 2 => 180, // Tasks
                 3 => 240, // Quick Controls
-                4 => 200, // Focus
+                4 => 180, // Focus
                 5 => 310, // Calendar & Weather
                 _ => 180
             };
@@ -230,7 +230,7 @@ internal sealed class PanelNavigation
     {
         if (reduced) pill.Set(selected);
         bool moving = pill.Advance(selected, seconds);
-        indicator.X = pill.Value * 32;
+        indicator.X = pill.Value * 28;
         return moving;
     }
 

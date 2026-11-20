@@ -58,18 +58,18 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="16,8,16,12">
+    <Grid Margin="12,4">
         <Grid.ColumnDefinitions>
             <!-- Left Column: Calendar & Agenda -->
             <ColumnDefinition Width="290"/>
-            <!-- 12 DIP Gap -->
-            <ColumnDefinition Width="12"/>
+            <!-- 8 DIP Gap -->
+            <ColumnDefinition Width="8"/>
             <!-- Right Column: Weather Card -->
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <!-- LEFT COLUMN: Calendar & Agenda inside an IslandCard -->
-        <Border Grid.Column="0" Style="{StaticResource IslandCard}">
+        <Border Grid.Column="0" Style="{StaticResource IslandCard}" VerticalAlignment="Stretch">
             <Grid>
                 <Grid.RowDefinitions>
                     <!-- Row 0: Month header & nav -->
@@ -231,7 +231,7 @@
         </Border>
 
         <!-- RIGHT COLUMN: Weather Card inside an IslandCard -->
-        <Border Grid.Column="2" Style="{StaticResource IslandCard}">
+        <Border Grid.Column="2" Style="{StaticResource IslandCard}" VerticalAlignment="Stretch">
             <Grid>
                 <Grid.RowDefinitions>
                     <!-- Row 0: Weather Header (Temp, Condition Text, City Pill, Controls) -->

@@ -98,16 +98,16 @@
                                        Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular"/>
                         </Grid>
 
-                        <!-- Per-Core Bars (Cyan Data) -->
+                        <!-- Per-Core Bars (Cyan Data - Single Horizontal Row, Never Wraps) -->
                         <ItemsControl Grid.Column="2" ItemsSource="{Binding CpuCores}" VerticalAlignment="Center" HorizontalAlignment="Left">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <WrapPanel MaxWidth="160" Orientation="Horizontal"/>
+                                    <StackPanel Orientation="Horizontal"/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid Width="4" Height="20" Margin="1,1" VerticalAlignment="Bottom" ToolTip="{Binding Tooltip}">
+                                    <Grid Width="3.5" Height="22" Margin="1,0" VerticalAlignment="Center" ToolTip="{Binding Tooltip}">
                                         <Border CornerRadius="1.5" Background="{DynamicResource Theme.Border}"/>
                                         <Border CornerRadius="1.5" Background="{DynamicResource Theme.Data}"
                                                 VerticalAlignment="Bottom" Height="{Binding Height}"/>
@@ -181,10 +181,10 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding GpuShortName}" MaxWidth="130" TextTrimming="CharacterEllipsis"
+                        <TextBlock Text="{Binding GpuShortName}" MaxWidth="120" TextTrimming="CharacterEllipsis"
                                    FontSize="{StaticResource FontSize.SectionTitle}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
                             <TextBlock Text="{Binding GpuUsageFormatted}" FontSize="{StaticResource FontSize.Value}"
                                        FontWeight="SemiBold" Foreground="{DynamicResource Theme.Data}"
                                        Typography.NumeralAlignment="Tabular"/>
