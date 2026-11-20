@@ -303,6 +303,15 @@ internal sealed class MediaSessions(Dispatcher dispatcher, Action<string> log) :
         try
         {
             var c = target.GetPlaybackInfo().Controls;
+            if (action == "Seek")
+            {
+                if (!c.IsPlaybackPositionEnabled || MaxSeek <= MinSeek) return false;
+                double clamped = Math.Clamp(position, MinSeek, MaxSeek);
+                pendingSeekPosition = clamped;
+                pendingSeekUntil = DateTimeOffset.UtcNow.AddSeconds(3);
+                timeline = timeline with { Position = clamped, Updated = DateTimeOffset.UtcNow };
+            }
+
             var command = action switch
             {
                 "Toggle" when c.IsPlayPauseToggleEnabled => target.TryTogglePlayPauseAsync(),
@@ -310,7 +319,7 @@ internal sealed class MediaSessions(Dispatcher dispatcher, Action<string> log) :
                 "Toggle" when !state.Playing && c.IsPlayEnabled => target.TryPlayAsync(),
                 "Previous" when c.IsPreviousEnabled => target.TrySkipPreviousAsync(),
                 "Next" when c.IsNextEnabled => target.TrySkipNextAsync(),
-                "Seek" when c.IsPlaybackPositionEnabled && MaxSeek > MinSeek => target.TryChangePlaybackPositionAsync(
+                "Seek" => target.TryChangePlaybackPositionAsync(
                     TimeSpan.FromSeconds(Math.Clamp(position, MinSeek, MaxSeek)).Ticks),
                 "Shuffle" when c.IsShuffleEnabled => target.TryChangeShuffleActiveAsync(!state.Shuffled),
                 "Repeat" when c.IsRepeatEnabled => target.TryChangeAutoRepeatModeAsync(state.Repeat switch
@@ -323,18 +332,17 @@ internal sealed class MediaSessions(Dispatcher dispatcher, Action<string> log) :
             };
             if (command != null && await command)
             {
-                if (action == "Seek")
-                {
-                    double clamped = Math.Clamp(position, MinSeek, MaxSeek);
-                    pendingSeekPosition = clamped;
-                    pendingSeekUntil = DateTimeOffset.UtcNow.AddSeconds(3);
-                    timeline = timeline with { Position = clamped, Updated = DateTimeOffset.UtcNow };
-                }
                 return true;
             }
+            if (action == "Seek") pendingSeekPosition = null;
             return false;
         }
-        catch (Exception ex) { log($"Media command {action} failed: {ex.HResult:X8}"); return false; }
+        catch (Exception ex)
+        {
+            if (action == "Seek") pendingSeekPosition = null;
+            log($"Media command {action} failed: {ex.HResult:X8}");
+            return false;
+        }
     }
 
     private void SessionsChanged(Manager sender, SessionsChangedEventArgs args) =>

@@ -175,7 +175,7 @@ public partial class OverlayWindow
         var initSize = navigation.GetDesiredSize(0);
         targetIslandWidth = initSize.Width;
         targetIslandHeight = initSize.Height;
-        double initContentW = Math.Max(560 - 24, Math.Round(initSize.Width - 24));
+        double initContentW = Math.Max(580 - 24, Math.Round(initSize.Width - 24));
         double initContentH = Math.Max(60, Math.Round(initSize.Height - 76));
         Header.Width = initContentW;
         Body.Width = initContentW;
@@ -225,7 +225,7 @@ public partial class OverlayWindow
         var size = navigation.GetDesiredSize(navigation.SelectedIndex);
         targetIslandWidth = size.Width;
         targetIslandHeight = size.Height;
-        double contentW = Math.Max(560 - 24, Math.Round(size.Width - 24));
+        double contentW = Math.Max(580 - 24, Math.Round(size.Width - 24));
         double contentH = Math.Max(60, Math.Round(size.Height - 76));
         if (Header.Width != contentW) Header.Width = contentW;
         if (Body.Width != contentW) Body.Width = contentW;

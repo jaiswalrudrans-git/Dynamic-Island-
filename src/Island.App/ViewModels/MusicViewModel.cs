@@ -206,8 +206,14 @@ internal sealed class MusicViewModel : ObservableObject, IDisposable
 
     public async Task CommitSeekAsync(double fraction)
     {
-        isSeeking = false;
-        await CommandAsync("Seek", fraction);
+        try
+        {
+            await CommandAsync("Seek", fraction);
+        }
+        finally
+        {
+            isSeeking = false;
+        }
     }
 
     public async Task CommandAsync(string action, double fraction = 0)

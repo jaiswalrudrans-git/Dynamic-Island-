@@ -171,7 +171,7 @@ internal sealed class PanelNavigation
 
         double screenW = SystemParameters.WorkArea.Width > 0 ? SystemParameters.WorkArea.Width : 1920;
         double screenH = SystemParameters.WorkArea.Height > 0 ? SystemParameters.WorkArea.Height : 1080;
-        double minIslandW = 560.0;
+        double minIslandW = 580.0;
         double maxIslandW = Math.Max(minIslandW, screenW * 0.62);
         double maxIslandH = Math.Max(180, screenH * 0.70);
 
@@ -179,20 +179,17 @@ internal sealed class PanelNavigation
         page.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
         double desiredContentW = page.DesiredSize.Width;
 
-        // Fallback default widths per tab if measure returns 0 before first layout
-        if (desiredContentW < 100)
+        // Comfortable baseline widths per tab
+        desiredContentW = tabIndex switch
         {
-            desiredContentW = tabIndex switch
-            {
-                0 => 560, // Music
-                1 => 660, // System
-                2 => 560, // Tasks
-                3 => 580, // Quick Controls
-                4 => 560, // Focus
-                5 => 680, // Calendar & Weather
-                _ => 560
-            };
-        }
+            0 => Math.Max(desiredContentW, 580), // Music
+            1 => Math.Max(desiredContentW, 680), // System
+            2 => Math.Max(desiredContentW, 580), // Tasks
+            3 => Math.Max(desiredContentW, 620), // Quick Controls
+            4 => Math.Max(desiredContentW, 580), // Focus
+            5 => Math.Max(desiredContentW, 680), // Calendar & Weather
+            _ => Math.Max(desiredContentW, 580)
+        };
 
         // Horizontal padding: 12 left + 12 right = 24 DIP
         double targetContentW = Math.Clamp(desiredContentW, minIslandW - 24.0, maxIslandW - 24.0);
@@ -204,20 +201,17 @@ internal sealed class PanelNavigation
         page.Measure(new Size(targetContentW, double.PositiveInfinity));
         double desiredContentH = page.DesiredSize.Height;
 
-        // Fallback default heights per tab if measure returns 0 before first layout
-        if (desiredContentH < 40)
+        // Ensure comfortable, un-cramped height floors per tab
+        desiredContentH = tabIndex switch
         {
-            desiredContentH = tabIndex switch
-            {
-                0 => 170, // Music
-                1 => 320, // System
-                2 => 180, // Tasks
-                3 => 240, // Quick Controls
-                4 => 180, // Focus
-                5 => 310, // Calendar & Weather
-                _ => 180
-            };
-        }
+            0 => Math.Max(desiredContentH, 170), // Music
+            1 => Math.Max(desiredContentH, 360), // System (ensures all 5 Top Apps are fully visible + comfortable padding)
+            2 => Math.Max(desiredContentH, 180), // Tasks
+            3 => Math.Max(desiredContentH, 260), // Quick Controls
+            4 => Math.Max(desiredContentH, 320), // Focus (spacious ring + controls)
+            5 => Math.Max(desiredContentH, 340), // Calendar & Weather
+            _ => Math.Max(desiredContentH, 180)
+        };
 
         // Vertical overhead: 12 top + 44 header + 8 gap + 12 bottom = 76 DIP
         double targetIslandH = Math.Ceiling((desiredContentH + 76.0) / 8.0) * 8.0;
