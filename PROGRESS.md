@@ -1,5 +1,66 @@
 # Milestone progress
 
+## M-Header-Clipboard-Screenshots · 2026-11-20
+
+### Part 1: Tab Bar Below the Clock & Directional Sliding
+- **Two-Row Centered Header Layout**:
+  - Row 0 (44 DIP): Time & Date centered dead center of the island surface with optical balance spacer (72 DIP) at the left matching the Pin and Settings action buttons on the right.
+  - Row 1 (36 DIP): Centered Tab Bar directly beneath the clock face. Total header height is 80 DIP (112 DIP vertical overhead for auto-sizing: 12 top + 80 header + 8 gap + 12 bottom).
+  - Legacy `LeftOfClock` position remains fully supported via Settings > Tabs & Navigation (collapses Row 1 to 0 DIP and shifts tab bar to left of clock with 76 DIP overhead).
+- **Active Tab Pill with Icon + Label Expansion**:
+  - Selected tab displays both icon and text label in a spring-animated sliding pill that dynamically tracks button X coordinate and width.
+  - Unselected tabs display clean icon buttons.
+  - Label display modes configurable in Settings: `SelectedOnly` (default), `All`, or `None`.
+- **Fast Tab Switching**:
+  - Mouse wheel over the header switches tabs (`HeaderMouseWheelTabSwitch`, default ON).
+  - Touchpad horizontal scroll / `WM_MOUSEHWHEEL` tilts switch tabs.
+  - Keyboard shortcuts `Ctrl+1` through `Ctrl+8` (and numpad 1..8) switch tabs when expanded.
+  - Optional "switch tab on hover" with 150 ms intent delay (`TabSwitchOnHover`, default OFF).
+  - Directional sliding transitions: incoming pages slide in from the direction of travel (+24 DIP / -24 DIP) while outgoing pages slide away.
+
+### Part 2: Clipboard History Tab
+- **Win32 Event-Driven Capture**:
+  - Listens via `AddClipboardFormatListener` / `WM_CLIPBOARDUPDATE` on a hidden message hook (zero polling, collapsed CPU ~0%).
+  - Captures Plain Text, Rich Text/HTML, Image Thumbnails, and File lists.
+  - Deduplicates consecutive identical entries.
+- **Privacy & Secret Protection**:
+  - Strictly ignores changes containing `ExcludeClipboardContentFromMonitorProcessing`, `CanIncludeInClipboardHistory = 0`, or `CanUploadToCloudClipboard = 0`.
+  - Automatically filters password managers: 1Password, Bitwarden, KeePass, KeePassXC, LastPass, Dashlane, Windows Credential UI (`credentialuibroker`, `consent`), NordPass, Enpass, RoboForm.
+  - Built-in heuristic engine skips secrets (GitHub personal tokens, OpenAI API keys, AWS credentials, RSA private keys, and valid credit card numbers via Luhn algorithm).
+  - In-memory storage by default; opt-in restart persistence encrypted with Windows DPAPI in `%LOCALAPPDATA%\Island\clipboard.dat`.
+  - Pause/resume capture toggle and "Clear all" button (pinned items survive clearing).
+  - Auto-expire options: Never, 24 hours, 7 days, 30 days.
+- **UI & Interaction**:
+  - Search box with instant filtering by text, source app, or file names.
+  - Card list with type icons, preview text/image/files, relative timestamp, and source app name.
+  - Hover actions: Copy, Paste directly into previous app (via `SendInput` `Ctrl+V` to `lastExternalForegroundHwnd` without stealing focus, preserving `WS_EX_NOACTIVATE`), Pin, Delete.
+  - Drag-and-drop out into any target application (Word, Discord, Explorer, etc.).
+  - Global hotkey: `Ctrl + Alt + V` opens Island directly on the Clipboard tab.
+
+### Part 3: Screenshots Tab
+- **Watcher & Snip Ingestion**:
+  - Automatically watches Windows Screenshots folder (`Pictures\Screenshots` via `SHGetKnownFolderPath` + `FileSystemWatcher`) and user-added custom watched folders.
+  - Automatically captures clipboard snips from `Win+Shift+S`, Snipping Tool, and `Print Screen`.
+  - Fast zero-dependency PNG header parser extracts native width and height from byte streams without loading full bitmaps into memory.
+  - Background downsampled thumbnail caching in `%LOCALAPPDATA%\Island\thumbs`.
+- **UI & Quick Actions**:
+  - Header "Snip" button triggers `ms-screenclip:` immediately.
+  - Card grid with thumbnails, dimensions (`1920 × 1080`), file size, and relative timestamp.
+  - Quick actions on hover: Copy to clipboard, Paste into target app, Open in default viewer, Show in folder, Delete (to Recycle Bin), Pin.
+  - Drag-and-drop image out into any external application.
+
+### Part 4: Settings & Verification
+- **Settings Pages in MotionSettingsWindow**:
+  - **Tabs & Navigation**: Tab bar position (`BelowClock` / `LeftOfClock`), Label mode (`SelectedOnly` / `All` / `None`), mouse wheel tab switch toggle, switch tab on hover toggle.
+  - **Clipboard History**: On/off toggle, capacity slider (10 to 200 items), remember across restarts (DPAPI), auto-expire dropdown, secret filtering toggle, click-to-paste action, collapse after paste toggle.
+  - **Screenshots**: On/off toggle, include clipboard snips toggle, save clipboard snips to Screenshots folder, thumbnail size, click action.
+- **Top Apps Headroom Polish**:
+  - Set System tab height floor to 415 DIP, providing abundant clearance so all 5 process rows in Top Apps (including `msedgewebview2`) render with zero clipping.
+- **149 Automated Tests Passing**:
+  - Verified Clipboard deduplication, privacy filtering, secret detection, DPAPI encryption round-trip.
+  - Verified Screenshots watcher, deduplication, thumbnail formatting, PNG header parsing.
+  - Verified layout bounds and zero wasted slack (< 12 DIP) across all 8 tabs at 100% and 125% scales.
+
 ## M-Density-Typography (Parts A & B Complete) · 2026-11-20
 
 ### Part A: Space Efficiency & Dynamic Content-Fitted Island

@@ -225,6 +225,23 @@
                 </StackPanel>
             </Border>
 
+            <!-- Tabs & Navigation Section -->
+            <TextBlock Text="Tabs &amp; Navigation" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
+            <Border Margin="0,14,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+                <StackPanel>
+                    <DockPanel Margin="0,4,0,8">
+                        <TextBlock Text="Tab bar position" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="TabBarPositionCombo" HorizontalAlignment="Right" MinWidth="130"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,4,0,8">
+                        <TextBlock Text="Tab label display" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="TabLabelModeCombo" HorizontalAlignment="Right" MinWidth="130"/>
+                    </DockPanel>
+                    <CheckBox x:Name="HeaderMouseWheelCheck" Content="Mouse wheel over header switches tabs" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                    <CheckBox x:Name="TabSwitchOnHoverCheck" Content="Switch tabs on hover (150 ms intent delay)" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,4"/>
+                </StackPanel>
+            </Border>
+
             <!-- Motion Section -->
             <TextBlock Text="Motion" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
             <Border Margin="0,14,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
@@ -278,6 +295,51 @@
                     <CheckBox x:Name="AlertSoundCheck" Content="Play alert sound"/>
                     <DockPanel Margin="0,10,0,4"><TextBlock Text="Alert duration"/><TextBlock Text="{Binding Value, ElementName=AlertDurationSlider, StringFormat={}{0:0} s}" HorizontalAlignment="Right"/></DockPanel>
                     <Slider x:Name="AlertDurationSlider" Minimum="1" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Clipboard History Section -->
+            <TextBlock Text="Clipboard History" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
+            <Border Margin="0,10,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+                <StackPanel>
+                    <StackPanel.Resources><Style TargetType="CheckBox"><Setter Property="Foreground" Value="{DynamicResource Theme.Foreground}"/><Setter Property="Margin" Value="0,2,0,4"/></Style></StackPanel.Resources>
+                    <CheckBox x:Name="ClipboardEnabledCheck" Content="Enable clipboard history"/>
+                    <DockPanel Margin="0,8,0,4">
+                        <TextBlock Text="History capacity" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding Value, ElementName=ClipboardHistorySlider, StringFormat={}{0:0} items}" HorizontalAlignment="Right" Foreground="{DynamicResource Theme.Accent}"/>
+                    </DockPanel>
+                    <Slider x:Name="ClipboardHistorySlider" Minimum="10" Maximum="200" TickFrequency="10" IsSnapToTickEnabled="True" Margin="0,0,0,8"/>
+                    <CheckBox x:Name="ClipboardRememberCheck" Content="Remember history across restarts (encrypted DPAPI)"/>
+                    <CheckBox x:Name="ClipboardFilterSecretsCheck" Content="Filter password/secret tokens &amp; credit cards"/>
+                    <CheckBox x:Name="ClipboardCollapseCheck" Content="Collapse island after clicking to paste"/>
+                    <DockPanel Margin="0,6,0,8">
+                        <TextBlock Text="Auto-expire items" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="ClipboardAutoExpireCombo" HorizontalAlignment="Right" MinWidth="130"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,4,0,8">
+                        <TextBlock Text="Single-click card action" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="ClipboardClickActionCombo" HorizontalAlignment="Right" MinWidth="140"/>
+                    </DockPanel>
+                    <TextBlock Text="Global hotkey: Ctrl + Alt + V opens Clipboard tab directly" FontSize="11" Foreground="{DynamicResource Theme.TextSecondary}" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Screenshots Section -->
+            <TextBlock Text="Screenshots" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
+            <Border Margin="0,10,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+                <StackPanel>
+                    <StackPanel.Resources><Style TargetType="CheckBox"><Setter Property="Foreground" Value="{DynamicResource Theme.Foreground}"/><Setter Property="Margin" Value="0,2,0,4"/></Style></StackPanel.Resources>
+                    <CheckBox x:Name="ScreenshotsEnabledCheck" Content="Enable screenshots tab"/>
+                    <CheckBox x:Name="ScreenshotsClipboardCheck" Content="Capture snips from Win+Shift+S / Snipping Tool"/>
+                    <CheckBox x:Name="ScreenshotsSaveSnipsCheck" Content="Save captured snips directly to Screenshots folder"/>
+                    <DockPanel Margin="0,6,0,8">
+                        <TextBlock Text="Thumbnail size" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="ScreenshotsThumbSizeCombo" HorizontalAlignment="Right" MinWidth="140"/>
+                    </DockPanel>
+                    <DockPanel Margin="0,4,0,8">
+                        <TextBlock Text="Single-click card action" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="ScreenshotsClickActionCombo" HorizontalAlignment="Right" MinWidth="140"/>
+                    </DockPanel>
                 </StackPanel>
             </Border>
 

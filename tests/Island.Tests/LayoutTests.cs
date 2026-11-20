@@ -93,14 +93,14 @@ public sealed class LayoutTests : TestFolder
         double maxWidth = effectiveW * 0.62;
         double maxHeight = effectiveH * 0.70;
 
-        // Base content widths for tabs: Music, System, Tasks, QuickControls, Focus, CalendarWeather
-        double[] tabContentWidths = [580, 680, 580, 620, 580, 680];
-        double[] tabContentHeights = [170, 360, 180, 260, 320, 340];
+        // Base content widths for tabs: Music, System, Tasks, QuickControls, Focus, CalendarWeather, Clipboard, Screenshots
+        double[] tabContentWidths = [580, 680, 580, 620, 580, 680, 580, 600];
+        double[] tabContentHeights = [170, 415, 180, 260, 320, 340, 300, 280];
 
         for (int i = 0; i < tabContentWidths.Length; i++)
         {
             double islandW = tabContentWidths[i] + 24;
-            double islandH = tabContentHeights[i] + 76; // Header + margins
+            double islandH = tabContentHeights[i] + 112; // Header (Row 1: 44, Row 2: 36) + margins (12+8+12)
 
             islandW = Math.Clamp(islandW, minWidth, maxWidth);
             islandH = Math.Clamp(islandH, 120, maxHeight);
@@ -118,12 +118,13 @@ public sealed class LayoutTests : TestFolder
     }
 
     [Theory]
-    [InlineData(1920, 1080, 1.0)]
-    [InlineData(1920, 1080, 1.25)]
-    [InlineData(2560, 1440, 1.0)]
-    [InlineData(2560, 1440, 1.25)]
-    [InlineData(1366, 768, 1.0)]
-    public void TabDimensionsHaveNoMoreThan12DipUnusedSpaceOnAnySide(int screenW, int screenH, double scale)
+    [InlineData(1920, 1080, 1.0, 112.0)] // BelowClock (default)
+    [InlineData(1920, 1080, 1.25, 112.0)]
+    [InlineData(1920, 1080, 1.0, 76.0)]   // LeftOfClock (legacy)
+    [InlineData(2560, 1440, 1.0, 112.0)]
+    [InlineData(2560, 1440, 1.25, 112.0)]
+    [InlineData(1366, 768, 1.0, 112.0)]
+    public void TabDimensionsHaveNoMoreThan12DipUnusedSpaceOnAnySide(int screenW, int screenH, double scale, double overhead)
     {
         double effectiveW = screenW / scale;
         double effectiveH = screenH / scale;
@@ -133,11 +134,13 @@ public sealed class LayoutTests : TestFolder
 
         (double w, double h)[] tabs = [
             (580, 170), // Music
-            (680, 360), // System
+            (680, 415), // System (ensures Top Apps has full headroom)
             (580, 180), // Tasks
             (620, 260), // Quick Controls
             (580, 320), // Focus
-            (680, 340)  // Calendar & Weather
+            (680, 340), // Calendar & Weather
+            (580, 300), // Clipboard
+            (600, 280)  // Screenshots
         ];
 
         for (int i = 0; i < tabs.Length; i++)
@@ -148,14 +151,14 @@ public sealed class LayoutTests : TestFolder
             double islandW = Math.Ceiling((targetContentW + 24.0) / 8.0) * 8.0;
             islandW = Math.Clamp(islandW, minIslandW, maxIslandW);
 
-            double islandH = Math.Ceiling((contentH + 76.0) / 8.0) * 8.0;
+            double islandH = Math.Ceiling((contentH + overhead) / 8.0) * 8.0;
             islandH = Math.Clamp(islandH, 120.0, maxIslandH);
 
             // Bounds calculations:
             double leftUnused = 12.0;
             double rightUnused = (islandW - 24.0) - targetContentW + 12.0;
             double topUnused = 12.0;
-            double bottomUnused = (islandH - 76.0) - contentH + 12.0;
+            double bottomUnused = (islandH - overhead) - contentH + 12.0;
 
             // Extra slack beyond uniform 12 DIP padding must be <= 8 DIP (< 12 DIP)
             Assert.True(Math.Abs(leftUnused - 12.0) <= 0.001, $"Tab {i} left padding must be exactly 12 DIP");

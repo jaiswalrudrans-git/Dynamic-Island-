@@ -39,6 +39,9 @@ public partial class OverlayWindow : Window
         source.AddHook(WindowMessage);
         OverlayDesktop.Configure(source.Handle);
         Place();
+        PreviewKeyDown += OnOverlayPreviewKeyDown;
+        ClipboardNative.AddClipboardFormatListener(source.Handle);
+        SyncClipboardHotkey();
         if (Pinned) Expand(true);
         else UpdateDemands();
     }
@@ -77,6 +80,22 @@ public partial class OverlayWindow : Window
         {
             case 0x0312 when wParam == EscapeId: // WM_HOTKEY
                 Dismiss();
+                handled = true;
+                break;
+            case 0x0312 when wParam == ClipboardHotkeyId:
+                UpdateExternalForegroundWindow();
+                Expand(true);
+                navigation.Select(6); // Switch to Clipboard tab
+                handled = true;
+                break;
+            case ClipboardNative.WM_CLIPBOARDUPDATE: // 0x031D
+                OnClipboardUpdate();
+                handled = true;
+                break;
+            case 0x020E: // WM_MOUSEHWHEEL
+                short tilt = (short)((wParam >> 16) & 0xFFFF);
+                if (tilt > 0) navigation.SelectNext();
+                else if (tilt < 0) navigation.SelectPrevious();
                 handled = true;
                 break;
             case 0x0021: // WM_MOUSEACTIVATE
@@ -158,6 +177,10 @@ public partial class OverlayWindow : Window
 
     protected override void OnClosed(EventArgs e)
     {
+        if (source != null)
+        {
+            ClipboardNative.RemoveClipboardFormatListener(source.Handle);
+        }
         DisposePanel();
         tick.Stop();
         tick.Tick -= ClockTick;

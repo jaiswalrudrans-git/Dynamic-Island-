@@ -6,15 +6,19 @@ using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using Island.App.Interop;
 using Island.App.Services.Alerts;
 using Island.App.Services.Controls;
 using Island.App.ViewModels;
 using Island.Core;
 using Island.Core.Alerts;
 using Island.Core.Calendar;
+using Island.Core.Clipboard;
 using Island.Core.Focus;
 using Island.Core.Motion;
+using Island.Core.Screenshots;
 using Island.Core.Settings;
 using Island.Core.Tasks;
 using Island.Core.Weather;
@@ -24,6 +28,7 @@ namespace Island.App.Views;
 public partial class OverlayWindow
 {
     private const int EscapeId = 0x491;
+    private const int ClipboardHotkeyId = 0x492;
     private readonly PanelMotion motion = new();
     private readonly NotchClip notch = new();
     private readonly DispatcherTimer intent = new();
@@ -52,6 +57,14 @@ public partial class OverlayWindow
     private CalendarStore calendarStore = null!;
     private WeatherClient weatherClient = null!;
     private CalendarWeatherViewModel calendarWeather = null!;
+    private ClipboardStore clipboardStore = null!;
+    private ClipboardViewModel clipboard = null!;
+    private ScreenshotsStore screenshotsStore = null!;
+    private ScreenshotsWatcher screenshotsWatcher = null!;
+    private ScreenshotsViewModel screenshots = null!;
+    private IntPtr lastExternalForegroundHwnd = IntPtr.Zero;
+    private bool suppressNextClipboardUpdate;
+    private bool clipboardHotkeyRegistered;
     private AlertQueue alertQueue = null!;
     private AlertsViewModel alerts = null!;
     private AudioOsdWatcher audioOsd = null!;
@@ -155,8 +168,28 @@ public partial class OverlayWindow
         calendarWeather = new(Dispatcher, calendarStore, weatherClient, new Island.App.Services.WindowsCalendarService(log));
         var calendarWeatherPage = new CalendarWeatherPage(calendarWeather, SetTypingFocus);
 
-        navigation = new(TabButtons, Pages, PillX, (Style)FindResource("IconButton"), () => settings.Current, RequestFrame,
-            musicPage, systemPage, tasksPage, quickControlsPage, focusPage, calendarWeatherPage);
+        clipboardStore = new(AppIdentity.DataDirectory,
+            () => settings.Current.ClipboardRememberAcrossRestarts,
+            () => settings.Current.ClipboardHistorySize,
+            () => settings.Current.ClipboardAutoExpireHours,
+            () => settings.Current.ClipboardFilterSecrets,
+            () => settings.Current.ClipboardIgnoredApps,
+            log);
+        clipboard = new(Dispatcher, clipboardStore, () => settings.Current, OnPasteClipboardItem, OnCopyClipboardItem);
+        var clipboardPage = new ClipboardPage(clipboard, SetTypingFocus);
+
+        screenshotsStore = new(log);
+        screenshotsWatcher = new(screenshotsStore,
+            AppIdentity.DataDirectory,
+            () => settings.Current.ScreenshotsWatchedFolders,
+            () => settings.Current.ScreenshotsIncludeClipboard,
+            log);
+        screenshotsWatcher.Start();
+        screenshots = new(Dispatcher, screenshotsStore, () => settings.Current, OnPasteScreenshotItem, OnCopyScreenshotItem, LaunchSnip);
+        var screenshotsPage = new ScreenshotsPage(screenshots);
+
+        navigation = new(TabButtons, Pages, PillIndicator, PillX, (Style)FindResource("IconButton"), () => settings.Current, RequestFrame,
+            musicPage, systemPage, tasksPage, quickControlsPage, focusPage, calendarWeatherPage, clipboardPage, screenshotsPage);
         navigation.SelectionChanged += () =>
         {
             UpdateDemands();
@@ -167,6 +200,17 @@ public partial class OverlayWindow
         {
             contentDebounceTimer.Stop();
             UpdateIslandTargetSize();
+        };
+        clipboardStore.HistoryChanged += () =>
+        {
+            if (navigation.ClipboardSelected)
+            {
+                Dispatcher.InvokeAsync(() =>
+                {
+                    contentDebounceTimer.Stop();
+                    contentDebounceTimer.Start();
+                });
+            }
         };
         tasks.TasksCountChanged += () =>
         {
@@ -329,6 +373,9 @@ public partial class OverlayWindow
             UpdateIslandTargetSize();
         }
 
+        ApplyTabBarLayout();
+        SyncClipboardHotkey();
+
         if (previousPin != Pinned)
         {
             previousPin = Pinned;
@@ -391,7 +438,11 @@ public partial class OverlayWindow
     private void Expand(bool open)
     {
         intent.Stop();
-        if (!open)
+        if (open)
+        {
+            UpdateExternalForegroundWindow();
+        }
+        else
         {
             Keyboard.ClearFocus();
             SetTypingFocus(false);
@@ -666,6 +717,350 @@ public partial class OverlayWindow
         }
     }
 
+    private void ApplyTabBarLayout()
+    {
+        if (HeaderRow0 == null || HeaderRow1 == null || Body == null) return;
+        bool belowClock = !string.Equals(settings.Current.TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase);
+        if (belowClock)
+        {
+            HeaderRow0.Height = new GridLength(44);
+            HeaderRow1.Height = new GridLength(36);
+            Header.Height = 80;
+            Body.Margin = new Thickness(0, 100, 0, 0);
+            if (LegacyTabContainer != null) LegacyTabContainer.Visibility = Visibility.Collapsed;
+            if (TabBarRow != null) TabBarRow.Visibility = Visibility.Visible;
+            if (TabBarRow != null && TabBarContainer != null && TabBarRow.Children.Count == 0 && LegacyTabContainer?.Child != null)
+            {
+                var el = LegacyTabContainer.Child;
+                LegacyTabContainer.Child = null;
+                TabBarRow.Children.Add(el);
+            }
+        }
+        else
+        {
+            HeaderRow0.Height = new GridLength(44);
+            HeaderRow1.Height = new GridLength(0);
+            Header.Height = 44;
+            Body.Margin = new Thickness(0, 64, 0, 0);
+            if (LegacyTabContainer != null) LegacyTabContainer.Visibility = Visibility.Visible;
+            if (TabBarRow != null) TabBarRow.Visibility = Visibility.Collapsed;
+            if (LegacyTabContainer != null && LegacyTabContainer.Child == null && TabBarRow != null && TabBarRow.Children.Count > 0)
+            {
+                var el = TabBarRow.Children[0];
+                TabBarRow.Children.Clear();
+                LegacyTabContainer.Child = el;
+            }
+        }
+    }
+
+    private void SyncClipboardHotkey()
+    {
+        if (source is null) return;
+        bool enabled = settings.Current.ClipboardEnabled;
+        if (enabled && !clipboardHotkeyRegistered)
+        {
+            // Ctrl + Alt + V (0x0001 | 0x0002 | 0x4000 = 0x4003, Key 0x56)
+            clipboardHotkeyRegistered = RegisterHotKey(source.Handle, ClipboardHotkeyId, 0x4003, 0x56);
+            if (!clipboardHotkeyRegistered) log("Clipboard hotkey (Ctrl+Alt+V) could not be registered.");
+        }
+        else if (!enabled && clipboardHotkeyRegistered)
+        {
+            UnregisterHotKey(source.Handle, ClipboardHotkeyId);
+            clipboardHotkeyRegistered = false;
+        }
+    }
+
+    private void UpdateExternalForegroundWindow()
+    {
+        if (source == null) return;
+        var fg = ClipboardNative.GetForegroundWindow();
+        if (fg != IntPtr.Zero && fg != source.Handle)
+        {
+            lastExternalForegroundHwnd = fg;
+        }
+    }
+
+    private void Header_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if (!settings.Current.HeaderMouseWheelTabSwitch) return;
+        if (e.Delta < 0) navigation.SelectNext();
+        else if (e.Delta > 0) navigation.SelectPrevious();
+        e.Handled = true;
+    }
+
+    private void OnOverlayPreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (!motion.Expanded) return;
+
+        if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+        {
+            int tabIndex = -1;
+            if (e.Key >= Key.D1 && e.Key <= Key.D8)
+            {
+                tabIndex = (int)e.Key - (int)Key.D1;
+            }
+            else if (e.Key >= Key.NumPad1 && e.Key <= Key.NumPad8)
+            {
+                tabIndex = (int)e.Key - (int)Key.NumPad1;
+            }
+
+            if (tabIndex >= 0 && tabIndex < PanelTab.All.Length)
+            {
+                navigation.Select(tabIndex);
+                e.Handled = true;
+            }
+        }
+    }
+
+    internal void OnClipboardUpdate()
+    {
+        if (suppressNextClipboardUpdate)
+        {
+            suppressNextClipboardUpdate = false;
+            return;
+        }
+
+        if (!settings.Current.ClipboardEnabled || clipboardStore.IsPaused)
+            return;
+
+        try
+        {
+            if (ClipboardNative.HasExcludedClipboardFormat())
+                return;
+
+            var fg = ClipboardNative.GetForegroundWindow();
+            string? appName = ClipboardNative.GetProcessNameForWindow(fg);
+
+            if (!string.IsNullOrEmpty(appName) &&
+                ClipboardPrivacyFilter.IsIgnoredApp(appName, settings.Current.ClipboardIgnoredApps))
+            {
+                return;
+            }
+
+            IDataObject? data = null;
+            try
+            {
+                data = Clipboard.GetDataObject();
+            }
+            catch
+            {
+                // Clipboard open failed
+            }
+
+            if (data == null) return;
+
+            // Check files
+            if (data.GetDataPresent(DataFormats.FileDrop))
+            {
+                if (data.GetData(DataFormats.FileDrop) is string[] files && files.Length > 0)
+                {
+                    clipboardStore.AddFiles(files, appName);
+                    return;
+                }
+            }
+
+            // Check bitmap
+            if (data.GetDataPresent(DataFormats.Bitmap))
+            {
+                if (Clipboard.GetImage() is BitmapSource bmp)
+                {
+                    var enc = new PngBitmapEncoder();
+                    enc.Frames.Add(BitmapFrame.Create(bmp));
+                    using var ms = new MemoryStream();
+                    enc.Save(ms);
+                    byte[] bytes = ms.ToArray();
+                    clipboardStore.AddImage(bytes, appName);
+
+                    // Pass to screenshot watcher if snips are captured
+                    if (settings.Current.ScreenshotsIncludeClipboard)
+                    {
+                        screenshotsWatcher.ProcessClipboardSnip(bytes);
+                    }
+                    return;
+                }
+            }
+
+            // Check HTML
+            string? html = null;
+            if (data.GetDataPresent(DataFormats.Html))
+            {
+                html = data.GetData(DataFormats.Html) as string;
+            }
+
+            // Check Text
+            if (data.GetDataPresent(DataFormats.UnicodeText))
+            {
+                string? text = data.GetData(DataFormats.UnicodeText) as string;
+                if (!string.IsNullOrEmpty(text))
+                {
+                    if (html != null)
+                    {
+                        clipboardStore.AddRichText(text, html, appName);
+                    }
+                    else
+                    {
+                        clipboardStore.AddText(text, appName);
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            log($"Clipboard listener error: {ex.Message}");
+        }
+    }
+
+    private void OnPasteClipboardItem(ClipboardItem item, bool plainText)
+    {
+        suppressNextClipboardUpdate = true;
+        try
+        {
+            var dataObject = new DataObject();
+            if (plainText || item.Type == ClipboardItemType.Text)
+            {
+                dataObject.SetData(DataFormats.UnicodeText, item.Text ?? "");
+            }
+            else if (item.Type == ClipboardItemType.RichText)
+            {
+                if (!string.IsNullOrEmpty(item.HtmlText))
+                    dataObject.SetData(DataFormats.Html, item.HtmlText);
+                dataObject.SetData(DataFormats.UnicodeText, item.Text ?? "");
+            }
+            else if (item.Type == ClipboardItemType.Image && item.ImageBytes != null)
+            {
+                using var ms = new MemoryStream(item.ImageBytes);
+                var decoder = BitmapDecoder.Create(ms, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+                if (decoder.Frames.Count > 0)
+                    dataObject.SetData(DataFormats.Bitmap, decoder.Frames[0]);
+            }
+            else if (item.Type == ClipboardItemType.Files && item.FilePaths != null)
+            {
+                var sc = new System.Collections.Specialized.StringCollection();
+                sc.AddRange(item.FilePaths.ToArray());
+                dataObject.SetFileDropList(sc);
+            }
+
+            Clipboard.SetDataObject(dataObject, true);
+
+            if (lastExternalForegroundHwnd != IntPtr.Zero)
+            {
+                ClipboardNative.SetForegroundWindow(lastExternalForegroundHwnd);
+                System.Threading.Thread.Sleep(30);
+                ClipboardNative.SendCtrlV();
+            }
+
+            if (settings.Current.ClipboardCollapseAfterPaste && !Pinned)
+            {
+                Collapse();
+            }
+        }
+        catch (Exception ex)
+        {
+            log($"Paste failed: {ex.Message}");
+        }
+    }
+
+    private void OnCopyClipboardItem(ClipboardItem item)
+    {
+        suppressNextClipboardUpdate = true;
+        try
+        {
+            var dataObject = new DataObject();
+            if (item.Type == ClipboardItemType.Text)
+            {
+                dataObject.SetData(DataFormats.UnicodeText, item.Text ?? "");
+            }
+            else if (item.Type == ClipboardItemType.RichText)
+            {
+                if (!string.IsNullOrEmpty(item.HtmlText))
+                    dataObject.SetData(DataFormats.Html, item.HtmlText);
+                dataObject.SetData(DataFormats.UnicodeText, item.Text ?? "");
+            }
+            else if (item.Type == ClipboardItemType.Image && item.ImageBytes != null)
+            {
+                using var ms = new MemoryStream(item.ImageBytes);
+                var decoder = BitmapDecoder.Create(ms, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+                if (decoder.Frames.Count > 0)
+                    dataObject.SetData(DataFormats.Bitmap, decoder.Frames[0]);
+            }
+            else if (item.Type == ClipboardItemType.Files && item.FilePaths != null)
+            {
+                var sc = new System.Collections.Specialized.StringCollection();
+                sc.AddRange(item.FilePaths.ToArray());
+                dataObject.SetFileDropList(sc);
+            }
+
+            Clipboard.SetDataObject(dataObject, true);
+        }
+        catch (Exception ex)
+        {
+            log($"Copy failed: {ex.Message}");
+        }
+    }
+
+    private void OnPasteScreenshotItem(ScreenshotItem item)
+    {
+        if (File.Exists(item.FilePath))
+        {
+            suppressNextClipboardUpdate = true;
+            try
+            {
+                var bmp = new BitmapImage(new Uri(item.FilePath, UriKind.Absolute));
+                Clipboard.SetImage(bmp);
+
+                if (lastExternalForegroundHwnd != IntPtr.Zero)
+                {
+                    ClipboardNative.SetForegroundWindow(lastExternalForegroundHwnd);
+                    System.Threading.Thread.Sleep(30);
+                    ClipboardNative.SendCtrlV();
+                }
+
+                if (settings.Current.ClipboardCollapseAfterPaste && !Pinned)
+                {
+                    Collapse();
+                }
+            }
+            catch (Exception ex)
+            {
+                log($"Screenshot paste failed: {ex.Message}");
+            }
+        }
+    }
+
+    private void OnCopyScreenshotItem(ScreenshotItem item)
+    {
+        if (File.Exists(item.FilePath))
+        {
+            suppressNextClipboardUpdate = true;
+            try
+            {
+                var bmp = new BitmapImage(new Uri(item.FilePath, UriKind.Absolute));
+                Clipboard.SetImage(bmp);
+            }
+            catch (Exception ex)
+            {
+                log($"Screenshot copy failed: {ex.Message}");
+            }
+        }
+    }
+
+    private void LaunchSnip()
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo("ms-screenclip:") { UseShellExecute = true });
+        }
+        catch (Exception ex)
+        {
+            log($"LaunchSnip error: {ex.Message}");
+        }
+    }
+
+    private void Collapse()
+    {
+        Expand(false);
+    }
+
     private void DisposePanel()
     {
         alerts.ActiveAlertChanged -= OnAlertChanged;
@@ -692,6 +1087,13 @@ public partial class OverlayWindow
         StopFrames();
         motion.Target(false);
         SyncEscape();
+        if (clipboardHotkeyRegistered && source != null)
+        {
+            UnregisterHotKey(source.Handle, ClipboardHotkeyId);
+            clipboardHotkeyRegistered = false;
+        }
+        clipboardStore?.Dispose();
+        screenshotsWatcher?.Dispose();
         preferences?.Close();
     }
 

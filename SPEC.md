@@ -36,15 +36,20 @@ You are building a production-quality Dynamic Island for Windows 11, similar in 
 - Reduce motion setting replaces springs with short fades. Animation speed setting (0.5x - 2x).
 
 === PANEL LAYOUT (expanded) ===
-Header row tab icon bar at left (icons with sliding selection pill), timedate centered, pin icon and settings gear at right. Below tab content. Right-click panel opens a context menu (Settings, Pin, Quit).
+Header layout: Two-row compact layout:
+- Row 1 (~44 DIP): Time & Date centered, Pin icon and Settings gear at right (optical balance spacer at left).
+- Row 2 (~36 DIP): Centered Tab Bar directly below the clock/date. Clean icon buttons with a sliding spring-animated pill for the active tab (which displays icon + label). Customizable tab bar position (Below Clock / Left of Clock) and label modes.
+Right-click panel opens context menu (Settings, Pin, Pause, Quit).
 
 TABS
-1. MUSIC Windows media sessions (SMTC) cover, title, artist, seekable progress bar, prevplay-pausenext, shufflerepeat when supported, multiple players with switchpin. Synced lyrics from LRCLIB (current line highlighted, scrolling). Real audio equalizer. Dominant-color theming from the cover.
-2. SYSTEM (like BrimDeck's monitor page) CPU total ring plus per-core vertical bars, RAM bar (usedtotal), GPU usage + VRAM + temperature + board power (NVML, with PDH fallback for non-NVIDIA), network updown speed plus today's totals, per-drive disk usage (internal drives only), power draw in watts with 60s curve and mean, battery (percent, charging plug icon, time left, health, power mode), CPUGPUSSD temperatures where available, top processes list with CPUMemory toggle and click for details, tooltips on every metric. Sample at 1 s only while this tab is visible or a compact readout needs it.
-3. CALENDAR & WEATHER month view with today highlighted, today'supcoming events (local events with addeditdelete, optional ICS fileURL import), weather via Open-Meteo current, hourly strip, 5-day forecast, auto-location by IP with manual override, units setting.
-4. TASKS to-dos (add, check, delete, drag reorder, priority, due date) and reminders (one-time or repeating, time picker). When a reminder fires alert in collapsed notch with Snooze (51030) and Done; sound optional.
-5. FOCUS Pomodoro (workshortlong break, cycles), plain timer, stopwatch; global hotkey to startstop; while running, a progress ring shows in the collapsed notch; finishing triggers an alert.
-6. QUICK CONTROLS volume slider (Core Audio) and brightness slider (WMI for built-in display, optional DDCCI), mic mute toggle, Wi-Fi and Bluetooth toggles (Windows.Devices.Radios), Do Not DisturbFocus toggle, screenshot (opens snipping), lock PC, sleep. Volumebrightnessmic changes made anywhere in Windows also trigger a small collapsed-notch OSD.
+1. MUSIC: Windows media sessions (SMTC) cover, title, artist, seekable progress bar, prev/play-pause/next, shuffle/repeat when supported, multiple players with switch/pin. Synced lyrics from LRCLIB (current line highlighted, scrolling). Real audio equalizer. Dominant-color theming from the cover.
+2. SYSTEM: (like BrimDeck's monitor page) CPU total ring plus per-core vertical bars, RAM bar (used/total), GPU usage + VRAM + temperature + board power (NVML, with PDH fallback for non-NVIDIA), network up/down speed plus today's totals, per-drive disk usage (internal drives only), power draw in watts with 60s curve and mean, battery (percent, charging plug icon, time left, health, power mode), CPU/GPU/SSD temperatures where available, top processes list with CPU/Memory toggle and click for details, tooltips on every metric. Sample at 1 s only while this tab is visible or a compact readout needs it. Shared-height Bento Grid layout.
+3. CALENDAR & WEATHER: month view with today highlighted, today's/upcoming events (local events with add/edit/delete, optional ICS file/URL import), weather via Open-Meteo current, hourly strip, 5-day forecast, auto-location by IP with manual override, units setting.
+4. TASKS: to-dos (add, check, delete, drag reorder, priority, due date) and reminders (one-time or repeating, time picker). When a reminder fires alert in collapsed notch with Snooze (5/10/30) and Done; sound optional.
+5. FOCUS: Pomodoro (work/short/long break, cycles), plain timer, stopwatch; global hotkey to start/stop; while running, a progress ring shows in the collapsed notch; finishing triggers an alert.
+6. QUICK CONTROLS: volume slider (Core Audio) and brightness slider (WMI for built-in display, optional DDC/CI), mic mute toggle, Wi-Fi and Bluetooth toggles (Windows.Devices.Radios), Do Not Disturb/Focus toggle, screenshot (opens snipping), lock PC, sleep. Volume/brightness/mic changes made anywhere in Windows also trigger a small collapsed-notch OSD.
+7. CLIPBOARD: Win32 clipboard listener (`AddClipboardFormatListener`), history of 10-200 items (plain text, rich text/HTML preview, image thumbnails, file lists), deduplication, DPAPI encrypted storage opt-in, strict privacy guard (ignores password managers, Windows Credential UI, `ExcludeClipboardContentFromMonitorProcessing`, `CanIncludeInClipboardHistory=0`, card/secret filters), search box, single-click paste into previous app via `SendInput` `Ctrl+V` without stealing window focus, drag-and-drop out.
+8. SCREENSHOTS: Monitors Windows Screenshots folder (`Pictures\Screenshots` via `SHGetKnownFolderPath`) + FileSystemWatcher, and captures in-memory snips from Win+Shift+S / Snipping Tool / Print Screen; thumbnail grid, large hover preview popover, background downsampled thumbnail disk caching (`%LOCALAPPDATA%\Island\thumbs`), quick actions (Copy, Paste, Open, Show in folder, Delete, Pin), drag-out into other apps.
 
 Everything is organized into these tabs; no giant dropdown list.
 
@@ -74,7 +79,7 @@ Tray icon with menu Open, PinUnpin, Settings, Pause, Quit. Double-click opens Se
 - Pause all polling and animation timers when collapsed unless a compact readout needs them.
 - Separate layers Services (Media, Audio, System, Battery, Weather, Calendar, Tasks, Timers, Hotkeys), ViewModels, Views, Theme resources.
 - Unit tests for tasksreminders logic, timers, settings, and theme loading.
-- Clean code, comments only where non-obvious. Do not add features not listed here. Out of scope AI quota tracking, notification mirroring, clipboard history.
+- Clean code, comments only where non-obvious. Do not add features not listed here. Out of scope: AI quota tracking, notification mirroring. (Note: Clipboard history and Screenshots are IN scope per milestone M-Header-Clipboard-Screenshots).
 
 === MILESTONES (stop after each) ===
 M0 Solution, plan, git, settings and theme infrastructure.
@@ -86,6 +91,8 @@ M5 Alerts system (battery, charger, temps, OSD for volumebrightnessmic).
 M6 Quick Controls, Focus, Tasks & Reminders.
 M-Layout: auto-sizing, spacing, readability and design system overhaul.
 M-Transparency-Clock-Polish: BrimDeck-style transparency, Clock Studio, Collapsed Layout settings, System page density matching BrimDeck, and Neon/Cyberpunk polish.
+M-Density-Typography: space efficiency, dynamic content-fitted auto-sizing, 5-role typography themes, clock-sync engine, 10 OFL fonts.
+M-Header-Clipboard-Screenshots: Centered tab bar below the clock with active icon+label pill, event-driven privacy-first Clipboard history tab with single-click background paste and drag-drop, Screenshots tab with folder watcher + clipboard snips + background thumbnail caching, and dedicated Settings pages.
 M7 Calendar & Weather.
 M8 Full Settings window with all pages, themes, hotkeys.
 M9 Fullscreenmaximized behavior, polish pass, performance profiling, installer (Inno Setup or MSIX).
