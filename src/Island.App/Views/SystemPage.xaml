@@ -182,7 +182,8 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding GpuShortName}" MaxWidth="105" Margin="0,0,8,0" TextTrimming="CharacterEllipsis"
+                    <TextBlock Text="{Binding GpuShortName}" Margin="0,0,8,0" TextTrimming="CharacterEllipsis"
+                               ToolTip="{Binding GpuTooltip}"
                                FontFamily="{DynamicResource Typography.Family.Heading}"
                                FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
                                Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
@@ -314,6 +315,7 @@
 
                 <!-- Daily Totals -->
                 <TextBlock Grid.Row="2" Text="{Binding TodayTotalsFormatted}"
+                           TextTrimming="CharacterEllipsis" ToolTip="{Binding TodayTotalsFormatted}"
                            FontFamily="{DynamicResource Typography.Family.Label}"
                            FontSize="{DynamicResource Typography.Size.Label}"
                            Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
@@ -333,11 +335,11 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{Binding Name}"
+                                    <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}"
                                                FontFamily="{DynamicResource Typography.Family.Heading}"
                                                FontSize="{DynamicResource Typography.Size.Label}" FontWeight="SemiBold"
                                                Foreground="{DynamicResource Theme.TextSecondary}"/>
-                                    <TextBlock Grid.Column="1" Text="{Binding UsageText}"
+                                    <TextBlock Grid.Column="1" Text="{Binding UsageText}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Tooltip}"
                                                FontFamily="{DynamicResource Typography.Family.Numeric}"
                                                FontSize="{DynamicResource Typography.Size.Label}"
                                                Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
@@ -402,15 +404,19 @@
                         <DataTemplate>
                             <Grid Height="19" Margin="0,1" ToolTip="{Binding Tooltip}">
                                 <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="10"/>
+                                    <ColumnDefinition Width="8"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding Name}" MaxWidth="130" TextTrimming="CharacterEllipsis"
+                                <TextBlock Text="&#xE71D;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
+                                           FontSize="11" Foreground="{DynamicResource Theme.TextSecondary}"
+                                           VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis"
                                            FontFamily="{DynamicResource Typography.Family.Body}"
                                            FontSize="{DynamicResource Typography.Size.Secondary}" Foreground="{DynamicResource Theme.TextPrimary}"
                                            VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="2" Text="{Binding MetricText}"
+                                <TextBlock Grid.Column="3" Text="{Binding MetricText}"
                                            FontFamily="{DynamicResource Typography.Family.Numeric}"
                                            FontSize="{DynamicResource Typography.Size.Secondary}"
                                            FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextSecondary}"

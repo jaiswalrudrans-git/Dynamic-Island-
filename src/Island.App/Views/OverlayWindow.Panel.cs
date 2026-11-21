@@ -229,8 +229,10 @@ public partial class OverlayWindow
         var initSize = navigation.GetDesiredSize(0);
         targetIslandWidth = initSize.Width;
         targetIslandHeight = initSize.Height;
+        bool belowClock = !string.Equals(settings.Current.TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase);
+        double overhead = belowClock ? 112.0 : 76.0;
         double initContentW = Math.Max(580 - 24, Math.Round(initSize.Width - 24));
-        double initContentH = Math.Max(60, Math.Round(initSize.Height - 76));
+        double initContentH = Math.Max(60, Math.Round(initSize.Height - overhead));
         Header.Width = initContentW;
         Body.Width = initContentW;
         Body.Height = initContentH;
@@ -286,8 +288,10 @@ public partial class OverlayWindow
         var size = navigation.GetDesiredSize(navigation.SelectedIndex);
         targetIslandWidth = size.Width;
         targetIslandHeight = size.Height;
+        bool belowClock = !string.Equals(settings.Current.TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase);
+        double overhead = belowClock ? 112.0 : 76.0;
         double contentW = Math.Max(580 - 24, Math.Round(size.Width - 24));
-        double contentH = Math.Max(60, Math.Round(size.Height - 76));
+        double contentH = Math.Max(60, Math.Round(size.Height - overhead));
         if (Header.Width != contentW) Header.Width = contentW;
         if (Body.Width != contentW) Body.Width = contentW;
         if (Body.Height != contentH) Body.Height = contentH;
@@ -590,12 +594,6 @@ public partial class OverlayWindow
     {
         double intensity = settings.Current.NeonIntensity;
         var activeNeonColor = (Color)ColorConverter.ConvertFromString(settings.Current.Theme == "Cyberpunk" ? "#FF2E97" : "#00E5FF");
-        if (PillGlow != null)
-        {
-            PillGlow.Color = activeNeonColor;
-            PillGlow.BlurRadius = 10 * intensity;
-            PillGlow.Opacity = 0.8 * intensity;
-        }
 
         if (!settings.Current.BottomNeonLine)
         {
@@ -726,6 +724,8 @@ public partial class OverlayWindow
             HeaderRow0.Height = new GridLength(44);
             HeaderRow1.Height = new GridLength(36);
             Header.Height = 80;
+            if (HeaderLeftCol != null) HeaderLeftCol.Width = new GridLength(72);
+            if (HeaderRightCol != null) HeaderRightCol.Width = new GridLength(72);
             Body.Margin = new Thickness(0, 100, 0, 0);
             if (LegacyTabContainer != null) LegacyTabContainer.Visibility = Visibility.Collapsed;
             if (TabBarRow != null) TabBarRow.Visibility = Visibility.Visible;
@@ -741,6 +741,8 @@ public partial class OverlayWindow
             HeaderRow0.Height = new GridLength(44);
             HeaderRow1.Height = new GridLength(0);
             Header.Height = 44;
+            if (HeaderLeftCol != null) HeaderLeftCol.Width = GridLength.Auto;
+            if (HeaderRightCol != null) HeaderRightCol.Width = new GridLength(72);
             Body.Margin = new Thickness(0, 64, 0, 0);
             if (LegacyTabContainer != null) LegacyTabContainer.Visibility = Visibility.Visible;
             if (TabBarRow != null) TabBarRow.Visibility = Visibility.Collapsed;

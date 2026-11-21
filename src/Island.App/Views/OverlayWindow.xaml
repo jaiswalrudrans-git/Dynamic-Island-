@@ -197,13 +197,10 @@
                 <!-- ROW 1: Centered Tab Bar directly below Clock/Date -->
                 <Grid Grid.Row="1" x:Name="TabBarRow" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <Grid x:Name="TabBarContainer" HorizontalAlignment="Center">
-                        <!-- Sliding pill indicator for selected tab -->
+                        <!-- Sliding pill indicator for selected tab (accent-soft 20% opacity, rounded pill) -->
                         <Border x:Name="PillIndicator" Height="28" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                Background="{DynamicResource Theme.Accent}" CornerRadius="6">
+                                Background="{DynamicResource Theme.AccentSoft}" CornerRadius="6">
                             <Border.RenderTransform><TranslateTransform x:Name="PillX"/></Border.RenderTransform>
-                            <Border.Effect>
-                                <DropShadowEffect x:Name="PillGlow" Color="#FFFF2E97" BlurRadius="10" ShadowDepth="0" Opacity="0.8"/>
-                            </Border.Effect>
                         </Border>
 
                         <StackPanel x:Name="TabButtons" Orientation="Horizontal" VerticalAlignment="Center"/>

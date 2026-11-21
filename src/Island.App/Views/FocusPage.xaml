@@ -95,7 +95,7 @@
             <Setter Property="Width" Value="48"/>
             <Setter Property="Height" Value="48"/>
             <Setter Property="Background" Value="{DynamicResource Theme.Accent}"/>
-            <Setter Property="Foreground" Value="#121620"/>
+            <Setter Property="Foreground" Value="{DynamicResource Theme.Background}"/>
             <Setter Property="Focusable" Value="False"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Effect" Value="{DynamicResource Theme.NeonGlow}"/>
@@ -245,7 +245,7 @@
             <Button Style="{StaticResource PlayBtn}" Click="PlayPauseClick"
                     Margin="16,0" ToolTip="{Binding PlayPauseText}">
                 <TextBlock Text="{Binding PlayPauseGlyph}" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
-                           FontSize="20" Foreground="#121620"
+                           FontSize="20" Foreground="{DynamicResource Theme.Background}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Button>
 

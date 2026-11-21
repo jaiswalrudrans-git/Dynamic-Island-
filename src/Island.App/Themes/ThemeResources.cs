@@ -53,6 +53,14 @@ public sealed class ThemeResources(ResourceDictionary applicationResources, Them
         };
         dataGlow.Freeze();
 
+        var accentBrush = new SolidColorBrush(accentColor);
+        accentBrush.Freeze();
+        byte accentAlpha = (byte)Math.Clamp(Math.Round(255.0 * 0.20), 40, 60); // 20% opacity accent-soft
+        var accentSoftBrush = new SolidColorBrush(Color.FromArgb(accentAlpha, accentColor.R, accentColor.G, accentColor.B));
+        accentSoftBrush.Freeze();
+        var dataBrush = new SolidColorBrush(dataColor);
+        dataBrush.Freeze();
+
         var next = new ResourceDictionary
         {
             ["Theme.Background"] = Brush(palette.Background),
@@ -67,9 +75,9 @@ public sealed class ThemeResources(ResourceDictionary applicationResources, Them
             ["Theme.TextPrimary"] = Brush(palette.Foreground),
             ["Theme.TextSecondary"] = Brush(palette.EffectiveTextSecondary),
             ["Theme.TextTertiary"] = Brush(palette.EffectiveTextTertiary),
-            [AccentKey] = Brush(palette.Accent),
-            ["Theme.AccentSoft"] = Brush(palette.EffectiveAccentSoft),
-            ["Theme.Data"] = Brush(palette.EffectiveData),
+            [AccentKey] = accentBrush,
+            ["Theme.AccentSoft"] = accentSoftBrush,
+            ["Theme.Data"] = dataBrush,
             ["Theme.DataSoft"] = BrushWithAlpha(palette.EffectiveData, 45),
             ["Theme.NeonLine"] = Brush(palette.EffectiveNeonLine),
             ["Theme.Success"] = Brush(palette.EffectiveSuccess),

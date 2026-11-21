@@ -18,30 +18,33 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
         }
     }
 
-    private static FontFamily CreateFamily(string fontNameWithFallback)
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> CoverageCache = new(StringComparer.OrdinalIgnoreCase);
+
+    private static FontFamily CreateFamily(string fontName)
     {
         EnsurePackSchemeRegistered();
-        return new FontFamily(new Uri("pack://application:,,,/Island.App;component/"), "./Assets/Fonts/#" + fontNameWithFallback);
+        string packUri = $"pack://application:,,,/Island.App;component/Assets/Fonts/#{fontName}";
+        return new FontFamily($"{packUri}, Segoe UI Variable Text, Segoe UI, Segoe UI Symbol, Segoe UI Emoji, Arial");
     }
 
-    // Embedded Font Families with Safe System Fallbacks
-    public static readonly FontFamily SegoeFamily = new("Segoe UI Variable Display, Segoe UI, Arial");
-    public static readonly FontFamily SegoeTextFamily = new("Segoe UI Variable Text, Segoe UI, Arial");
-    public static readonly FontFamily InterFamily = CreateFamily("Inter, Segoe UI Variable Text, Segoe UI");
-    public static readonly FontFamily DotoFamily = CreateFamily("Doto, Segoe UI");
-    public static readonly FontFamily SilkscreenFamily = CreateFamily("Silkscreen, Segoe UI");
-    public static readonly FontFamily SpaceGroteskFamily = CreateFamily("Space Grotesk, Segoe UI Variable Display, Segoe UI");
-    public static readonly FontFamily ShareTechMonoFamily = CreateFamily("Share Tech Mono, Consolas, Courier New");
-    public static readonly FontFamily RajdhaniFamily = CreateFamily("Rajdhani, Segoe UI");
-    public static readonly FontFamily ChakraPetchFamily = CreateFamily("Chakra Petch, Segoe UI");
-    public static readonly FontFamily JetBrainsMonoFamily = CreateFamily("JetBrains Mono, Cascadia Code, Consolas");
-    public static readonly FontFamily BarlowCondensedFamily = CreateFamily("Barlow Condensed, Bahnschrift, Arial");
-    public static readonly FontFamily CaveatFamily = CreateFamily("Caveat, Segoe UI");
-    public static readonly FontFamily BebasNeueFamily = CreateFamily("Bebas Neue, Bahnschrift, Arial");
-    public static readonly FontFamily FredokaFamily = CreateFamily("Fredoka, Segoe UI");
-    public static readonly FontFamily InstrumentSerifFamily = CreateFamily("Instrument Serif, Georgia, Times New Roman");
-    public static readonly FontFamily OrbitronFamily = CreateFamily("Orbitron, Segoe UI Variable Display, Segoe UI");
-    public static readonly FontFamily UnboundedFamily = CreateFamily("Unbounded, Segoe UI");
+    // Embedded Font Families with Safe System Fallbacks ending in Segoe UI Variable, Symbol & Arial
+    public static readonly FontFamily SegoeFamily = new("Segoe UI Variable Display, Segoe UI, Segoe UI Symbol, Arial");
+    public static readonly FontFamily SegoeTextFamily = new("Segoe UI Variable Text, Segoe UI, Segoe UI Symbol, Arial");
+    public static readonly FontFamily InterFamily = CreateFamily("Inter");
+    public static readonly FontFamily DotoFamily = CreateFamily("Doto");
+    public static readonly FontFamily SilkscreenFamily = CreateFamily("Silkscreen");
+    public static readonly FontFamily SpaceGroteskFamily = CreateFamily("Space Grotesk");
+    public static readonly FontFamily ShareTechMonoFamily = CreateFamily("Share Tech Mono");
+    public static readonly FontFamily RajdhaniFamily = CreateFamily("Rajdhani");
+    public static readonly FontFamily ChakraPetchFamily = CreateFamily("Chakra Petch");
+    public static readonly FontFamily JetBrainsMonoFamily = CreateFamily("JetBrains Mono");
+    public static readonly FontFamily BarlowCondensedFamily = CreateFamily("Barlow Condensed");
+    public static readonly FontFamily CaveatFamily = CreateFamily("Caveat");
+    public static readonly FontFamily BebasNeueFamily = CreateFamily("Bebas Neue");
+    public static readonly FontFamily FredokaFamily = CreateFamily("Fredoka");
+    public static readonly FontFamily InstrumentSerifFamily = CreateFamily("Instrument Serif");
+    public static readonly FontFamily OrbitronFamily = CreateFamily("Orbitron");
+    public static readonly FontFamily UnboundedFamily = CreateFamily("Unbounded");
 
     public record PresetDefinition(
         string Id,
@@ -61,7 +64,7 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
             SegoeFamily, SegoeTextFamily, SegoeTextFamily, SegoeTextFamily, SegoeTextFamily),
 
         new("Dot Matrix", "Dot Matrix", "Doto matrix numerals paired with Inter",
-            DotoFamily, DotoFamily, InterFamily, InterFamily, DotoFamily),
+            DotoFamily, InterFamily, InterFamily, InterFamily, DotoFamily),
 
         new("LED", "LED Segment", "Share Tech Mono digital italic feel",
             ShareTechMonoFamily, ShareTechMonoFamily, InterFamily, ShareTechMonoFamily, ShareTechMonoFamily),
@@ -70,16 +73,16 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
             OrbitronFamily, RajdhaniFamily, RajdhaniFamily, RajdhaniFamily, OrbitronFamily, HasGlow: true),
 
         new("Editorial Serif", "Editorial Serif", "Instrument Serif with clean tabular Inter",
-            InstrumentSerifFamily, InstrumentSerifFamily, InterFamily, InterFamily, InterFamily),
+            InstrumentSerifFamily, InterFamily, InterFamily, InterFamily, InterFamily),
 
         new("Wide Futuristic", "Wide Futuristic", "Unbounded geometric wide display with Chakra Petch",
-            UnboundedFamily, UnboundedFamily, ChakraPetchFamily, ChakraPetchFamily, ChakraPetchFamily),
+            UnboundedFamily, ChakraPetchFamily, ChakraPetchFamily, ChakraPetchFamily, ChakraPetchFamily),
 
         new("Condensed Impact", "Condensed Impact", "Bebas Neue display with Barlow Condensed",
-            BebasNeueFamily, BebasNeueFamily, BarlowCondensedFamily, BarlowCondensedFamily, BarlowCondensedFamily),
+            BebasNeueFamily, BarlowCondensedFamily, BarlowCondensedFamily, BarlowCondensedFamily, BarlowCondensedFamily),
 
         new("Pixel Arcade", "Pixel Arcade", "Silkscreen retro pixel display with Share Tech Mono",
-            SilkscreenFamily, SilkscreenFamily, InterFamily, InterFamily, ShareTechMonoFamily),
+            SilkscreenFamily, InterFamily, InterFamily, InterFamily, ShareTechMonoFamily),
 
         new("Terminal Mono", "Terminal Mono", "JetBrains Mono monospace throughout",
             JetBrainsMonoFamily, JetBrainsMonoFamily, JetBrainsMonoFamily, JetBrainsMonoFamily, JetBrainsMonoFamily),
@@ -119,24 +122,24 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
         double scale = Math.Clamp(settings.TypographySizeScale, 0.9, 1.3);
         bool guard = settings.LegibilityGuard;
 
-        // Resolve 5 roles with Legibility Guard
+        // Resolve 5 roles with Legibility Guard & glyph coverage verification
         FontFamily display = ResolveFamily(settings.FontFamilyDisplay, preset.Display);
         FontFamily heading = ResolveFamily(settings.FontFamilyHeading, preset.Heading);
         FontFamily body = ResolveFamily(settings.FontFamilyBody, preset.Body);
         FontFamily label = ResolveFamily(settings.FontFamilyLabel, preset.Label);
         FontFamily numeric = ResolveFamily(settings.FontFamilyNumeric, preset.Numeric);
 
+        // Tab labels, counts, buttons, tooltips and settings text must NEVER use a decorative font
+        if (IsDecorative(heading) || !HasGeneralTextCoverage(heading)) heading = InterFamily;
+        if (IsDecorative(body) || !HasGeneralTextCoverage(body)) body = InterFamily;
+        if (IsDecorative(label) || !HasGeneralTextCoverage(label)) label = InterFamily;
+
         if (guard)
         {
-            // Decorative fonts never used for Body or Label
-            if (IsDecorative(body)) body = InterFamily;
-            if (IsDecorative(label)) label = InterFamily;
-
-            // Headings below 18px threshold must never use decorative fonts (Doto/Silkscreen/Bebas/Caveat)
-            if (IsDecorative(heading) && (16.0 * scale) < 18.0) heading = InterFamily;
-
-            // Small numerals below 16px must use companion font
+            // Small numerals below 16px must use clean companion font with tabular figures
             if (IsDecorative(numeric) && (17.0 * scale) < 16.0) numeric = InterFamily;
+            // Display below 18px threshold must fall back to companion font
+            if (IsDecorative(display) && (20.0 * scale) < 18.0) display = InterFamily;
         }
 
         // Font Weights
@@ -276,12 +279,50 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
         catch { return fallback; }
     }
 
+    public static bool HasGeneralTextCoverage(FontFamily family)
+    {
+        string key = family.Source ?? "";
+        if (CoverageCache.TryGetValue(key, out bool cached)) return cached;
+
+        bool covered = CheckCoverage(family, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,:;!?'\"-()");
+        CoverageCache[key] = covered;
+        return covered;
+    }
+
+    public static bool CheckCoverage(FontFamily family, string requiredChars)
+    {
+        try
+        {
+            var typeface = new Typeface(family, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
+            if (typeface.TryGetGlyphTypeface(out var glyphTypeface))
+            {
+                var map = glyphTypeface.CharacterToGlyphMap;
+                foreach (char c in requiredChars)
+                {
+                    if (!map.ContainsKey(c)) return false;
+                }
+                return true;
+            }
+        }
+        catch
+        {
+            // If typeface lookup fails, safe fallback
+        }
+        return false;
+    }
+
     public static bool IsDecorative(FontFamily family)
     {
         string source = family.Source ?? "";
         return source.Contains("Doto", StringComparison.OrdinalIgnoreCase) ||
                source.Contains("Silkscreen", StringComparison.OrdinalIgnoreCase) ||
                source.Contains("Bebas", StringComparison.OrdinalIgnoreCase) ||
-               source.Contains("Caveat", StringComparison.OrdinalIgnoreCase);
+               source.Contains("Caveat", StringComparison.OrdinalIgnoreCase) ||
+               source.Contains("Audiowide", StringComparison.OrdinalIgnoreCase) ||
+               source.Contains("Syncopate", StringComparison.OrdinalIgnoreCase) ||
+               source.Contains("Michroma", StringComparison.OrdinalIgnoreCase) ||
+               source.Contains("DotGothic", StringComparison.OrdinalIgnoreCase) ||
+               source.Contains("DSEG", StringComparison.OrdinalIgnoreCase) ||
+               source.Contains("Pixelify", StringComparison.OrdinalIgnoreCase);
     }
 }

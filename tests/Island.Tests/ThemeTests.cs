@@ -112,6 +112,66 @@ public sealed class ThemeTests : TestFolder
         Assert.Equal(14 * 0.8, glow.BlurRadius, 2);
     }
 
+    [Theory]
+    [InlineData("Midnight")]
+    [InlineData("Dark")]
+    [InlineData("Graphite")]
+    [InlineData("Pure Black")]
+    [InlineData("Light")]
+    [InlineData("One Dark Pro")]
+    [InlineData("GitHub Dark")]
+    [InlineData("Dracula")]
+    [InlineData("Night Owl")]
+    [InlineData("Cyberpunk")]
+    [InlineData("Aurora")]
+    [InlineData("Amber Terminal")]
+    [InlineData("Mono White")]
+    [InlineData("Sakura")]
+    public void ShippedThemeSatisfiesContrastRequirements(string themeName)
+    {
+        var catalog = new ThemeCatalog(Folder, Messages.Add);
+        var palette = catalog.Resolve(themeName);
+
+        static double Channel(double c) => c <= 0.03928 ? c / 12.92 : Math.Pow((c + 0.055) / 1.055, 2.4);
+        static double Lum(Color color) =>
+            0.2126 * Channel(color.R / 255.0) +
+            0.7152 * Channel(color.G / 255.0) +
+            0.0722 * Channel(color.B / 255.0);
+
+        static double Contrast(Color c1, Color c2)
+        {
+            double l1 = Lum(c1);
+            double l2 = Lum(c2);
+            if (l1 < l2) (l1, l2) = (l2, l1);
+            return (l1 + 0.05) / (l2 + 0.05);
+        }
+
+        static Color ParseHex(string hex) => (Color)ColorConverter.ConvertFromString(hex);
+        static Color Blend(Color top, double alpha, Color bottom) => Color.FromRgb(
+            (byte)Math.Clamp(Math.Round(top.R * alpha + bottom.R * (1 - alpha)), 0, 255),
+            (byte)Math.Clamp(Math.Round(top.G * alpha + bottom.G * (1 - alpha)), 0, 255),
+            (byte)Math.Clamp(Math.Round(top.B * alpha + bottom.B * (1 - alpha)), 0, 255));
+
+        var bg = ParseHex(palette.Background);
+        var surf = ParseHex(palette.Surface);
+        var fg = ParseHex(palette.Foreground);
+        var sec = ParseHex(palette.EffectiveTextSecondary);
+
+        // 0% transparency: text on surface
+        double primContrast0 = Contrast(fg, surf);
+        double secContrast0 = Contrast(sec, surf);
+
+        // 50% transparency: surface blended over background
+        var surf50 = Blend(surf, 0.5, bg);
+        double primContrast50 = Contrast(fg, surf50);
+        double secContrast50 = Contrast(sec, surf50);
+
+        Assert.True(primContrast0 >= 7.0, $"{themeName} Primary text contrast at 0% ({primContrast0:F1}:1) must be >= 7:1");
+        Assert.True(primContrast50 >= 7.0, $"{themeName} Primary text contrast at 50% ({primContrast50:F1}:1) must be >= 7:1");
+        Assert.True(secContrast0 >= 4.5, $"{themeName} Secondary text contrast at 0% ({secContrast0:F1}:1) must be >= 4.5:1");
+        Assert.True(secContrast50 >= 4.5, $"{themeName} Secondary text contrast at 50% ({secContrast50:F1}:1) must be >= 4.5:1");
+    }
+
     private void WriteCustom(string input)
     {
         Directory.CreateDirectory(Path.Combine(Folder, "themes"));

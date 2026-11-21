@@ -99,6 +99,39 @@ public sealed class TypographyTests
         Assert.False(TypographyResources.IsDecorative(labelFamily), "Label font below threshold must never be decorative under Legibility Guard");
     }
 
+    [Fact]
+    public void EveryPresetAndRoleCombinationHasSufficientGlyphCoverage()
+    {
+        var res = new ResourceDictionary();
+        var typography = new TypographyResources(res);
+
+        foreach (var preset in TypographyResources.Presets)
+        {
+            var settings = new AppSettings
+            {
+                MatchTypographyToClock = false,
+                TypographyPreset = preset.Id,
+                LegibilityGuard = true
+            };
+
+            typography.Apply(settings);
+
+            var heading = (FontFamily)res["Typography.Family.Heading"];
+            var body = (FontFamily)res["Typography.Family.Body"];
+            var label = (FontFamily)res["Typography.Family.Label"];
+
+            // Heading, Body and Label must never be decorative
+            Assert.False(TypographyResources.IsDecorative(heading), $"{preset.Id} Heading font must not be decorative");
+            Assert.False(TypographyResources.IsDecorative(body), $"{preset.Id} Body font must not be decorative");
+            Assert.False(TypographyResources.IsDecorative(label), $"{preset.Id} Label font must not be decorative");
+
+            // Heading, Body and Label must have general text coverage (A-Z, a-z, 0-9, basic punctuation)
+            Assert.True(TypographyResources.HasGeneralTextCoverage(heading), $"{preset.Id} Heading font must cover A-Z, a-z, 0-9");
+            Assert.True(TypographyResources.HasGeneralTextCoverage(body), $"{preset.Id} Body font must cover A-Z, a-z, 0-9");
+            Assert.True(TypographyResources.HasGeneralTextCoverage(label), $"{preset.Id} Label font must cover A-Z, a-z, 0-9");
+        }
+    }
+
     [Theory]
     [InlineData(0.9)]
     [InlineData(1.0)]
