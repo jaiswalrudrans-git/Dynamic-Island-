@@ -95,12 +95,12 @@ public sealed class LayoutTests : TestFolder
 
         // Base content widths for tabs: Music, System, Tasks, QuickControls, Focus, CalendarWeather, Clipboard (Unified Copies & Screenshots)
         double[] tabContentWidths = [580, 680, 580, 620, 580, 680, 680];
-        double[] tabContentHeights = [170, 240, 140, 220, 240, 240, 240];
+        double[] tabContentHeights = [170, 264, 140, 230, 266, 250, 250];
 
         for (int i = 0; i < tabContentWidths.Length; i++)
         {
-            double islandW = tabContentWidths[i] + 24;
-            double islandH = tabContentHeights[i] + 112; // Header (Row 1: 44, Row 2: 36) + margins (12+8+12)
+            double islandW = tabContentWidths[i] + 32;
+            double islandH = tabContentHeights[i] + 116; // Header (Row 1: 44, Row 2: 36) + margins (14+8+14)
 
             islandW = Math.Clamp(islandW, minWidth, maxWidth);
             islandH = Math.Clamp(islandH, 120, maxHeight);
@@ -137,34 +137,34 @@ public sealed class LayoutTests : TestFolder
 
         (double w, double h)[] tabs = [
             (580, 170), // Music
-            (680, 240), // System (clean 3x2 Bento Grid)
+            (680, 264), // System (clean 3x2 Bento Grid)
             (580, 140), // Tasks
-            (620, 220), // Quick Controls
-            (580, 240), // Focus
-            (680, 240), // Calendar & Weather
-            (680, 240)  // Clipboard (Unified Copies & Screenshots)
+            (620, 230), // Quick Controls
+            (580, 266), // Focus
+            (680, 250), // Calendar & Weather
+            (680, 250)  // Clipboard (Unified Copies & Screenshots)
         ];
 
         for (int i = 0; i < tabs.Length; i++)
         {
             var (contentW, contentH) = tabs[i];
 
-            double targetContentW = Math.Clamp(contentW, minIslandW - 28.0, maxIslandW - 28.0);
-            double islandW = Math.Ceiling((targetContentW + 28.0) / 8.0) * 8.0;
+            double targetContentW = Math.Clamp(contentW, minIslandW - 32.0, maxIslandW - 32.0);
+            double islandW = Math.Ceiling((targetContentW + 32.0) / 8.0) * 8.0;
             islandW = Math.Clamp(islandW, minIslandW, maxIslandW);
 
             double islandH = Math.Ceiling((contentH + overhead) / 8.0) * 8.0;
             islandH = Math.Clamp(islandH, 120.0, maxIslandH);
 
-            // Bounds calculations: 14 DIP uniform outer padding
-            double leftUnused = 14.0;
-            double rightUnused = (islandW - 28.0) - targetContentW + 14.0;
+            // Bounds calculations: 16 DIP horizontal, 14 DIP vertical outer padding
+            double leftUnused = 16.0;
+            double rightUnused = (islandW - 32.0) - targetContentW + 16.0;
             double topUnused = 14.0;
             double bottomUnused = (islandH - overhead) - contentH + 14.0;
 
-            // Extra slack beyond uniform 14 DIP padding must be <= 8 DIP (< 12 DIP)
-            Assert.True(Math.Abs(leftUnused - 14.0) <= 0.001, $"Tab {i} left padding must be exactly 14 DIP");
-            Assert.True(rightUnused - 14.0 <= 8.0, $"Tab {i} right unused slack {rightUnused - 14.0} > 8 DIP");
+            // Extra slack beyond safe padding must be <= 8 DIP (< 12 DIP)
+            Assert.True(Math.Abs(leftUnused - 16.0) <= 0.001, $"Tab {i} left padding must be exactly 16 DIP");
+            Assert.True(rightUnused - 16.0 <= 8.0, $"Tab {i} right unused slack {rightUnused - 16.0} > 8 DIP");
             Assert.True(Math.Abs(topUnused - 14.0) <= 0.001, $"Tab {i} top padding must be exactly 14 DIP");
             Assert.True(bottomUnused - 14.0 <= 8.0, $"Tab {i} bottom unused slack {bottomUnused - 14.0} > 8 DIP");
 

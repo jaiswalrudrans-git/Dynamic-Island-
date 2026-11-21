@@ -35,8 +35,8 @@ public sealed class SpacingAndChromeLintTests
         using var stream = File.OpenRead(xamlPath);
         var dict = (ResourceDictionary)XamlReader.Load(stream);
 
-        // Single root padding owner
-        Assert.Equal(new Thickness(14), (Thickness)dict["Padding.Island"]);
+        // Single root padding owner (16 left/right, 14 top/bottom)
+        Assert.Equal(new Thickness(16, 14, 16, 14), (Thickness)dict["Padding.Island"]);
 
         // Spacing gap tokens
         Assert.Equal(16.0, (double)dict["Spacing.Group"]);

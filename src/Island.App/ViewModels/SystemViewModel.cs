@@ -13,7 +13,7 @@ public sealed record CoreViewModel(int Index, double Percent, double Height, str
 
 public sealed record DriveItemViewModel(string Name, string Label, string UsageText, double Percent, string Tooltip);
 
-public sealed record ProcessItemViewModel(string Name, string MetricText, string Tooltip);
+public sealed record ProcessItemViewModel(string Name, string MetricText, string Tooltip, ImageSource? Icon = null, bool HasIcon = false);
 
 public sealed class SystemViewModel : ObservableObject, IDisposable
 {
@@ -174,6 +174,8 @@ public sealed class SystemViewModel : ObservableObject, IDisposable
                 .Select(g => new
                 {
                     Name = g.Key,
+                    RawName = g.First().Name,
+                    FirstPid = g.First().Id,
                     Cpu = g.Sum(x => x.CpuPercent),
                     Mem = g.Sum(x => x.WorkingSetBytes),
                     Count = g.Count(),
@@ -191,7 +193,8 @@ public sealed class SystemViewModel : ObservableObject, IDisposable
                 string displayName = p.Name + countSuffix;
                 string tooltip = $"{p.Name}\nInstances: {p.Count}\nPIDs: {p.Pids}\nCPU: {p.Cpu:0.0}%\nMemory: {FormatBytes(p.Mem)}";
 
-                list.Add(new ProcessItemViewModel(displayName, metric, tooltip));
+                var icon = ProcessIconCache.GetIcon(p.RawName, p.FirstPid);
+                list.Add(new ProcessItemViewModel(displayName, metric, tooltip, icon, icon != null));
             }
             return list;
         }

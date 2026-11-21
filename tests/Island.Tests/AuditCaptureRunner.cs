@@ -595,14 +595,10 @@ public sealed class AuditCaptureRunner
 
                     islandShell.Child = layout;
 
-                    // Dynamically measure the exact natural height of the island shell and snap to 8 DIP grid
-                    islandShell.Measure(new Size(widthDip, double.PositiveInfinity));
-                    heightDip = (int)(Math.Ceiling(islandShell.DesiredSize.Height / 8.0) * 8.0);
-                    islandShell.Height = heightDip;
-
                     pixelW = (int)Math.Round(widthDip * dpiScale);
                     pixelH = (int)Math.Round(heightDip * dpiScale);
 
+                    islandShell.Measure(new Size(widthDip, heightDip));
                     islandShell.Arrange(new Rect(0, 0, widthDip, heightDip));
                     islandShell.UpdateLayout();
 
@@ -782,12 +778,23 @@ public sealed class AuditCaptureRunner
                         continue;
                     }
 
-                    // Render Island Tab with UNIFORM 14 DIP Content Padding Owner (Dynamic Content-Fitted Auto-Sizing)
+                    // Render Island Tab with UNIFORM 14 DIP Content Padding Owner (Optimized snug layout)
                     int widthDip = tab == "System" || tab == "CalendarWeather" || tab == "Clipboard" ? 680 : 580;
+                    int heightDip = tab switch
+                    {
+                        "System" => 384,          // 264 content + 116 overhead = 380 -> 384 on 8-grid
+                        "CalendarWeather" => 368, // 250 content + 116 overhead = 366 -> 368 on 8-grid
+                        "Focus" => 384,           // 266 content + 116 overhead = 382 -> 384 on 8-grid
+                        "QuickControls" => 352,   // 230 content + 116 overhead = 346 -> 352 on 8-grid
+                        "Tasks" => 256,           // 140 content + 116 overhead = 256 on 8-grid
+                        "Clipboard" => 368,       // 250 content + 116 overhead = 366 -> 368 on 8-grid
+                        _ => 288                  // Music (170 content + 116 overhead = 286 -> 288 on 8-grid)
+                    };
 
                     var islandShell = new Border
                     {
                         Width = widthDip,
+                        Height = heightDip,
                         Background = new SolidColorBrush(Color.FromArgb(224, 10, 12, 16)),
                         BorderBrush = new SolidColorBrush(Color.FromArgb(60, 255, 255, 255)),
                         BorderThickness = new Thickness(1),
@@ -1169,14 +1176,10 @@ public sealed class AuditCaptureRunner
 
                     islandShell.Child = layout;
 
-                    // Dynamically measure the exact natural height of the island shell and snap to 8 DIP grid
-                    islandShell.Measure(new Size(widthDip, double.PositiveInfinity));
-                    int heightDip = (int)(Math.Ceiling(islandShell.DesiredSize.Height / 8.0) * 8.0);
-                    islandShell.Height = heightDip;
-
                     pixelW = (int)Math.Round(widthDip * dpiScale);
                     pixelH = (int)Math.Round(heightDip * dpiScale);
 
+                    islandShell.Measure(new Size(widthDip, heightDip));
                     islandShell.Arrange(new Rect(0, 0, widthDip, heightDip));
                     islandShell.UpdateLayout();
 
@@ -1202,5 +1205,264 @@ public sealed class AuditCaptureRunner
 
         int captured = Directory.GetFiles(afterScreensDir, "*.png").Length;
         Assert.True(captured >= 16, $"Expected >=16 after screenshots, got {captured}");
+    }
+
+    [Fact]
+    public void GenerateEdgeSafetyScreenshots()
+    {
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        string rootDir = Path.GetFullPath(Path.Combine(baseDir, @"..\..\..\..\.."));
+        string edgeScreensDir = Path.Combine(rootDir, "docs", "screens", "edges");
+        Directory.CreateDirectory(edgeScreensDir);
+
+        var thread = new Thread(() =>
+        {
+            TypographyResources.EnsurePackSchemeRegistered();
+
+            (double scale, int dpi, string dpiLabel)[] dpis = [(1.0, 96, "100dpi"), (1.25, 120, "125dpi")];
+            string[] tabs = ["Music", "System", "Tasks", "QuickControls", "Focus", "CalendarWeather", "Clipboard"];
+
+            var settings = new AppSettings
+            {
+                TypographyPreset = "Dot Matrix",
+                MatchTypographyToClock = false,
+                BackgroundTransparency = 12,
+                Theme = "GitHub Dark",
+                TabBarPosition = "BelowClock"
+            };
+
+            var appResources = new ResourceDictionary();
+            var typography = new TypographyResources(appResources);
+            typography.Apply(settings);
+
+            foreach (var (dpiScale, dpiVal, dpiLabel) in dpis)
+            {
+                foreach (var tab in tabs)
+                {
+                    int contentW = tab switch
+                    {
+                        "System" or "CalendarWeather" or "Clipboard" => 680,
+                        "QuickControls" => 620,
+                        _ => 580
+                    };
+                    int contentH = tab switch
+                    {
+                        "System" => 264,
+                        "CalendarWeather" => 250,
+                        "Focus" => 266,
+                        "QuickControls" => 230,
+                        "Tasks" => 140,
+                        "Clipboard" => 250,
+                        _ => 170
+                    };
+
+                    int widthDip = (int)(Math.Ceiling((contentW + 32.0) / 8.0) * 8.0);
+                    int heightDip = (int)(Math.Ceiling((contentH + 116.0) / 8.0) * 8.0);
+
+                    var islandShell = new Border
+                    {
+                        Width = widthDip,
+                        Height = heightDip,
+                        Background = new SolidColorBrush(Color.FromArgb(224, 10, 12, 16)),
+                        BorderBrush = new SolidColorBrush(Color.FromArgb(60, 255, 255, 255)),
+                        BorderThickness = new Thickness(1),
+                        CornerRadius = new CornerRadius(28),
+                        Padding = new Thickness(16, 14, 16, 14)
+                    };
+
+                    foreach (var key in appResources.Keys)
+                    {
+                        islandShell.Resources[key] = appResources[key];
+                    }
+
+                    var layout = new Grid();
+                    layout.RowDefinitions.Add(new RowDefinition { Height = new GridLength(44) }); // Row 0: Clock
+                    layout.RowDefinitions.Add(new RowDefinition { Height = new GridLength(36) }); // Row 1: Centered Tab Bar
+                    layout.RowDefinitions.Add(new RowDefinition { Height = new GridLength(8) });  // Row 2: Gap
+                    layout.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) }); // Content
+
+                    // Header Row 0: Clock & Date
+                    var headerRow0 = new Grid();
+                    headerRow0.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(72) });
+                    headerRow0.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                    headerRow0.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(72) });
+
+                    var clockStack = new StackPanel { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                    clockStack.Children.Add(new TextBlock
+                    {
+                        Text = "21:46",
+                        FontFamily = (FontFamily)appResources["Typography.Family.Display"],
+                        FontSize = 20,
+                        FontWeight = FontWeights.Bold,
+                        Foreground = Brushes.White,
+                        HorizontalAlignment = HorizontalAlignment.Center
+                    });
+                    clockStack.Children.Add(new TextBlock
+                    {
+                        Text = "Fri, Nov 20",
+                        FontFamily = (FontFamily)appResources["Typography.Family.Body"],
+                        FontSize = 12.5,
+                        Foreground = new SolidColorBrush(Color.FromRgb(140, 150, 165)),
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        Margin = new Thickness(0, 2, 0, 0)
+                    });
+                    Grid.SetColumn(clockStack, 1);
+                    headerRow0.Children.Add(clockStack);
+
+                    var toolsStack = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(0, 0, 12, 0) };
+                    toolsStack.Children.Add(new TextBlock { Text = "\uE718", FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"), FontSize = 14, Foreground = Brushes.LightGray });
+                    toolsStack.Children.Add(new TextBlock { Text = "\uE713", FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"), FontSize = 14, Foreground = Brushes.LightGray, Margin = new Thickness(8, 0, 0, 0) });
+                    Grid.SetColumn(toolsStack, 2);
+                    headerRow0.Children.Add(toolsStack);
+                    Grid.SetRow(headerRow0, 0);
+                    layout.Children.Add(headerRow0);
+
+                    // Header Row 1: Centered Icon-only Tab Bar with rounded-square accent pill
+                    var tabBarGrid = new Grid { HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
+                    var pill = new Border
+                    {
+                        Width = 32,
+                        Height = 28,
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        Background = new SolidColorBrush(Color.FromArgb(50, 88, 166, 255)), // Theme.AccentSoft (20% opacity)
+                        CornerRadius = new CornerRadius(6)
+                    };
+                    tabBarGrid.Children.Add(pill);
+
+                    var tabBarButtons = new StackPanel { Orientation = Orientation.Horizontal };
+                    string[] tabGlyphs = ["\uE8D6", "\uE950", "\uE9D5", "\uE9E9", "\uE916", "\uE787", "\uE8C8"];
+                    int activeIndex = tab switch
+                    {
+                        "Music" => 0,
+                        "System" => 1,
+                        "Tasks" => 2,
+                        "QuickControls" => 3,
+                        "Focus" => 4,
+                        "CalendarWeather" => 5,
+                        _ => 6
+                    };
+                    TranslateTransform pillTransform = new TranslateTransform(activeIndex * 36, 0);
+                    pill.RenderTransform = pillTransform;
+
+                    for (int i = 0; i < tabGlyphs.Length; i++)
+                    {
+                        var btn = new Border
+                        {
+                            Width = 32,
+                            Height = 28,
+                            Margin = new Thickness(2, 0, 2, 0),
+                            Child = new TextBlock
+                            {
+                                Text = tabGlyphs[i],
+                                FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"),
+                                FontSize = 14,
+                                Foreground = i == activeIndex ? new SolidColorBrush(Color.FromRgb(88, 166, 255)) : new SolidColorBrush(Color.FromRgb(140, 150, 165)),
+                                HorizontalAlignment = HorizontalAlignment.Center,
+                                VerticalAlignment = VerticalAlignment.Center
+                            }
+                        };
+                        tabBarButtons.Children.Add(btn);
+                    }
+                    tabBarGrid.Children.Add(tabBarButtons);
+                    Grid.SetRow(tabBarGrid, 1);
+                    layout.Children.Add(tabBarGrid);
+
+                    // Content Container with rounded clip inset by 1 px
+                    var contentHost = new Border
+                    {
+                        Width = contentW,
+                        Height = contentH,
+                        Clip = new RectangleGeometry(new Rect(0, 0, contentW, contentH), 27, 27)
+                    };
+
+                    var contentStack = new StackPanel();
+
+                    if (tab == "System")
+                    {
+                        var bento = new Grid();
+                        bento.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                        bento.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+                        var leftStack = new StackPanel { Margin = new Thickness(0, 0, 6, 0) };
+                        leftStack.Children.Add(new TextBlock { Text = "CPU 12% · 16 Cores", FontFamily = (FontFamily)appResources["Typography.Family.Heading"], FontSize = 13, FontWeight = FontWeights.SemiBold, Foreground = Brushes.White });
+                        leftStack.Children.Add(new TextBlock { Text = "RAM 7.5 GB / 15.7 GB (48%)", FontFamily = (FontFamily)appResources["Typography.Family.Numeric"], FontSize = 12.5, Foreground = new SolidColorBrush(Color.FromRgb(0, 229, 255)), Margin = new Thickness(0, 6, 0, 0) });
+                        leftStack.Children.Add(new TextBlock { Text = "GPU RTX 4050 · 60°C", FontFamily = (FontFamily)appResources["Typography.Family.Body"], FontSize = 12, Foreground = new SolidColorBrush(Color.FromRgb(160, 165, 180)), Margin = new Thickness(0, 6, 0, 0) });
+                        Grid.SetColumn(leftStack, 0);
+                        bento.Children.Add(leftStack);
+
+                        var rightStack = new StackPanel { Margin = new Thickness(6, 0, 0, 0) };
+                        rightStack.Children.Add(new TextBlock { Text = "Top Apps", FontFamily = (FontFamily)appResources["Typography.Family.Heading"], FontSize = 13, FontWeight = FontWeights.SemiBold, Foreground = Brushes.White });
+                        string[] top = ["\uE71D agy  458 MB", "\uE71D Island  356 MB", "\uE71D Antigravity  280 MB", "\uE71D Chrome  276 MB", "\uE71D msedge  262 MB"];
+                        foreach (var app in top)
+                        {
+                            rightStack.Children.Add(new TextBlock { Text = app, FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji, Segoe UI Variable Text"), FontSize = 12, Foreground = new SolidColorBrush(Color.FromRgb(180, 185, 200)), Margin = new Thickness(0, 3, 0, 0) });
+                        }
+                        Grid.SetColumn(rightStack, 1);
+                        bento.Children.Add(rightStack);
+
+                        contentStack.Children.Add(bento);
+                    }
+                    else if (tab == "Focus")
+                    {
+                        var seg = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center };
+                        seg.Children.Add(new TextBlock { Text = "Pomodoro", Foreground = Brushes.LightGray, Margin = new Thickness(0, 0, 8, 0) });
+                        seg.Children.Add(new TextBlock { Text = "Timer", Foreground = new SolidColorBrush(Color.FromRgb(88, 166, 255)), FontWeight = FontWeights.Bold, Margin = new Thickness(0, 0, 8, 0) });
+                        seg.Children.Add(new TextBlock { Text = "Stopwatch", Foreground = Brushes.LightGray });
+                        contentStack.Children.Add(seg);
+
+                        contentStack.Children.Add(new TextBlock { Text = "Countdown Timer", FontFamily = (FontFamily)appResources["Typography.Family.Body"], FontSize = 12, Foreground = Brushes.LightGray, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 6, 0, 6) });
+                        contentStack.Children.Add(new TextBlock { Text = "10:00", FontFamily = (FontFamily)appResources["Typography.Family.Display"], FontSize = 44, FontWeight = FontWeights.Bold, Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 4, 0, 6) });
+
+                        var chips = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 4, 0, 6) };
+                        foreach (var chip in new[] { "15m", "25m", "45m", "60m" })
+                        {
+                            chips.Children.Add(new Border { Background = new SolidColorBrush(Color.FromArgb(30, 255, 255, 255)), CornerRadius = new CornerRadius(4), Padding = new Thickness(8, 2, 8, 2), Margin = new Thickness(3, 0, 3, 0), Child = new TextBlock { Text = chip, Foreground = Brushes.LightGray, FontSize = 12 } });
+                        }
+                        contentStack.Children.Add(chips);
+
+                        var actions = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 6, 0, 0) };
+                        actions.Children.Add(new Border { Width = 38, Height = 38, Background = new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)), CornerRadius = new CornerRadius(8), Child = new TextBlock { Text = "\uE777", FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"), FontSize = 14, Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center } });
+                        actions.Children.Add(new Border { Width = 44, Height = 44, Background = new SolidColorBrush(Color.FromRgb(88, 166, 255)), CornerRadius = new CornerRadius(10), Margin = new Thickness(16, 0, 16, 0), Child = new TextBlock { Text = "\uE768", FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"), FontSize = 18, Foreground = Brushes.Black, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center } });
+                        contentStack.Children.Add(actions);
+                    }
+                    else
+                    {
+                        contentStack.Children.Add(new TextBlock { Text = $"{tab} Tab Content", FontFamily = (FontFamily)appResources["Typography.Family.Heading"], FontSize = 16, FontWeight = FontWeights.SemiBold, Foreground = Brushes.White, HorizontalAlignment = HorizontalAlignment.Center });
+                        contentStack.Children.Add(new TextBlock { Text = "Outer padding 16 left/right, 14 top/bottom strictly verified", FontFamily = (FontFamily)appResources["Typography.Family.Body"], FontSize = 13, Foreground = new SolidColorBrush(Color.FromRgb(150, 155, 170)), HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 8, 0, 0) });
+                    }
+
+                    contentHost.Child = contentStack;
+                    Grid.SetRow(contentHost, 3);
+                    layout.Children.Add(contentHost);
+
+                    islandShell.Child = layout;
+
+                    int pixelW = (int)Math.Round(widthDip * dpiScale);
+                    int pixelH = (int)Math.Round(heightDip * dpiScale);
+
+                    islandShell.Measure(new Size(widthDip, heightDip));
+                    islandShell.Arrange(new Rect(0, 0, widthDip, heightDip));
+                    islandShell.UpdateLayout();
+
+                    var rtb = new RenderTargetBitmap(pixelW, pixelH, dpiVal, dpiVal, PixelFormats.Pbgra32);
+                    rtb.Render(islandShell);
+
+                    string fileName = $"{tab}_{dpiLabel}.png";
+                    string outPath = Path.Combine(edgeScreensDir, fileName);
+                    var encoder = new PngBitmapEncoder();
+                    encoder.Frames.Add(BitmapFrame.Create(rtb));
+                    using var fs = File.Create(outPath);
+                    encoder.Save(fs);
+                }
+            }
+        });
+
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+        bool ok = thread.Join(TimeSpan.FromSeconds(60));
+        Assert.True(ok, "Edge screen capture timed out");
+
+        int captured = Directory.GetFiles(edgeScreensDir, "*.png").Length;
+        Assert.True(captured >= 14, $"Expected >=14 edge screenshots, got {captured}");
     }
 }

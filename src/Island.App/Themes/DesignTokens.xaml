@@ -28,8 +28,8 @@
     <CornerRadius x:Key="Radius.Tile">14</CornerRadius>
     <Thickness x:Key="Padding.Tile">10</Thickness>
 
-    <!-- SINGLE ROOT PADDING OWNER (14 DIP all four sides) -->
-    <Thickness x:Key="Padding.Island">14</Thickness>
+    <!-- SINGLE ROOT PADDING OWNER (16 DIP left/right, 14 DIP top/bottom) -->
+    <Thickness x:Key="Padding.Island">16,14,16,14</Thickness>
     <Thickness x:Key="Padding.Card">0</Thickness>
     <Thickness x:Key="Padding.Page">0</Thickness>
     <Thickness x:Key="Margin.Card">0</Thickness>

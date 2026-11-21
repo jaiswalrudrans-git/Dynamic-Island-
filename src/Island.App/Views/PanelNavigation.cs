@@ -19,7 +19,7 @@ internal sealed class PanelNavigation
     private readonly TranslateTransform indicator;
     private readonly FrameworkElement[] pages = new FrameworkElement[PanelTab.All.Length];
     private readonly Button[] buttons = new Button[PanelTab.All.Length];
-    private readonly TextBlock[] labelBlocks = new TextBlock[PanelTab.All.Length];
+    private readonly TextBlock[] iconBlocks = new TextBlock[PanelTab.All.Length];
     private readonly StackPanel bar;
     private readonly Func<AppSettings> settings;
     private readonly Action requestFrame;
@@ -66,46 +66,30 @@ internal sealed class PanelNavigation
             var tab = PanelTab.All[i];
             int index = i;
 
-            var stack = new StackPanel
-            {
-                Orientation = Orientation.Horizontal,
-                VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Center
-            };
-
             var iconBlock = new TextBlock
             {
                 Text = tab.Glyph,
                 FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"),
-                FontSize = 13,
+                FontSize = 14,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
-            stack.Children.Add(iconBlock);
-
-            var labelBlock = new TextBlock
-            {
-                Text = tab.Name,
-                FontSize = 12,
-                FontWeight = FontWeights.SemiBold,
-                Margin = new Thickness(6, 0, 2, 0),
-                VerticalAlignment = VerticalAlignment.Center,
-                Visibility = Visibility.Collapsed
-            };
-            stack.Children.Add(labelBlock);
-            labelBlocks[i] = labelBlock;
+            iconBlock.SetResourceReference(TextBlock.ForegroundProperty, "Theme.TextSecondary");
+            iconBlocks[i] = iconBlock;
 
             var button = new Button
             {
-                Content = stack,
+                Content = iconBlock,
                 Style = style,
-                ToolTip = string.IsNullOrEmpty(tab.Description) ? tab.Name : tab.Description,
+                Width = 32,
                 Height = 28,
-                MinWidth = 32,
-                Padding = new Thickness(6, 0, 6, 0),
+                Padding = new Thickness(0),
                 Margin = new Thickness(2, 0, 2, 0),
                 ClipToBounds = true
             };
+            ToolTipService.SetInitialShowDelay(button, 400);
+            ToolTipService.SetBetweenShowDelay(button, 100);
+            ToolTipService.SetToolTip(button, string.IsNullOrEmpty(tab.Description) ? tab.Name : tab.Description);
             AutomationProperties.SetName(button, tab.Name);
             button.Click += (_, _) => Select(index);
 
@@ -183,20 +167,11 @@ internal sealed class PanelNavigation
 
     private void UpdateLabels()
     {
-        var config = settings();
-        string mode = config.TabLabelMode ?? "SelectedOnly";
-
         for (int i = 0; i < buttons.Length; i++)
         {
-            bool showLabel = mode switch
-            {
-                "All" => true,
-                "None" => false,
-                _ => i == selected // "SelectedOnly" (default)
-            };
-
-            labelBlocks[i].Visibility = showLabel ? Visibility.Visible : Visibility.Collapsed;
-            buttons[i].Padding = showLabel ? new Thickness(10, 0, 12, 0) : new Thickness(6, 0, 6, 0);
+            buttons[i].Width = 32;
+            buttons[i].Height = 28;
+            buttons[i].Padding = new Thickness(0);
         }
     }
 
@@ -205,10 +180,12 @@ internal sealed class PanelNavigation
         if (active)
         {
             buttons[index].SetResourceReference(Control.ForegroundProperty, "Theme.Accent");
+            iconBlocks[index].SetResourceReference(TextBlock.ForegroundProperty, "Theme.Accent");
         }
         else
         {
             buttons[index].SetResourceReference(Control.ForegroundProperty, "Theme.TextSecondary");
+            iconBlocks[index].SetResourceReference(TextBlock.ForegroundProperty, "Theme.TextSecondary");
         }
         AutomationProperties.SetItemStatus(buttons[index], active ? "Selected" : "");
     }
@@ -236,9 +213,8 @@ internal sealed class PanelNavigation
             }
         }
 
-        double w = Math.Max(btn.ActualWidth, 32);
         targetPillX = x;
-        targetPillW = w;
+        targetPillW = 32;
 
         if (instant)
         {
@@ -356,39 +332,33 @@ internal sealed class PanelNavigation
             _ => Math.Max(desiredContentW, 580)
         };
 
-        bool belowClock = !string.Equals(settings().TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase);
-        if (!belowClock)
-        {
-            // When tab bar is to the left of the clock, provide enough header breadth for tabs + clock + tools
-            desiredContentW = Math.Max(desiredContentW, 600);
-        }
-
-        // Horizontal padding: 14 left + 14 right = 28 DIP (Single Root Padding Owner)
-        double targetContentW = Math.Clamp(desiredContentW, minIslandW - 28.0, maxIslandW - 28.0);
-        double targetIslandW = Math.Ceiling((targetContentW + 28.0) / 8.0) * 8.0;
+        // Horizontal padding: 16 left + 16 right = 32 DIP (Single Root Padding Owner)
+        double targetContentW = Math.Clamp(desiredContentW, minIslandW - 32.0, maxIslandW - 32.0);
+        double targetIslandW = Math.Ceiling((targetContentW + 32.0) / 8.0) * 8.0;
         targetIslandW = Math.Clamp(targetIslandW, minIslandW, maxIslandW);
-        targetContentW = targetIslandW - 28.0;
+        targetContentW = targetIslandW - 32.0;
 
         // Pass 2: Measure with the target content width so text wrapping & reflow compute exact height
         page.Measure(new Size(targetContentW, double.PositiveInfinity));
         double desiredContentH = page.DesiredSize.Height;
 
-        // Ensure sensible minimum safety floors per tab matching flat layout
+        // Ensure comfortable, un-cramped height floors per tab matching flat layout
         desiredContentH = tabIndex switch
         {
-            0 => Math.Max(desiredContentH, 90),  // Music (empty 90, active ~170)
-            1 => Math.Max(desiredContentH, 220), // System (clean 3x2 Bento Grid)
+            0 => Math.Max(desiredContentH, 90),  // Music (empty 90, active 170)
+            1 => Math.Max(desiredContentH, 264), // System (clean 3x2 Bento Grid)
             2 => Math.Max(desiredContentH, 75),  // Tasks (empty 75, populated 140-200)
-            3 => Math.Max(desiredContentH, 200), // Quick Controls (sliders + 8 tiles)
-            4 => Math.Max(desiredContentH, 160), // Focus (stopwatch ~160, timer/pomodoro ~220)
-            5 => Math.Max(desiredContentH, 220), // Calendar & Weather (month + weather)
-            6 => Math.Max(desiredContentH, 140), // Clipboard & Screenshots (empty 140, dual-half 240)
-            _ => Math.Max(desiredContentH, 100)
+            3 => Math.Max(desiredContentH, 230), // Quick Controls (sliders + 8 tiles)
+            4 => Math.Max(desiredContentH, 160), // Focus (stopwatch 160, pomodoro ~262, timer ~298)
+            5 => Math.Max(desiredContentH, 250), // Calendar & Weather (month + weather)
+            6 => Math.Max(desiredContentH, 140), // Clipboard & Screenshots (empty 140, dual-half 250)
+            _ => Math.Max(desiredContentH, 120)
         };
 
         // Vertical overhead:
         // When TabBarPosition is "BelowClock": 14 top + 80 header + 8 gap + 14 bottom = 116 DIP.
         // When TabBarPosition is "LeftOfClock": 14 top + 44 header + 8 gap + 14 bottom = 80 DIP.
+        bool belowClock = !string.Equals(settings().TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase);
         double overhead = belowClock ? 116.0 : 80.0;
 
         double targetIslandH = Math.Ceiling((desiredContentH + overhead) / 8.0) * 8.0;

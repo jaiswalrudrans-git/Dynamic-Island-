@@ -226,13 +226,21 @@ public partial class OverlayWindow
                 contentDebounceTimer.Start();
             }
         };
+        focus.PropertyChanged += (_, _) =>
+        {
+            if (navigation.FocusSelected)
+            {
+                contentDebounceTimer.Stop();
+                contentDebounceTimer.Start();
+            }
+        };
 
         var initSize = navigation.GetDesiredSize(0);
         targetIslandWidth = initSize.Width;
         targetIslandHeight = initSize.Height;
         bool belowClock = !string.Equals(settings.Current.TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase);
         double overhead = belowClock ? 116.0 : 80.0;
-        double initContentW = Math.Max(580 - 28, Math.Round(initSize.Width - 28));
+        double initContentW = Math.Max(580 - 32, Math.Round(initSize.Width - 32));
         double initContentH = Math.Max(60, Math.Round(initSize.Height - overhead));
         Header.Width = initContentW;
         Body.Width = initContentW;
@@ -267,6 +275,7 @@ public partial class OverlayWindow
         Shell.ContextMenu = menu;
         previousPin = Pinned;
         ApplyPanelSettings();
+        ApplyTabBarLayout();
         intent.Tick += IntentTick;
         DrawPanel();
     }
@@ -291,7 +300,7 @@ public partial class OverlayWindow
         targetIslandHeight = size.Height;
         bool belowClock = !string.Equals(settings.Current.TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase);
         double overhead = belowClock ? 116.0 : 80.0;
-        double contentW = Math.Max(580 - 28, Math.Round(size.Width - 28));
+        double contentW = Math.Max(580 - 32, Math.Round(size.Width - 32));
         double contentH = Math.Max(60, Math.Round(size.Height - overhead));
         if (Header.Width != contentW) Header.Width = contentW;
         if (Body.Width != contentW) Body.Width = contentW;
@@ -328,6 +337,11 @@ public partial class OverlayWindow
 
     private void FocusChanged()
     {
+        if (navigation != null && navigation.FocusSelected)
+        {
+            contentDebounceTimer.Stop();
+            contentDebounceTimer.Start();
+        }
         double target = (alerts.HasActiveAlert || music.Preview || system.HasCollapsedStat || (focus != null && focus.IsRunning)) ? 1 : 0;
         if (previewWidth.Value != target) RequestFrame();
         DrawPanel();
@@ -515,9 +529,14 @@ public partial class OverlayWindow
             EdgeOffset.Y = shadowTop - BottomEdge.Height;
             lastShape = shape;
 
-            double liveContentW = Math.Max(300, Math.Round(curW - 24));
+            bool belowClock = !string.Equals(settings.Current.TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase);
+            double overhead = belowClock ? 116.0 : 80.0;
+            double liveContentW = Math.Max(300, Math.Round(curW - 32));
+            double liveContentH = Math.Max(60, Math.Round(curH - overhead));
             if (Header.Width != liveContentW) Header.Width = liveContentW;
             if (Body.Width != liveContentW) Body.Width = liveContentW;
+            if (Body.Height != liveContentH) Body.Height = liveContentH;
+            Pages.Clip = new RectangleGeometry(new Rect(0, 0, liveContentW, liveContentH), 27, 27);
         }
         IslandBackground.Opacity = shape;
         CollapsedBackground.Opacity = Math.Max(0, 1.0 - shape);
@@ -579,10 +598,11 @@ public partial class OverlayWindow
                 Canvas.SetLeft(DebugHud, iLeft + 8);
                 Canvas.SetTop(DebugHud, curH + 6);
 
-                double slackX = Math.Max(0, (curW - 24) - Body.Width);
-                double slackY = Math.Max(0, (curH - 76) - Body.Height);
+                double overheadDbg = !string.Equals(settings.Current.TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase) ? 116.0 : 80.0;
+                double slackX = Math.Max(0, (curW - 32) - Body.Width);
+                double slackY = Math.Max(0, (curH - overheadDbg) - Body.Height);
                 string tabName = navigation != null ? PanelTab.All[navigation.SelectedIndex].Name : "Tab";
-                DebugHudText.Text = $"Tab: {tabName} | Island: {curW:0}x{curH:0} | Content: {Body.Width:0}x{Body.Height:0} | Margins: 12 DIP | Slack: X={slackX:0} Y={slackY:0} DIP";
+                DebugHudText.Text = $"Tab: {tabName} | Island: {curW:0}x{curH:0} | Content: {Body.Width:0}x{Body.Height:0} | Safe Inset: 16/14 DIP | Slack: X={slackX:0} Y={slackY:0} DIP";
             }
             else
             {
