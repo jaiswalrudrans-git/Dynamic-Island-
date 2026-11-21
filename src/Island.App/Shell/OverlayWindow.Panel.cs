@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
@@ -108,8 +108,10 @@ public partial class OverlayWindow
         tempAlerts = new(Dispatcher, alertQueue, settings.Current, log);
 
         music = new(Dispatcher, settings.Current, log);
-        CompactMusic.DataContext = music;
+        CompactCover.DataContext = music;
+        MusicGlow.DataContext = music;
         CompactMeter.Attach(music.Spectrum);
+        CompactMeter.AvailabilityChanged += () => { RequestFrame(); DrawPanel(); };
         system = new(Dispatcher, settings.Current, log);
         system.SnapshotUpdated += tempAlerts.OnSnapshot;
         CompactStat.DataContext = system;
@@ -393,3 +395,5 @@ public partial class OverlayWindow
         }
     }
 }
+
+

@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
@@ -95,17 +95,17 @@ public partial class OverlayWindow
         bool switching = navigation.Advance(dt, config.ReduceMotion);
         bool sizingW = currentWidthSpring.Advance(targetIslandWidth, dt);
         bool sizingH = currentHeightSpring.Advance(targetIslandHeight, dt);
-        double target = (alerts.HasActiveAlert || music.Preview || system.HasCollapsedStat || (focus != null && focus.IsRunning)) ? 1 : 0;
+        double targetCollapsedW = GetTargetCollapsedWidth();
         if (config.ReduceMotion)
         {
-            previewWidth.Set(target);
+            previewWidth.Set(targetCollapsedW);
             alertSpring.Set(alerts.HasActiveAlert ? 1 : 0);
             currentWidthSpring.Set(targetIslandWidth);
             currentHeightSpring.Set(targetIslandHeight);
             sizingW = false;
             sizingH = false;
         }
-        bool widening = previewWidth.Advance(target, dt);
+        bool widening = previewWidth.Advance(targetCollapsedW, dt);
         bool alerting = alertSpring.Advance(alerts.HasActiveAlert ? 1 : 0, dt);
         AlertY.Y = config.ReduceMotion ? 0 : (1 - alertSpring.Value) * -12;
         DrawPanel();

@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
 using Island.App.Features.Music.Services;
 
@@ -7,6 +7,8 @@ namespace Island.App.Features.Music.Views;
 public sealed class SpectrumMeter : FrameworkElement
 {
     private LoopbackSpectrum? source;
+    internal event Action? AvailabilityChanged;
+
     internal void Attach(LoopbackSpectrum? value)
     {
         if (source != null) source.Frame -= Refresh;
@@ -17,8 +19,21 @@ public sealed class SpectrumMeter : FrameworkElement
 
     private void Refresh()
     {
-        Visibility = source?.Available == true ? Visibility.Visible : Visibility.Hidden;
+        bool available = source?.Available == true;
+        var nextVis = available ? Visibility.Visible : Visibility.Collapsed;
+        if (Visibility != nextVis)
+        {
+            Visibility = nextVis;
+            AvailabilityChanged?.Invoke();
+        }
         InvalidateVisual();
+    }
+
+    protected override Size MeasureOverride(Size availableSize)
+    {
+        if (Visibility == Visibility.Collapsed || source?.Available != true)
+            return new Size(0, 0);
+        return new Size(25, 16);
     }
 
     protected override void OnRender(DrawingContext dc)

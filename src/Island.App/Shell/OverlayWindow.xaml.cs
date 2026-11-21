@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
@@ -193,6 +193,11 @@ public partial class OverlayWindow : Window
         CompactClock.Time = now;
         HeaderClock.Time = now;
         ReducedClock.Time = now;
+        double targetCollapsedW = GetTargetCollapsedWidth();
+        if (Math.Abs(previewWidth.Value - targetCollapsedW) > 0.5)
+        {
+            RequestFrame();
+        }
         tick.Interval = TimeSpan.FromMilliseconds(Math.Ceiling(delay.TotalMilliseconds));
         tick.Start();
     }
@@ -253,3 +258,4 @@ public partial class OverlayWindow : Window
     [DllImport("user32.dll")]
     private static extern nint SetActiveWindow(nint hwnd);
 }
+

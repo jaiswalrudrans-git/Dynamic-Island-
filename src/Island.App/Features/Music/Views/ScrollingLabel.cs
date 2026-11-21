@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -26,8 +26,18 @@ public sealed class ScrollingLabel : Canvas
         active = show;
         reduced = reduceMotion;
         caption.Text = text;
-        Visibility = show ? Visibility.Visible : Visibility.Hidden;
+        Visibility = show && !string.IsNullOrEmpty(text) ? Visibility.Visible : Visibility.Collapsed;
+        InvalidateMeasure();
         ArrangeCaption();
+    }
+
+    protected override Size MeasureOverride(Size constraint)
+    {
+        if (!active || string.IsNullOrEmpty(caption.Text)) return new Size(0, 0);
+        caption.Measure(new Size(double.PositiveInfinity, 20));
+        double maxW = double.IsNaN(MaxWidth) ? 140.0 : MaxWidth;
+        double w = Math.Min(caption.DesiredSize.Width, maxW);
+        return new Size(w, 20);
     }
 
     private void ArrangeCaption()
@@ -39,8 +49,8 @@ public sealed class ScrollingLabel : Canvas
         SetTop(caption, (ActualHeight - caption.DesiredSize.Height) / 2);
         offset.X = overflow < 0 ? -overflow / 2 : 0;
         if (overflow <= 1 || reduced) return;
-        var travel = TimeSpan.FromSeconds(overflow / 32);
-        var pause = TimeSpan.FromSeconds(1);
+        var travel = TimeSpan.FromSeconds(overflow / 24);
+        var pause = TimeSpan.FromSeconds(1.5);
         var scroll = new DoubleAnimationUsingKeyFrames { AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever };
         scroll.KeyFrames.Add(new LinearDoubleKeyFrame(0, pause));
         scroll.KeyFrames.Add(new LinearDoubleKeyFrame(-overflow, pause + travel));

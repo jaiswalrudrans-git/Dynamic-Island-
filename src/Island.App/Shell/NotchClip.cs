@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Media;
 
 namespace Island.App.Shell;
@@ -16,13 +16,13 @@ internal sealed class NotchClip
         foreach (var segment in new PathSegment[] { top, shoulderR, right, cornerR, bottom, cornerL, left, shoulderL })
             outline.Segments.Add(segment);
         Geometry.Figures.Add(outline);
-        Update(0, 0, 640, 320, 480);
+        Update(0, 136, 640, 320, 480);
     }
 
-    public void Update(double progress, double preview, double currentWidth, double currentHeight, double centerX)
+    public void Update(double progress, double compactWidth, double currentWidth, double currentHeight, double centerX)
     {
-        // Collapsed pill: width 136-272 DIP, height 35 DIP
-        double compactHalf = 68 + 68 * preview;
+        // Collapsed pill: width dynamic DIP, height 35 DIP
+        double compactHalf = compactWidth / 2.0;
         double compactHeight = 35;
 
         double targetHalf = currentWidth / 2.0;

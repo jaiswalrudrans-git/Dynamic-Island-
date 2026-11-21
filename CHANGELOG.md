@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased] - 2026-11-21
+
+### Fixed
+- Sized collapsed notch dynamically to its visible content, eliminating empty space when music is playing.
+- Unified collapsed row with 8 DIP spacing between cover, clock, and equalizer/lyrics with even side padding.
+
 ## [Unreleased] - 2026-11-20
 
 ### Added

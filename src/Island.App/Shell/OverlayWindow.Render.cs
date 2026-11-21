@@ -1,4 +1,4 @@
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Island.App.Design;
@@ -53,20 +53,29 @@ public partial class OverlayWindow
         bool showClockOnly = !showAlert && !showMusic && !showStat && !showFocus && settings.Current.ShowNotchClock;
 
         CompactAlert.Visibility = showAlert && compactOpacity > 0 ? Visibility.Visible : Visibility.Hidden;
-        CompactAlert.Opacity = compactOpacity * Math.Clamp(previewWidth.Value, 0, 1) * Math.Clamp(alertSpring.Value, 0.01, 1);
+        CompactAlert.Opacity = compactOpacity * Math.Clamp(alertSpring.Value, 0.01, 1);
 
-        CompactMusic.Visibility = showMusic && compactOpacity > 0 ? Visibility.Visible : Visibility.Hidden;
-        CompactMusic.Opacity = compactOpacity * Math.Clamp(previewWidth.Value, 0, 1);
+        bool showCollapsed = !showAlert && !showStat && !showFocus && (showMusic || showClockOnly);
+        CollapsedContent.Visibility = showCollapsed && compactOpacity > 0 ? Visibility.Visible : Visibility.Hidden;
+        CollapsedContent.Opacity = compactOpacity;
+
+        CompactCover.Visibility = showMusic ? Visibility.Visible : Visibility.Collapsed;
+        MusicGlow.Visibility = showMusic && settings.Current.CoverGlow && compactOpacity > 0 ? Visibility.Visible : Visibility.Collapsed;
+        MusicGlow.Opacity = compactOpacity * 0.65;
+        MusicGlow.Width = Math.Max(0, previewWidth.Value);
+
+        bool showEqualizer = showMusic && settings.Current.MusicEqualizer && music.Spectrum?.Available == true;
+        CompactMeter.Visibility = showEqualizer ? Visibility.Visible : Visibility.Collapsed;
+
+        CompactClock.Visibility = settings.Current.ShowNotchClock ? Visibility.Visible : Visibility.Collapsed;
+        double trailing = GetClockTrailingAdvance();
+        CompactClock.Margin = new Thickness(0, 0, -trailing, 0);
 
         CompactStat.Visibility = showStat && compactOpacity > 0 ? Visibility.Visible : Visibility.Hidden;
-        CompactStat.Opacity = compactOpacity * Math.Clamp(previewWidth.Value, 0, 1);
+        CompactStat.Opacity = compactOpacity;
 
         CompactFocus.Visibility = showFocus && compactOpacity > 0 ? Visibility.Visible : Visibility.Hidden;
-        CompactFocus.Opacity = compactOpacity * Math.Clamp(previewWidth.Value, 0, 1);
-
-        double clockOpacity = (showClockOnly || (showMusic && music.PreviewClock && settings.Current.ShowNotchClock)) ? compactOpacity : 0;
-        CompactClock.Opacity = clockOpacity;
-        CompactClock.Visibility = clockOpacity > 0.01 ? Visibility.Visible : Visibility.Hidden;
+        CompactFocus.Opacity = compactOpacity;
         Header.Opacity = motion.HeaderOpacity;
         Body.Opacity = motion.BodyOpacity;
         HeaderY.Y = reduced ? 0 : 6 * (1 - Header.Opacity);
