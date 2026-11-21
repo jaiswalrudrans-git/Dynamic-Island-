@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Island.App.Design;
+using Island.App.Features.Clipboard.Services;
 using Island.App.Features.Clipboard.ViewModels;
 using Island.App.Features.Clipboard.Views;
 using Island.Core.Clipboard;
@@ -389,7 +390,8 @@ public sealed class ClipboardAndScreenshotsTests : TestFolder
                 _ => { },
                 _ => { },
                 _ => { },
-                () => { });
+                () => { },
+                enableListener: false);
 
             string testDoc = Path.Combine(Folder, "project_spec.pdf");
             string testZip = Path.Combine(Folder, "build_assets.zip");
@@ -447,7 +449,8 @@ public sealed class ClipboardAndScreenshotsTests : TestFolder
                 _ => { },
                 _ => { },
                 _ => { },
-                () => { });
+                () => { },
+                enableListener: false);
             vmEmpty.ClearDroppedFiles();
 
             var pageEmpty = new ClipboardPage(vmEmpty, _ => { });
@@ -480,5 +483,220 @@ public sealed class ClipboardAndScreenshotsTests : TestFolder
         thread.Start();
         bool finished = thread.Join(TimeSpan.FromSeconds(30));
         Assert.True(finished, "RenderClipboardTabArtifacts timed out");
+    }
+
+    [Fact]
+    public void PureSizingFunctionAndZeroDriftTest()
+    {
+        var thread = new Thread(() =>
+        {
+            var app = Application.Current ?? new Application();
+            var tokensUri = new Uri("pack://application:,,,/Island.App;component/Design/DesignTokens.xaml");
+            if (!app.Resources.MergedDictionaries.Any(d => d.Source == tokensUri))
+            {
+                app.Resources.MergedDictionaries.Add(new ResourceDictionary { Source = tokensUri });
+            }
+            var catalog = new ThemeCatalog(Folder, _ => { });
+            var themeRes = new ThemeResources(app.Resources, catalog);
+            themeRes.Apply("Midnight", "Translucent");
+
+            var store = new ClipboardStore();
+            var settings = new AppSettings();
+            var vm = new ClipboardViewModel(
+                Dispatcher.CurrentDispatcher,
+                store,
+                new ScreenshotsStore(),
+                () => settings,
+                (_, _) => { },
+                _ => { },
+                _ => { },
+                _ => { },
+                () => { },
+                enableListener: false);
+
+            try
+            {
+                // 1) Pure sizing function: call 100 times with varying inputs and assert run 1 == run 100
+                var page = new ClipboardPage(vm, _ => { });
+                var sizes = new List<Size>();
+                for (int i = 0; i < 100; i++)
+                {
+                    if (i % 2 == 0)
+                    {
+                        store.AddText($"Sample text {i}", "App");
+                    }
+                    page.Measure(new Size(580, double.PositiveInfinity));
+                    sizes.Add(page.DesiredSize);
+                    Assert.Equal(580, page.DesiredSize.Width);
+                }
+
+                // Verify determinism: repeating the exact same state produces the exact same size
+                page.Measure(new Size(580, double.PositiveInfinity));
+                var finalSize1 = page.DesiredSize;
+                page.Measure(new Size(580, double.PositiveInfinity));
+                var finalSize2 = page.DesiredSize;
+                Assert.Equal(finalSize1.Width, finalSize2.Width);
+                Assert.Equal(finalSize1.Height, finalSize2.Height);
+
+                // 2) 200-cycle open/collapse repro loop with long items and dropped files: assert driftRow == null
+                store.ClearAll();
+                for (int i = 0; i < 10; i++)
+                {
+                    store.AddText(
+                        $"Cycle Item {i}: A very long line of copied text from a browser or code editor that spans across many columns without wrapping https://github.com/microsoft/terminal/issues/1234567890-{i}",
+                        "Brave");
+                }
+                vm.AddDroppedFiles(new[]
+                {
+                    @"C:\Extremely\Long\Path\To\Some\Deeply\Nested\File\On\Disk\With\Super\Long\Name\Report_2026_Q4_Final_Draft_v2.docx"
+                });
+
+                string? driftRow = null;
+                double baselineWidth = 0;
+
+                for (int cycle = 0; cycle < 200; cycle++)
+                {
+                    page.Measure(new Size(580, double.PositiveInfinity));
+                    page.Arrange(new Rect(0, 0, 580, page.DesiredSize.Height));
+                    page.UpdateLayout();
+
+                    double currentWidth = page.DesiredSize.Width;
+                    if (cycle == 0)
+                    {
+                        baselineWidth = currentWidth;
+                    }
+                    else if (Math.Abs(currentWidth - baselineWidth) > 0.01)
+                    {
+                        driftRow = $"[Cycle {cycle:D3}] Width drifted from {baselineWidth} to {currentWidth}";
+                        break;
+                    }
+                }
+
+                Assert.Null(driftRow);
+            }
+            finally
+            {
+                vm.Dispose();
+                Dispatcher.CurrentDispatcher.InvokeShutdown();
+            }
+        });
+
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+        bool finished = thread.Join(TimeSpan.FromSeconds(30));
+        Assert.True(finished, "PureSizingFunctionAndZeroDriftTest timed out");
+    }
+
+    [Fact]
+    public void RealClipboardCaptureTest()
+    {
+        var thread = new Thread(() =>
+        {
+            var app = Application.Current ?? new Application();
+            var store = new ClipboardStore();
+            var listener = new ClipboardListener(store, () => false, null);
+
+            void PumpMessages(int maxMs, Func<bool> condition)
+            {
+                var sw = System.Diagnostics.Stopwatch.StartNew();
+                while (sw.ElapsedMilliseconds < maxMs)
+                {
+                    if (condition()) return;
+                    var frame = new DispatcherFrame();
+                    Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, new DispatcherOperationCallback(f =>
+                    {
+                        ((DispatcherFrame)f).Continue = false;
+                        return null;
+                    }), frame);
+                    Dispatcher.PushFrame(frame);
+                    Thread.Sleep(20);
+                }
+            }
+
+            void SetClipboardSafe(object data)
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    try
+                    {
+                        Clipboard.SetDataObject(data, false);
+                        return;
+                    }
+                    catch (System.Runtime.InteropServices.COMException)
+                    {
+                        Thread.Sleep(30);
+                    }
+                }
+            }
+
+            void SetFileDropListSafe(System.Collections.Specialized.StringCollection list)
+            {
+                for (int i = 0; i < 6; i++)
+                {
+                    try
+                    {
+                        Clipboard.SetFileDropList(list);
+                        return;
+                    }
+                    catch (System.Runtime.InteropServices.COMException)
+                    {
+                        Thread.Sleep(30);
+                    }
+                }
+            }
+
+            try
+            {
+                // Capture 1: Unicode string
+                string testText = "Test Unicode String " + Guid.NewGuid();
+                SetClipboardSafe(new DataObject(DataFormats.UnicodeText, testText));
+                PumpMessages(500, () => store.GetItems().Any(x => x.Text == testText));
+                Assert.Contains(store.GetItems(), x => x.Text == testText);
+
+                // Capture 2: BitmapSource
+                var bmp = BitmapSource.Create(2, 2, 96, 96, PixelFormats.Bgr32, null, new byte[16], 8);
+                SetClipboardSafe(new DataObject(DataFormats.Bitmap, bmp));
+                PumpMessages(500, () => store.GetItems().Any(x => x.Type == ClipboardItemType.Image));
+                Assert.Contains(store.GetItems(), x => x.Type == ClipboardItemType.Image);
+
+                // Capture 3: File drop list
+                string tempFile = Path.Combine(Path.GetTempPath(), "island_test_" + Guid.NewGuid().ToString("N") + ".txt");
+                try
+                {
+                    File.WriteAllText(tempFile, "temp content");
+                    var sc = new System.Collections.Specialized.StringCollection { tempFile };
+                    SetFileDropListSafe(sc);
+                    PumpMessages(500, () => store.GetItems().Any(x => x.Type == ClipboardItemType.Files));
+                    Assert.Contains(store.GetItems(), x => x.Type == ClipboardItemType.Files);
+                }
+                finally
+                {
+                    if (File.Exists(tempFile))
+                    {
+                        try { File.Delete(tempFile); } catch { }
+                    }
+                }
+
+                // Capture 4: CanIncludeInClipboardHistory = 0 should NOT be captured
+                string secretText = "SecretPassword_" + Guid.NewGuid().ToString("N");
+                var secretData = new DataObject();
+                secretData.SetData(DataFormats.UnicodeText, secretText);
+                secretData.SetData("CanIncludeInClipboardHistory", new MemoryStream(new byte[4] { 0, 0, 0, 0 }));
+                SetClipboardSafe(secretData);
+                PumpMessages(500, () => false); // wait full 500 ms
+                Assert.DoesNotContain(store.GetItems(), x => x.Text == secretText);
+            }
+            finally
+            {
+                try { Clipboard.Clear(); } catch { }
+                listener.Dispose();
+                Dispatcher.CurrentDispatcher.InvokeShutdown();
+            }
+        });
+
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+        bool finished = thread.Join(TimeSpan.FromSeconds(30));
+        Assert.True(finished, "RealClipboardCaptureTest timed out");
     }
 }

@@ -336,7 +336,7 @@ internal sealed class PanelNavigation
             3 => Math.Max(desiredContentW, 620), // Quick Controls
             4 => Math.Max(desiredContentW, 580), // Focus
             5 => Math.Max(desiredContentW, 680), // Calendar & Weather
-            6 => Math.Max(desiredContentW, 680), // Clipboard & Screenshots dual-half
+            6 => 580, // Clipboard & Screenshots dual-half (fixed 580 DIP content, 640 DIP island)
             _ => Math.Max(desiredContentW, 580)
         };
 

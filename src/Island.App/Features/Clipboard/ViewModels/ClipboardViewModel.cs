@@ -8,6 +8,7 @@ using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using Island.App.Features.Clipboard.Services;
 using Island.Core.Clipboard;
 using Island.Core.Screenshots;
 using Island.Core.Settings;
@@ -253,7 +254,7 @@ public sealed class ClipboardRowViewModel : INotifyPropertyChanged
     }
 }
 
-public sealed class ClipboardViewModel : INotifyPropertyChanged
+public sealed class ClipboardViewModel : INotifyPropertyChanged, IDisposable
 {
     private readonly ObservableCollection<DroppedFileItem> droppedFiles = [];
     private readonly Dispatcher dispatcher;
@@ -265,6 +266,7 @@ public sealed class ClipboardViewModel : INotifyPropertyChanged
     private readonly Action<ScreenshotItem> pasteScreenshotHandler;
     private readonly Action<ScreenshotItem> copyScreenshotHandler;
     private readonly Action snipHandler;
+    private readonly ClipboardListener? listener;
 
     private bool showFavoritesOnly;
     private bool isSearchOpen;
@@ -281,7 +283,8 @@ public sealed class ClipboardViewModel : INotifyPropertyChanged
         Action<ClipboardItem> copyClipboardHandler,
         Action<ScreenshotItem> pasteScreenshotHandler,
         Action<ScreenshotItem> copyScreenshotHandler,
-        Action snipHandler)
+        Action snipHandler,
+        bool enableListener = true)
     {
         this.dispatcher = dispatcher;
         this.clipboardStore = clipboardStore;
@@ -295,6 +298,15 @@ public sealed class ClipboardViewModel : INotifyPropertyChanged
 
         clipboardStore.HistoryChanged += OnHistoryChanged;
         screenshotsStore.HistoryChanged += OnHistoryChanged;
+
+        if (enableListener)
+        {
+            try
+            {
+                listener = new ClipboardListener(clipboardStore, () => IsPaused, _ => dispatcher.InvokeAsync(Refresh));
+            }
+            catch { }
+        }
     }
 
     public bool ShowFavoritesOnly
@@ -463,6 +475,7 @@ public sealed class ClipboardViewModel : INotifyPropertyChanged
 
     public void CopyRow(ClipboardRowViewModel row)
     {
+        ClipboardListener.IgnoreCurrentOrNextSequence();
         if (row.ClipboardItem != null)
         {
             copyClipboardHandler(row.ClipboardItem);
@@ -475,6 +488,7 @@ public sealed class ClipboardViewModel : INotifyPropertyChanged
 
     public void PasteRow(ClipboardRowViewModel row, bool plainText = false)
     {
+        ClipboardListener.IgnoreCurrentOrNextSequence();
         if (row.ClipboardItem != null)
         {
             pasteClipboardHandler(row.ClipboardItem, plainText);
@@ -563,6 +577,11 @@ public sealed class ClipboardViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(IsPaused));
         OnPropertyChanged(nameof(PauseStatusText));
         OnPropertyChanged(nameof(PauseGlyph));
+    }
+
+    public void Dispose()
+    {
+        listener?.Dispose();
     }
 
     private void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
