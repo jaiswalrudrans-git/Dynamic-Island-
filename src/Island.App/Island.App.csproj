@@ -15,4 +15,9 @@
     <PackageReference Include="System.Management" Version="8.0.0" />
     <ProjectReference Include="../Island.Core/Island.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Island.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>
