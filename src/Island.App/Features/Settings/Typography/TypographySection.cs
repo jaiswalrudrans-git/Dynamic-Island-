@@ -54,7 +54,7 @@ public partial class MotionSettingsWindow
             var pBody = new TextBlock
             {
                 Text = "Now Playing",
-                FontFamily = preset.Body,
+                FontFamily = preset.Heading,
                 FontSize = 10,
                 Foreground = (Brush)FindResource("Theme.TextSecondary"),
                 HorizontalAlignment = HorizontalAlignment.Center
@@ -62,6 +62,7 @@ public partial class MotionSettingsWindow
             var pName = new TextBlock
             {
                 Text = preset.DisplayName,
+                FontFamily = TypographyResources.SegoeTextFamily,
                 FontSize = 9.5,
                 FontWeight = FontWeights.SemiBold,
                 Foreground = (Brush)FindResource("Theme.TextTertiary"),

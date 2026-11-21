@@ -198,7 +198,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="{Binding Elapsed}" VerticalAlignment="Center" FontFamily="{DynamicResource Typography.Family.Numeric}" FontSize="{DynamicResource Font.Label}"
+                <TextBlock Text="{Binding Elapsed}" VerticalAlignment="Center" FontFamily="{DynamicResource Typography.Family.Body}" FontSize="{DynamicResource Font.Label}"
                            Foreground="{DynamicResource Theme.TextTertiary}" Typography.NumeralAlignment="Tabular"/>
                 <Slider x:Name="Seek" Grid.Column="1" Minimum="0" Maximum="1" Margin="10,0"
                         Value="{Binding Fraction, Mode=OneWay}" IsEnabled="{Binding CanSeek}"
@@ -230,7 +230,7 @@
                         </ControlTemplate>
                     </Slider.Template>
                 </Slider>
-                <TextBlock Grid.Column="2" Text="{Binding Duration}" VerticalAlignment="Center" FontFamily="{DynamicResource Typography.Family.Numeric}" FontSize="{DynamicResource Font.Label}"
+                <TextBlock Grid.Column="2" Text="{Binding Duration}" VerticalAlignment="Center" FontFamily="{DynamicResource Typography.Family.Body}" FontSize="{DynamicResource Font.Label}"
                            Foreground="{DynamicResource Theme.TextTertiary}" Typography.NumeralAlignment="Tabular"/>
             </Grid>
 

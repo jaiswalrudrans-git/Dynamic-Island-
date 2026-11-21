@@ -292,7 +292,7 @@
                                        FontSize="30" Foreground="{DynamicResource Theme.Accent}" VerticalAlignment="Center" Margin="0,0,10,0"/>
                             <TextBlock Text="{Binding CurrentTemp}" FontSize="28" FontWeight="Bold"
                                        Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"
-                                       FontFamily="{StaticResource Font.FamilyDisplay}" Typography.NumeralAlignment="Tabular"/>
+                                       FontFamily="{DynamicResource Typography.Family.Display}" Typography.NumeralAlignment="Tabular"/>
                         </StackPanel>
 
                         <!-- Condition TEXT right next to the icon + High/Low & Metrics -->

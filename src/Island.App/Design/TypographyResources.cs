@@ -1,14 +1,24 @@
-using System.Globalization;
+using System;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
+using Island.App.Design.Typography;
 using Island.Core.Settings;
 
 namespace Island.App.Design;
 
 public sealed class TypographyResources(ResourceDictionary applicationResources)
 {
-    private const string BaseFontUri = "pack://application:,,,/Island.App;component/Assets/Fonts/#";
+    private static readonly Uri FontBaseUri;
+
+    static TypographyResources()
+    {
+        EnsurePackSchemeRegistered();
+        FontBaseUri = new Uri("pack://application:,,,/Island.App;component/Assets/Fonts/");
+    }
 
     public static void EnsurePackSchemeRegistered()
     {
@@ -16,15 +26,24 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
         {
             _ = System.IO.Packaging.PackUriHelper.UriSchemePack;
         }
+
+        try
+        {
+            if (Application.Current != null && Application.ResourceAssembly == null)
+            {
+                Application.ResourceAssembly = typeof(TypographyResources).Assembly;
+            }
+        }
+        catch
+        {
+            // Ignore in test or detached runner contexts
+        }
     }
 
-    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, bool> CoverageCache = new(StringComparer.OrdinalIgnoreCase);
-
-    private static FontFamily CreateFamily(string fontName)
+    public static FontFamily CreateFamily(string fontName)
     {
         EnsurePackSchemeRegistered();
-        string packUri = $"pack://application:,,,/Island.App;component/Assets/Fonts/#{fontName}";
-        return new FontFamily($"{packUri}, Segoe UI Variable Text, Segoe UI, Segoe UI Symbol, Segoe UI Emoji, Arial");
+        return new FontFamily(FontBaseUri, $"./#{fontName}, Segoe UI Variable Display, Segoe UI, Segoe UI Symbol, Segoe UI Emoji, Arial");
     }
 
     // Embedded Font Families with Safe System Fallbacks ending in Segoe UI Variable, Symbol & Arial
@@ -46,55 +65,130 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
     public static readonly FontFamily OrbitronFamily = CreateFamily("Orbitron");
     public static readonly FontFamily UnboundedFamily = CreateFamily("Unbounded");
 
-    public record PresetDefinition(
-        string Id,
-        string DisplayName,
-        string Description,
-        FontFamily Display,
-        FontFamily Heading,
-        FontFamily Body,
-        FontFamily Label,
-        FontFamily Numeric,
-        bool HasGlow = false
-    );
-
-    public static readonly PresetDefinition[] Presets =
+    // The 12 Restored Typography Presets with Exact Zone Map Pairings
+    public static readonly TypographyPreset[] Presets =
     [
-        new("Classic", "Classic", "Segoe UI Variable system typography",
-            SegoeFamily, SegoeTextFamily, SegoeTextFamily, SegoeTextFamily, SegoeTextFamily),
+        // 1. Classic: Segoe UI Variable for all roles.
+        new("Classic", "Classic", "Segoe UI Variable for all roles",
+            Display: SegoeFamily,
+            Heading: SegoeTextFamily,
+            Numeric: SegoeTextFamily,
+            Body: SegoeTextFamily,
+            Label: SegoeTextFamily,
+            UI: SegoeTextFamily,
+            Companion: SegoeTextFamily),
 
-        new("Dot Matrix", "Dot Matrix", "Doto matrix numerals paired with Space Grotesk",
-            DotoFamily, SpaceGroteskFamily, InterFamily, InterFamily, DotoFamily),
+        // 2. Dot Matrix: Display/Heading/Numeric = Doto; companion Geist or Inter.
+        new("Dot Matrix", "Dot Matrix", "Doto dot-matrix numerals and headings with Inter companion",
+            Display: DotoFamily,
+            Heading: DotoFamily,
+            Numeric: DotoFamily,
+            Body: SegoeTextFamily,
+            Label: SegoeTextFamily,
+            UI: SegoeTextFamily,
+            Companion: InterFamily),
 
-        new("LED", "LED Segment", "Share Tech Mono digital italic feel",
-            ShareTechMonoFamily, ShareTechMonoFamily, InterFamily, ShareTechMonoFamily, ShareTechMonoFamily),
+        // 3. LED Segment: Display/Numeric = DSEG14 Classic Italic (Share Tech Mono); Heading = Share Tech Mono; companion Inter.
+        new("LED", "LED Segment", "Share Tech Mono digital italic numerals with Inter companion",
+            Display: ShareTechMonoFamily,
+            Heading: ShareTechMonoFamily,
+            Numeric: ShareTechMonoFamily,
+            Body: SegoeTextFamily,
+            Label: SegoeTextFamily,
+            UI: SegoeTextFamily,
+            Companion: InterFamily),
 
-        new("Neon Techno", "Neon Techno", "Orbitron sci-fi glow with Rajdhani headings",
-            OrbitronFamily, RajdhaniFamily, RajdhaniFamily, RajdhaniFamily, OrbitronFamily, HasGlow: true),
+        // 4. Neon Techno: Display/Numeric = Orbitron (or Audiowide); Heading = Rajdhani; companion Rajdhani.
+        new("Neon Techno", "Neon Techno", "Orbitron sci-fi display and numeric glow with Rajdhani headings",
+            Display: OrbitronFamily,
+            Heading: RajdhaniFamily,
+            Numeric: OrbitronFamily,
+            Body: SegoeTextFamily,
+            Label: SegoeTextFamily,
+            UI: SegoeTextFamily,
+            Companion: RajdhaniFamily,
+            HasGlow: true),
 
-        new("Editorial Serif", "Editorial Serif", "Instrument Serif with clean tabular Inter",
-            InstrumentSerifFamily, InterFamily, InterFamily, InterFamily, InterFamily),
+        // 5. Editorial Serif: Display/Heading = Playfair Display (Instrument Serif); Numeric = Inter tabular; companion Inter.
+        new("Editorial Serif", "Editorial Serif", "Instrument Serif display with clean tabular Inter",
+            Display: InstrumentSerifFamily,
+            Heading: InstrumentSerifFamily,
+            Numeric: InterFamily,
+            Body: SegoeTextFamily,
+            Label: SegoeTextFamily,
+            UI: SegoeTextFamily,
+            Companion: InterFamily),
 
-        new("Wide Futuristic", "Wide Futuristic", "Unbounded geometric wide display with Chakra Petch",
-            UnboundedFamily, ChakraPetchFamily, ChakraPetchFamily, ChakraPetchFamily, ChakraPetchFamily),
+        // 6. Wide Futuristic: Display/Heading = Syncopate (Unbounded); Numeric = Chakra Petch; companion Chakra Petch.
+        new("Wide Futuristic", "Wide Futuristic", "Unbounded wide display with Chakra Petch",
+            Display: UnboundedFamily,
+            Heading: UnboundedFamily,
+            Numeric: ChakraPetchFamily,
+            Body: SegoeTextFamily,
+            Label: SegoeTextFamily,
+            UI: SegoeTextFamily,
+            Companion: ChakraPetchFamily),
 
+        // 7. Condensed Impact: Display/Heading = Bebas Neue; Numeric = Barlow Condensed; companion Barlow Condensed.
         new("Condensed Impact", "Condensed Impact", "Bebas Neue display with Barlow Condensed",
-            BebasNeueFamily, BarlowCondensedFamily, BarlowCondensedFamily, BarlowCondensedFamily, BarlowCondensedFamily),
+            Display: BebasNeueFamily,
+            Heading: BebasNeueFamily,
+            Numeric: BarlowCondensedFamily,
+            Body: SegoeTextFamily,
+            Label: SegoeTextFamily,
+            UI: SegoeTextFamily,
+            Companion: BarlowCondensedFamily),
 
-        new("Pixel Arcade", "Pixel Arcade", "Silkscreen retro pixel display with Space Grotesk",
-            SilkscreenFamily, SpaceGroteskFamily, InterFamily, InterFamily, ShareTechMonoFamily),
+        // 8. Pixel Arcade: Display/Heading = Silkscreen; Numeric = Space Mono (Share Tech Mono); companion Space Mono.
+        new("Pixel Arcade", "Pixel Arcade", "Silkscreen retro pixel display with Share Tech Mono numerals",
+            Display: SilkscreenFamily,
+            Heading: SilkscreenFamily,
+            Numeric: ShareTechMonoFamily,
+            Body: SegoeTextFamily,
+            Label: SegoeTextFamily,
+            UI: SegoeTextFamily,
+            Companion: ShareTechMonoFamily),
 
-        new("Terminal Mono", "Terminal Mono", "JetBrains Mono monospace throughout",
-            JetBrainsMonoFamily, JetBrainsMonoFamily, JetBrainsMonoFamily, JetBrainsMonoFamily, JetBrainsMonoFamily),
+        // 9. Terminal Mono: JetBrains Mono for the three fancy roles; companion JetBrains Mono.
+        new("Terminal Mono", "Terminal Mono", "JetBrains Mono monospace typography throughout",
+            Display: JetBrainsMonoFamily,
+            Heading: JetBrainsMonoFamily,
+            Numeric: JetBrainsMonoFamily,
+            Body: SegoeTextFamily,
+            Label: SegoeTextFamily,
+            UI: SegoeTextFamily,
+            Companion: JetBrainsMonoFamily),
 
-        new("Rounded Soft", "Rounded Soft", "Fredoka rounded friendly curves with Inter",
-            FredokaFamily, FredokaFamily, InterFamily, InterFamily, FredokaFamily),
+        // 10. Rounded Soft: Nunito (Fredoka) for the three fancy roles; companion Nunito.
+        new("Rounded Soft", "Rounded Soft", "Fredoka rounded curves for fancy roles with Inter",
+            Display: FredokaFamily,
+            Heading: FredokaFamily,
+            Numeric: FredokaFamily,
+            Body: SegoeTextFamily,
+            Label: SegoeTextFamily,
+            UI: SegoeTextFamily,
+            Companion: FredokaFamily),
 
-        new("Handwritten Accent", "Handwritten Accent", "Caveat handwritten display with clean body text",
-            CaveatFamily, SpaceGroteskFamily, InterFamily, InterFamily, InterFamily),
+        // 11. Handwritten Accent: Caveat for Display only; Heading and Numeric = Segoe UI Variable Semibold.
+        new("Handwritten Accent", "Handwritten Accent", "Caveat handwritten display with Segoe UI Variable",
+            Display: CaveatFamily,
+            Heading: SegoeTextFamily,
+            Numeric: SegoeTextFamily,
+            Body: SegoeTextFamily,
+            Label: SegoeTextFamily,
+            UI: SegoeTextFamily,
+            Companion: SegoeTextFamily),
 
-        new("Retro Wave", "Retro Wave", "Orbitron with Rajdhani retro-synth typography",
-            OrbitronFamily, RajdhaniFamily, RajdhaniFamily, RajdhaniFamily, RajdhaniFamily, HasGlow: true)
+        // 12. Retro Wave: Audiowide (Rajdhani) for Display/Heading; Numeric = Rajdhani; companion Rajdhani.
+        new("Retro Wave", "Retro Wave", "Rajdhani retro-synth typography with subtle glow",
+            Display: RajdhaniFamily,
+            Heading: RajdhaniFamily,
+            Numeric: RajdhaniFamily,
+            Body: SegoeTextFamily,
+            Label: SegoeTextFamily,
+            UI: SegoeTextFamily,
+            Companion: RajdhaniFamily,
+            HasGlow: true)
     ];
 
     private ResourceDictionary? active;
@@ -107,7 +201,7 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
 
     public void Apply(AppSettings settings, Color? clockResolvedColor = null)
     {
-        PresetDefinition preset;
+        TypographyPreset preset;
 
         if (settings.MatchTypographyToClock)
         {
@@ -120,26 +214,24 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
         }
 
         double scale = Math.Clamp(settings.TypographySizeScale, 0.9, 1.3);
-        bool guard = settings.LegibilityGuard;
 
-        // Resolve 5 roles with Legibility Guard & glyph coverage verification
-        FontFamily display = ResolveFamily(settings.FontFamilyDisplay, preset.Display);
-        FontFamily heading = ResolveFamily(settings.FontFamilyHeading, preset.Heading);
-        FontFamily body = ResolveFamily(settings.FontFamilyBody, preset.Body);
-        FontFamily label = ResolveFamily(settings.FontFamilyLabel, preset.Label);
-        FontFamily numeric = ResolveFamily(settings.FontFamilyNumeric, preset.Numeric);
+        // Resolve 3 fancy roles (overridable in settings) + 3 default roles (ALWAYS Segoe UI Variable)
+        FontFamily display = ResolveCustomFamily(settings.FontFamilyDisplay, preset.Display);
+        FontFamily heading = ResolveCustomFamily(settings.FontFamilyHeading, preset.Heading);
+        FontFamily numeric = ResolveCustomFamily(settings.FontFamilyNumeric, preset.Numeric);
+        FontFamily body = SegoeTextFamily;
+        FontFamily label = SegoeTextFamily;
+        FontFamily ui = SegoeTextFamily;
 
-        // Tab labels, counts, buttons, tooltips and settings text must NEVER use a decorative font
-        if (IsDecorative(heading) || !HasGeneralTextCoverage(heading)) heading = InterFamily;
-        if (IsDecorative(body) || !HasGeneralTextCoverage(body)) body = InterFamily;
-        if (IsDecorative(label) || !HasGeneralTextCoverage(label)) label = InterFamily;
-
-        if (guard)
+        // Startup/debug diagnosis log on change
+        if (!string.Equals(lastPreset, preset.Id, StringComparison.OrdinalIgnoreCase))
         {
-            // Small numerals below 16px must use clean companion font with tabular figures
-            if (IsDecorative(numeric) && (17.0 * scale) < 16.0) numeric = InterFamily;
-            // Display below 18px threshold must fall back to companion font
-            if (IsDecorative(display) && (20.0 * scale) < 18.0) display = InterFamily;
+            try
+            {
+                string report = TypographyResolver.GenerateDiagnosticReport(preset, Presets);
+                Debug.WriteLine(report);
+            }
+            catch { }
         }
 
         // Font Weights
@@ -174,6 +266,7 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
             ["Typography.Family.Body"] = body,
             ["Typography.Family.Label"] = label,
             ["Typography.Family.Numeric"] = numeric,
+            ["Typography.Family.UI"] = ui,
 
             // Legacy & Direct Aliases
             ["Font.FamilyDisplay"] = display,
@@ -244,36 +337,40 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
         lastClockColor = settings.ClockColor;
     }
 
-    private static PresetDefinition ResolveClockPreset(string clockStyle) => clockStyle switch
+    public static TypographyPreset ResolveClockPreset(string clockStyle) => clockStyle switch
     {
         "Stacked" => new("Stacked", "Stacked Grotesk", "Space Grotesk with Inter",
-            SpaceGroteskFamily, SpaceGroteskFamily, InterFamily, InterFamily, SpaceGroteskFamily),
+            Display: SpaceGroteskFamily,
+            Heading: SpaceGroteskFamily,
+            Numeric: SpaceGroteskFamily,
+            Body: SegoeTextFamily,
+            Label: SegoeTextFamily,
+            UI: SegoeTextFamily,
+            Companion: InterFamily),
 
         "DotMatrix" => Presets.First(p => p.Id == "Dot Matrix"),
-
         "Segment" => Presets.First(p => p.Id == "LED"),
-
         "Neon" => Presets.First(p => p.Id == "Neon Techno"),
-
         "Serif" => Presets.First(p => p.Id == "Editorial Serif"),
-
         "Wide" => Presets.First(p => p.Id == "Wide Futuristic"),
-
         "Condensed" => Presets.First(p => p.Id == "Condensed Impact"),
-
         "Pixel" => Presets.First(p => p.Id == "Pixel Arcade"),
-
         "Compact" => Presets.First(p => p.Id == "Rounded Soft"),
-
         "Terminal" => Presets.First(p => p.Id == "Terminal Mono"),
 
         "Gradient" or "Outline" => new("Gradient", "Modern Outline", "Space Grotesk Display with Inter",
-            SpaceGroteskFamily, SpaceGroteskFamily, InterFamily, InterFamily, SpaceGroteskFamily),
+            Display: SpaceGroteskFamily,
+            Heading: SpaceGroteskFamily,
+            Numeric: SpaceGroteskFamily,
+            Body: SegoeTextFamily,
+            Label: SegoeTextFamily,
+            UI: SegoeTextFamily,
+            Companion: InterFamily),
 
-        _ => Presets.First(p => p.Id == "Classic") // Simple / WithDate / Default
+        _ => Presets.First(p => p.Id == "Classic")
     };
 
-    private static FontFamily ResolveFamily(string? custom, FontFamily fallback)
+    private static FontFamily ResolveCustomFamily(string? custom, FontFamily fallback)
     {
         if (string.IsNullOrWhiteSpace(custom)) return fallback;
         try { return new FontFamily(custom); }
@@ -282,48 +379,16 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
 
     public static bool HasGeneralTextCoverage(FontFamily family)
     {
-        string key = family.Source ?? "";
-        if (CoverageCache.TryGetValue(key, out bool cached)) return cached;
-
-        bool covered = CheckCoverage(family, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,:;!?'\"-()");
-        CoverageCache[key] = covered;
-        return covered;
+        return TypographyResolver.CheckCoverage(family, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789.,:;!?'\"-()");
     }
 
     public static bool CheckCoverage(FontFamily family, string requiredChars)
     {
-        try
-        {
-            var typeface = new Typeface(family, FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
-            if (typeface.TryGetGlyphTypeface(out var glyphTypeface))
-            {
-                var map = glyphTypeface.CharacterToGlyphMap;
-                foreach (char c in requiredChars)
-                {
-                    if (!map.ContainsKey(c)) return false;
-                }
-                return true;
-            }
-        }
-        catch
-        {
-            // If typeface lookup fails, safe fallback
-        }
-        return false;
+        return TypographyResolver.CheckCoverage(family, requiredChars);
     }
 
     public static bool IsDecorative(FontFamily family)
     {
-        string source = family.Source ?? "";
-        return source.Contains("Doto", StringComparison.OrdinalIgnoreCase) ||
-               source.Contains("Silkscreen", StringComparison.OrdinalIgnoreCase) ||
-               source.Contains("Bebas", StringComparison.OrdinalIgnoreCase) ||
-               source.Contains("Caveat", StringComparison.OrdinalIgnoreCase) ||
-               source.Contains("Audiowide", StringComparison.OrdinalIgnoreCase) ||
-               source.Contains("Syncopate", StringComparison.OrdinalIgnoreCase) ||
-               source.Contains("Michroma", StringComparison.OrdinalIgnoreCase) ||
-               source.Contains("DotGothic", StringComparison.OrdinalIgnoreCase) ||
-               source.Contains("DSEG", StringComparison.OrdinalIgnoreCase) ||
-               source.Contains("Pixelify", StringComparison.OrdinalIgnoreCase);
+        return TypographyResolver.IsDecorative(family);
     }
 }

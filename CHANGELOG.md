@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed tofu boxes on buttons and labels by explicitly assigning Body typography and icon fonts.
 
 ### Fixed
+- Repaired typography preset pairings by fixing WPF pack font loading with base URI resolution.
+- Enforced strict zone map separating fancy zones from default Segoe UI Variable controls and labels.
 - Fixed clipboard capture with dedicated HWND listener, background retries, and format exclusion validation.
 - Fixed island sizing drift by constraining Clipboard page width to 580 DIP and setting fixed navigation width floor.
 - Fixed volume and brightness sliders with click-to-position, pointer capture, and smooth dragging.

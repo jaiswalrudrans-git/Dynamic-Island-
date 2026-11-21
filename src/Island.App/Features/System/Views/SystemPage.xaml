@@ -138,7 +138,7 @@
                     <TextBlock Text="In Use" FontFamily="{DynamicResource Typography.Family.Label}"
                                FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
                     <TextBlock Grid.Column="1" Text="{Binding RamText}"
-                               FontFamily="{DynamicResource Typography.Family.Numeric}"
+                               FontFamily="{DynamicResource Typography.Family.Body}"
                                FontSize="{DynamicResource Typography.Size.Label}"
                                Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
                 </Grid>
@@ -192,7 +192,7 @@
                     <TextBlock Text="VRAM" FontFamily="{DynamicResource Typography.Family.Label}"
                                FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"/>
                     <TextBlock Grid.Column="1" Text="{Binding VramText}"
-                               FontFamily="{DynamicResource Typography.Family.Numeric}"
+                               FontFamily="{DynamicResource Typography.Family.Body}"
                                FontSize="{DynamicResource Typography.Size.Label}"
                                Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
                 </Grid>
@@ -386,7 +386,7 @@
                                                FontSize="{DynamicResource Typography.Size.Secondary}" Foreground="{DynamicResource Theme.TextPrimary}"
                                                VerticalAlignment="Center"/>
                                     <TextBlock Grid.Column="3" Text="{Binding MetricText}"
-                                               FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                               FontFamily="{DynamicResource Typography.Family.Body}"
                                                FontSize="{DynamicResource Typography.Size.Secondary}"
                                                FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextSecondary}"
                                                VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>

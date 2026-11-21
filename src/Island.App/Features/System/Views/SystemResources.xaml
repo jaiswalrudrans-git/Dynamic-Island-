@@ -49,11 +49,11 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Name}"
-                           FontFamily="{DynamicResource Typography.Family.Heading}"
+                           FontFamily="{DynamicResource Typography.Family.Body}"
                            FontSize="{DynamicResource Typography.Size.Label}" FontWeight="SemiBold"
                            Foreground="{DynamicResource Theme.TextSecondary}"/>
                 <TextBlock Grid.Column="1" Text="{Binding UsageText}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Tooltip}"
-                           FontFamily="{DynamicResource Typography.Family.Numeric}"
+                           FontFamily="{DynamicResource Typography.Family.Body}"
                            FontSize="{DynamicResource Typography.Size.Label}"
                            Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
             </Grid>
