@@ -73,7 +73,7 @@ public sealed record AppSettings
     // Tab Bar Below Clock & Tab Customization (M-Header-Clipboard-Screenshots)
     public string TabBarPosition { get; init; } = "BelowClock"; // "BelowClock", "LeftOfClock"
     public string TabLabelMode { get; init; } = "SelectedOnly"; // "SelectedOnly", "All", "None"
-    public IReadOnlyList<string> TabOrder { get; init; } = ["music", "system", "tasks", "controls", "focus", "calendar", "clipboard", "screenshots"];
+    public IReadOnlyList<string> TabOrder { get; init; } = ["music", "system", "tasks", "controls", "focus", "calendar", "clipboard"];
     public IReadOnlyList<string> HiddenTabs { get; init; } = [];
     public bool TabSwitchOnHover { get; init; } = false;
     public bool HeaderMouseWheelTabSwitch { get; init; } = true;
@@ -131,8 +131,14 @@ public sealed record AppSettings
         TypographyGlowStrength = double.IsFinite(TypographyGlowStrength) ? Math.Clamp(TypographyGlowStrength, 0.0, 1.0) : 0.5,
         TabBarPosition = TabBarPosition is "LeftOfClock" ? "LeftOfClock" : "BelowClock",
         TabLabelMode = TabLabelMode is "All" or "None" ? TabLabelMode : "SelectedOnly",
-        TabOrder = TabOrder ?? ["music", "system", "tasks", "controls", "focus", "calendar", "clipboard", "screenshots"],
-        HiddenTabs = HiddenTabs ?? [],
+        TabOrder = (TabOrder ?? ["music", "system", "tasks", "controls", "focus", "calendar", "clipboard"])
+            .Where(t => !string.Equals(t, "screenshots", StringComparison.OrdinalIgnoreCase))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList(),
+        HiddenTabs = (HiddenTabs ?? [])
+            .Where(t => !string.Equals(t, "screenshots", StringComparison.OrdinalIgnoreCase))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList(),
         ClipboardHistorySize = Math.Clamp(ClipboardHistorySize, 10, 200),
         ClipboardAutoExpireHours = Math.Clamp(ClipboardAutoExpireHours, 1, 168),
         ClipboardIgnoredApps = ClipboardIgnoredApps ?? ["1password", "bitwarden", "keepass", "keepassxc", "lastpass", "dashlane", "credentialuibroker", "consent"],

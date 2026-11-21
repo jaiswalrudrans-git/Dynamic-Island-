@@ -37,7 +37,6 @@ internal sealed class PanelNavigation
     public bool FocusSelected => selected == 4;
     public bool CalendarSelected => selected == 5;
     public bool ClipboardSelected => selected == 6;
-    public bool ScreenshotsSelected => selected == 7;
     public event Action? SelectionChanged;
 
     public PanelNavigation(StackPanel bar, Grid host, Border? pillBorder, TranslateTransform indicator, Style style,
@@ -45,8 +44,7 @@ internal sealed class PanelNavigation
         MusicPage musicPage, SystemPage systemPage,
         TasksPage tasksPage, QuickControlsPage quickControlsPage, FocusPage focusPage,
         CalendarWeatherPage calendarWeatherPage,
-        ClipboardPage clipboardPage,
-        ScreenshotsPage screenshotsPage)
+        ClipboardPage clipboardPage)
     {
         this.bar = bar;
         this.pillBorder = pillBorder;
@@ -142,7 +140,6 @@ internal sealed class PanelNavigation
                 4 => focusPage,
                 5 => calendarWeatherPage,
                 6 => clipboardPage,
-                7 => screenshotsPage,
                 _ => CreatePage(tab)
             };
             page.RenderTransform = new TranslateTransform();
@@ -355,8 +352,7 @@ internal sealed class PanelNavigation
             3 => Math.Max(desiredContentW, 620), // Quick Controls
             4 => Math.Max(desiredContentW, 580), // Focus
             5 => Math.Max(desiredContentW, 680), // Calendar & Weather
-            6 => Math.Max(desiredContentW, 580), // Clipboard
-            7 => Math.Max(desiredContentW, 600), // Screenshots
+            6 => Math.Max(desiredContentW, 680), // Clipboard & Screenshots dual-half
             _ => Math.Max(desiredContentW, 580)
         };
 
@@ -379,8 +375,7 @@ internal sealed class PanelNavigation
             3 => Math.Max(desiredContentH, 260), // Quick Controls
             4 => Math.Max(desiredContentH, 320), // Focus (spacious ring + controls)
             5 => Math.Max(desiredContentH, 340), // Calendar & Weather
-            6 => Math.Max(desiredContentH, 300), // Clipboard
-            7 => Math.Max(desiredContentH, 280), // Screenshots
+            6 => Math.Max(desiredContentH, 280), // Clipboard & Screenshots dual-half
             _ => Math.Max(desiredContentH, 180)
         };
 

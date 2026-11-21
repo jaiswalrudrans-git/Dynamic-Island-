@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Windows.Threading;
 using Island.Core.Clipboard;
+using Island.Core.Screenshots;
 using Island.Core.Settings;
 
 namespace Island.App.ViewModels;
@@ -55,28 +57,41 @@ public sealed class ClipboardItemViewModel
 public sealed class ClipboardViewModel : INotifyPropertyChanged
 {
     private readonly Dispatcher dispatcher;
-    private readonly ClipboardStore store;
+    private readonly ClipboardStore clipboardStore;
+    private readonly ScreenshotsStore screenshotsStore;
     private readonly Func<AppSettings> settings;
-    private readonly Action<ClipboardItem, bool> pasteHandler;
-    private readonly Action<ClipboardItem> copyHandler;
+    private readonly Action<ClipboardItem, bool> pasteClipboardHandler;
+    private readonly Action<ClipboardItem> copyClipboardHandler;
+    private readonly Action<ScreenshotItem> pasteScreenshotHandler;
+    private readonly Action<ScreenshotItem> copyScreenshotHandler;
+    private readonly Action snipHandler;
     private string searchQuery = "";
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public ClipboardViewModel(
         Dispatcher dispatcher,
-        ClipboardStore store,
+        ClipboardStore clipboardStore,
+        ScreenshotsStore screenshotsStore,
         Func<AppSettings> settings,
-        Action<ClipboardItem, bool> pasteHandler,
-        Action<ClipboardItem> copyHandler)
+        Action<ClipboardItem, bool> pasteClipboardHandler,
+        Action<ClipboardItem> copyClipboardHandler,
+        Action<ScreenshotItem> pasteScreenshotHandler,
+        Action<ScreenshotItem> copyScreenshotHandler,
+        Action snipHandler)
     {
         this.dispatcher = dispatcher;
-        this.store = store;
+        this.clipboardStore = clipboardStore;
+        this.screenshotsStore = screenshotsStore;
         this.settings = settings;
-        this.pasteHandler = pasteHandler;
-        this.copyHandler = copyHandler;
+        this.pasteClipboardHandler = pasteClipboardHandler;
+        this.copyClipboardHandler = copyClipboardHandler;
+        this.pasteScreenshotHandler = pasteScreenshotHandler;
+        this.copyScreenshotHandler = copyScreenshotHandler;
+        this.snipHandler = snipHandler;
 
-        store.HistoryChanged += OnHistoryChanged;
+        clipboardStore.HistoryChanged += OnHistoryChanged;
+        screenshotsStore.HistoryChanged += OnHistoryChanged;
     }
 
     public string SearchQuery
@@ -87,32 +102,42 @@ public sealed class ClipboardViewModel : INotifyPropertyChanged
             if (searchQuery == value) return;
             searchQuery = value;
             OnPropertyChanged(nameof(SearchQuery));
-            OnPropertyChanged(nameof(DisplayedItems));
+            OnPropertyChanged(nameof(DisplayedCopies));
+            OnPropertyChanged(nameof(DisplayedScreenshots));
+            OnPropertyChanged(nameof(DisplayedItems)); // Backward compat
+            OnPropertyChanged(nameof(HasCopies));
+            OnPropertyChanged(nameof(HasScreenshots));
+            OnPropertyChanged(nameof(BothEmpty));
+            OnPropertyChanged(nameof(HasBoth));
+            OnPropertyChanged(nameof(OnlyCopies));
+            OnPropertyChanged(nameof(OnlyScreenshots));
         }
     }
 
     public bool IsPaused
     {
-        get => store.IsPaused;
+        get => clipboardStore.IsPaused;
         set
         {
-            if (store.IsPaused == value) return;
-            store.IsPaused = value;
+            if (clipboardStore.IsPaused == value) return;
+            clipboardStore.IsPaused = value;
             OnPropertyChanged(nameof(IsPaused));
             OnPropertyChanged(nameof(PauseStatusText));
         }
     }
 
-    public string PauseStatusText => IsPaused ? "Capture Paused" : "Capturing";
+    public string PauseStatusText => IsPaused ? "Paused" : "Capture Active";
 
-    public int TotalItemsCount => store.GetItems().Count;
-    public bool ShowSearchBox => TotalItemsCount > 8;
+    public int TotalCopiesCount => clipboardStore.GetItems().Count;
+    public int TotalScreenshotsCount => screenshotsStore.GetItems().Count;
+    public int TotalItemsCount => TotalCopiesCount + TotalScreenshotsCount;
+    public string CountsText => $"{TotalCopiesCount} copied · {TotalScreenshotsCount} screenshots";
 
-    public IReadOnlyList<ClipboardItemViewModel> DisplayedItems
+    public IReadOnlyList<ClipboardItemViewModel> DisplayedCopies
     {
         get
         {
-            var all = store.GetItems();
+            var all = clipboardStore.GetItems();
             if (!string.IsNullOrWhiteSpace(searchQuery))
             {
                 string q = searchQuery.Trim();
@@ -127,41 +152,92 @@ public sealed class ClipboardViewModel : INotifyPropertyChanged
         }
     }
 
-    public void TogglePause()
+    public IReadOnlyList<ClipboardItemViewModel> DisplayedItems => DisplayedCopies;
+
+    public IReadOnlyList<ScreenshotItemViewModel> DisplayedScreenshots
     {
-        IsPaused = !IsPaused;
+        get
+        {
+            var all = screenshotsStore.GetItems();
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                string q = searchQuery.Trim();
+                all = all.Where(x =>
+                    (!string.IsNullOrEmpty(x.FilePath) && Path.GetFileName(x.FilePath).Contains(q, StringComparison.OrdinalIgnoreCase)) ||
+                    x.DimensionsText.Contains(q, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
+
+            return all.Select(x => new ScreenshotItemViewModel(x)).ToList();
+        }
     }
 
-    public void ClearAll()
-    {
-        store.ClearAll();
-    }
+    public bool HasCopies => DisplayedCopies.Count > 0;
+    public bool HasScreenshots => DisplayedScreenshots.Count > 0;
+    public bool BothEmpty => !HasCopies && !HasScreenshots;
+    public bool HasBoth => HasCopies && HasScreenshots;
+    public bool OnlyCopies => HasCopies && !HasScreenshots;
+    public bool OnlyScreenshots => !HasCopies && HasScreenshots;
 
-    public void TogglePin(string id)
-    {
-        store.TogglePin(id);
-    }
+    public void TogglePause() => IsPaused = !IsPaused;
+    public void ClearAll() => clipboardStore.ClearAll();
+    public void TriggerSnip() => snipHandler();
 
-    public void Delete(string id)
-    {
-        store.Delete(id);
-    }
+    // Clipboard Item Actions
+    public void TogglePin(string id) => clipboardStore.TogglePin(id);
+    public void Delete(string id) => clipboardStore.Delete(id);
 
     public void Paste(string id, bool plainText = false)
     {
-        var item = store.GetItems().FirstOrDefault(x => x.Id == id);
-        if (item != null)
-        {
-            pasteHandler(item, plainText);
-        }
+        var item = clipboardStore.GetItems().FirstOrDefault(x => x.Id == id);
+        if (item != null) pasteClipboardHandler(item, plainText);
     }
 
     public void Copy(string id)
     {
-        var item = store.GetItems().FirstOrDefault(x => x.Id == id);
-        if (item != null)
+        var item = clipboardStore.GetItems().FirstOrDefault(x => x.Id == id);
+        if (item != null) copyClipboardHandler(item);
+    }
+
+    // Screenshot Item Actions
+    public void TogglePinScreenshot(string id) => screenshotsStore.TogglePin(id);
+    public void DeleteScreenshot(string id) => screenshotsStore.Delete(id);
+
+    public void PasteScreenshot(string id)
+    {
+        var item = screenshotsStore.GetItems().FirstOrDefault(x => x.Id == id);
+        if (item != null) pasteScreenshotHandler(item);
+    }
+
+    public void CopyScreenshot(string id)
+    {
+        var item = screenshotsStore.GetItems().FirstOrDefault(x => x.Id == id);
+        if (item != null) copyScreenshotHandler(item);
+    }
+
+    public void OpenScreenshot(string id)
+    {
+        var item = screenshotsStore.GetItems().FirstOrDefault(x => x.Id == id);
+        if (item != null && !string.IsNullOrEmpty(item.FilePath) && File.Exists(item.FilePath))
         {
-            copyHandler(item);
+            try
+            {
+                Process.Start(new ProcessStartInfo(item.FilePath) { UseShellExecute = true });
+            }
+            catch { }
+        }
+    }
+
+    public void ShowScreenshotInFolder(string id)
+    {
+        var item = screenshotsStore.GetItems().FirstOrDefault(x => x.Id == id);
+        if (item != null && !string.IsNullOrEmpty(item.FilePath) && File.Exists(item.FilePath))
+        {
+            try
+            {
+                Process.Start("explorer.exe", $"/select,\"{item.FilePath}\"");
+            }
+            catch { }
         }
     }
 
@@ -179,9 +255,19 @@ public sealed class ClipboardViewModel : INotifyPropertyChanged
 
     private void Refresh()
     {
+        OnPropertyChanged(nameof(TotalCopiesCount));
+        OnPropertyChanged(nameof(TotalScreenshotsCount));
         OnPropertyChanged(nameof(TotalItemsCount));
-        OnPropertyChanged(nameof(ShowSearchBox));
+        OnPropertyChanged(nameof(CountsText));
+        OnPropertyChanged(nameof(DisplayedCopies));
+        OnPropertyChanged(nameof(DisplayedScreenshots));
         OnPropertyChanged(nameof(DisplayedItems));
+        OnPropertyChanged(nameof(HasCopies));
+        OnPropertyChanged(nameof(HasScreenshots));
+        OnPropertyChanged(nameof(BothEmpty));
+        OnPropertyChanged(nameof(HasBoth));
+        OnPropertyChanged(nameof(OnlyCopies));
+        OnPropertyChanged(nameof(OnlyScreenshots));
         OnPropertyChanged(nameof(IsPaused));
         OnPropertyChanged(nameof(PauseStatusText));
     }

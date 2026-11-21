@@ -93,9 +93,9 @@ public sealed class LayoutTests : TestFolder
         double maxWidth = effectiveW * 0.62;
         double maxHeight = effectiveH * 0.70;
 
-        // Base content widths for tabs: Music, System, Tasks, QuickControls, Focus, CalendarWeather, Clipboard, Screenshots
-        double[] tabContentWidths = [580, 680, 580, 620, 580, 680, 580, 600];
-        double[] tabContentHeights = [170, 415, 180, 260, 320, 340, 300, 280];
+        // Base content widths for tabs: Music, System, Tasks, QuickControls, Focus, CalendarWeather, Clipboard (Unified Copies & Screenshots)
+        double[] tabContentWidths = [580, 680, 580, 620, 580, 680, 680];
+        double[] tabContentHeights = [170, 415, 180, 260, 320, 340, 280];
 
         for (int i = 0; i < tabContentWidths.Length; i++)
         {
@@ -139,8 +139,7 @@ public sealed class LayoutTests : TestFolder
             (620, 260), // Quick Controls
             (580, 320), // Focus
             (680, 340), // Calendar & Weather
-            (580, 300), // Clipboard
-            (600, 280)  // Screenshots
+            (680, 280)  // Clipboard (Unified Copies & Screenshots)
         ];
 
         for (int i = 0; i < tabs.Length; i++)

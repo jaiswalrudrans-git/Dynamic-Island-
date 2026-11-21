@@ -168,16 +168,6 @@ public partial class OverlayWindow
         calendarWeather = new(Dispatcher, calendarStore, weatherClient, new Island.App.Services.WindowsCalendarService(log));
         var calendarWeatherPage = new CalendarWeatherPage(calendarWeather, SetTypingFocus);
 
-        clipboardStore = new(AppIdentity.DataDirectory,
-            () => settings.Current.ClipboardRememberAcrossRestarts,
-            () => settings.Current.ClipboardHistorySize,
-            () => settings.Current.ClipboardAutoExpireHours,
-            () => settings.Current.ClipboardFilterSecrets,
-            () => settings.Current.ClipboardIgnoredApps,
-            log);
-        clipboard = new(Dispatcher, clipboardStore, () => settings.Current, OnPasteClipboardItem, OnCopyClipboardItem);
-        var clipboardPage = new ClipboardPage(clipboard, SetTypingFocus);
-
         screenshotsStore = new(log);
         screenshotsWatcher = new(screenshotsStore,
             AppIdentity.DataDirectory,
@@ -186,10 +176,21 @@ public partial class OverlayWindow
             log);
         screenshotsWatcher.Start();
         screenshots = new(Dispatcher, screenshotsStore, () => settings.Current, OnPasteScreenshotItem, OnCopyScreenshotItem, LaunchSnip);
-        var screenshotsPage = new ScreenshotsPage(screenshots);
+
+        clipboardStore = new(AppIdentity.DataDirectory,
+            () => settings.Current.ClipboardRememberAcrossRestarts,
+            () => settings.Current.ClipboardHistorySize,
+            () => settings.Current.ClipboardAutoExpireHours,
+            () => settings.Current.ClipboardFilterSecrets,
+            () => settings.Current.ClipboardIgnoredApps,
+            log);
+        clipboard = new(Dispatcher, clipboardStore, screenshotsStore, () => settings.Current,
+            OnPasteClipboardItem, OnCopyClipboardItem,
+            OnPasteScreenshotItem, OnCopyScreenshotItem, LaunchSnip);
+        var clipboardPage = new ClipboardPage(clipboard, SetTypingFocus);
 
         navigation = new(TabButtons, Pages, PillIndicator, PillX, (Style)FindResource("IconButton"), () => settings.Current, RequestFrame,
-            musicPage, systemPage, tasksPage, quickControlsPage, focusPage, calendarWeatherPage, clipboardPage, screenshotsPage);
+            musicPage, systemPage, tasksPage, quickControlsPage, focusPage, calendarWeatherPage, clipboardPage);
         navigation.SelectionChanged += () =>
         {
             UpdateDemands();

@@ -35,7 +35,7 @@ public sealed class AuditCaptureRunner
                 (0.50, 128, "trans50")
             ];
 
-            string[] tabs = ["Music", "System", "Tasks", "QuickControls", "Focus", "CalendarWeather", "Clipboard", "Screenshots"];
+            string[] tabs = ["Music", "System", "Tasks", "QuickControls", "Focus", "CalendarWeather", "Clipboard"];
 
             foreach (var preset in presets)
             {
@@ -58,7 +58,7 @@ public sealed class AuditCaptureRunner
 
                         foreach (var tab in tabs)
                         {
-                            int widthDip = tab == "System" || tab == "CalendarWeather" ? 680 : 580;
+                            int widthDip = tab == "System" || tab == "CalendarWeather" || tab == "Clipboard" ? 680 : 580;
                             int heightDip = tab switch
                             {
                                 "System" => 380,
@@ -66,8 +66,7 @@ public sealed class AuditCaptureRunner
                                 "Focus" => 300,
                                 "QuickControls" => 260,
                                 "Tasks" => 220,
-                                "Clipboard" => 300,
-                                "Screenshots" => 300,
+                                "Clipboard" => 280,
                                 _ => 180 // Music
                             };
 
@@ -125,8 +124,8 @@ public sealed class AuditCaptureRunner
 
                             // Row 1 Tab Bar
                             var tabBar = new StackPanel { Orientation = Orientation.Horizontal, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-                            string[] tabGlyphs = ["\uE8D6", "\uE950", "\uE762", "\uE713", "\uE916", "\uE787", "\uE8C8", "\uE722"];
-                            string[] tabNames = ["Music", "System", "Tasks", "Controls", "Focus", "Calendar", "Clipboard", "Screenshots"];
+                            string[] tabGlyphs = ["\uE8D6", "\uE950", "\uE9D5", "\uE9E9", "\uE916", "\uE787", "\uE8C8"];
+                            string[] tabNames = ["Music", "System", "Tasks", "Controls", "Focus", "Calendar", "Clipboard"];
                             for (int i = 0; i < tabNames.Length; i++)
                             {
                                 bool isCur = tabNames[i].Equals(tab, StringComparison.OrdinalIgnoreCase) || (tab == "QuickControls" && tabNames[i] == "Controls") || (tab == "CalendarWeather" && tabNames[i] == "Calendar");

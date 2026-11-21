@@ -10,7 +10,6 @@ internal sealed record PanelTab(string Id, string Name, string Glyph, string Des
         new("controls", "Controls", "\uE9E9", "Quick Controls"),
         new("focus", "Focus", "\uE916", "Focus Timer"),
         new("calendar", "Calendar", "\uE787", "Calendar & Weather"),
-        new("clipboard", "Clipboard", "\uE8C8", "Clipboard History"),
-        new("screenshots", "Screenshots", "\uEB9F", "Screenshots")
+        new("clipboard", "Clipboard", "\uE8C8", "Clipboard History & Snips")
     ];
 }

@@ -44,7 +44,25 @@ This log tracks every defect identified during the Stage A audit, the exact chan
 ---
 
 ## Stage C: Merge Clipboard & Screenshots
-- **Status**: Pending
+- **Status**: Completed
+- **Changes Implemented**:
+  1. **Unified Dual-Half Layout (`ClipboardPage.xaml`, `ClipboardPage.xaml.cs`)**:
+     - Merged separate Clipboard and Screenshots tabs into a single unified 7th tab "Clipboard" (`\uE8C8`).
+     - Left Half: Scrollable recent copies with type icons (text, code, HTML, file list, image thumbnail), snippet preview, character counts, relative timestamps, and pin/unpin toggles.
+     - Right Half: 3x2 uniform grid (`UniformGrid Columns="3"`) displaying 6 recent screenshot thumbnails and snips, dividing width equally and filling 100% of the right width without clipping.
+     - Top Utility Strip: Filter/search input, copy count and screenshot count badges, pause/resume capture toggle, Clear All button, and "New Snip" button.
+     - Compact Empty State: When empty, displays a clean centered empty prompt without wasting vertical space.
+  2. **Model & ViewModel Consolidation (`ClipboardViewModel.cs`, `PanelTab.cs`, `PanelNavigation.cs`)**:
+     - Merged clipboard items and screenshot collections into `ClipboardViewModel`.
+     - Supports double-click / Ctrl+click to copy, single-click to paste into background target app without activating window, and full OLE drag-and-drop out.
+     - Background thumbnail loading downsampled to 240px (`DecodePixelWidth = 240`) preventing memory spikes.
+     - Updated tab enumeration to 7 tabs in `PanelTab.cs`, `PanelNavigation.cs`, and `OverlayWindow.Panel.cs`.
+  3. **Settings Normalization (`AppSettings.cs`)**:
+     - Filtered legacy "screenshots" tab from `TabOrder` and `HiddenTabs` during normalization and deserialization.
+  4. **Verification**:
+     - Removed obsolete `ScreenshotsPage.xaml` and `ScreenshotsPage.xaml.cs`.
+     - Updated `LayoutTests.cs` and `AuditCaptureRunner.cs` to test the 7-tab architecture.
+     - Verified clean builds in Debug and Release with warnings as errors and all 165 unit/layout tests passing.
 
 ---
 

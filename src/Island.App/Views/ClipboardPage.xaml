@@ -34,20 +34,51 @@
             </Setter>
         </Style>
 
+        <!-- Snip Button in Screenshots Header -->
+        <Style x:Key="SnipBtn" TargetType="Button">
+            <Setter Property="Height" Value="22"/>
+            <Setter Property="Padding" Value="8,0"/>
+            <Setter Property="Background" Value="{DynamicResource Theme.AccentSoft}"/>
+            <Setter Property="Foreground" Value="{DynamicResource Theme.Accent}"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="{DynamicResource Typography.Size.Label}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" CornerRadius="4" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="&#xE8C6;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
+                                           FontSize="10" Margin="0,0,4,0" VerticalAlignment="Center" Foreground="{TemplateBinding Foreground}"/>
+                                <TextBlock Text="Snip" VerticalAlignment="Center" Foreground="{TemplateBinding Foreground}"/>
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{DynamicResource Theme.Accent}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource Theme.Background}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- Search Box Style -->
         <Style x:Key="SearchInputBox" TargetType="TextBox">
-            <Setter Property="Height" Value="28"/>
+            <Setter Property="Height" Value="24"/>
             <Setter Property="Background" Value="{DynamicResource Theme.SurfaceRaised}"/>
             <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimary}"/>
             <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="8,4"/>
-            <Setter Property="FontSize" Value="{DynamicResource Typography.Size.Secondary}"/>
+            <Setter Property="Padding" Value="6,2"/>
+            <Setter Property="FontSize" Value="{DynamicResource Typography.Size.Label}"/>
             <Setter Property="FontFamily" Value="{DynamicResource Typography.Family.Body}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
-                        <Border x:Name="Bd" CornerRadius="6" Background="{TemplateBinding Background}"
+                        <Border x:Name="Bd" CornerRadius="4" Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                             <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center"/>
                         </Border>
@@ -62,36 +93,44 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="12,4,12,10">
+    <Grid Margin="12,2,12,10">
         <Grid.RowDefinitions>
-            <!-- Row 0: Top Action Bar (Count, Pause status, Clear All) -->
+            <!-- Row 0: Unified Header Strip -->
             <RowDefinition Height="Auto"/>
-            <!-- Row 1: Optional Search Input -->
-            <RowDefinition Height="Auto"/>
-            <!-- Row 2: Scrollable History Items List -->
+            <!-- Row 1: Dual Half Layout / Compact Empty State -->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- ROW 0: Header Strip -->
-        <Grid Grid.Row="0" Margin="0,0,0,6">
+        <!-- ROW 0: Top Header Strip Across Both Halves -->
+        <Grid Grid.Row="0" Margin="0,0,0,8">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <TextBlock Text="Clipboard History" FontFamily="{DynamicResource Typography.Family.Heading}"
-                           FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
-                           Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
-                <TextBlock Text="{Binding DisplayedItems.Count, StringFormat=' ({0})'}"
-                           FontFamily="{DynamicResource Typography.Family.Numeric}"
-                           FontSize="{DynamicResource Typography.Size.Secondary}"
-                           Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"/>
-            </StackPanel>
+            <!-- Title & Combined Counts -->
+            <TextBlock Grid.Column="0" Text="Clipboard" FontFamily="{DynamicResource Typography.Family.Heading}"
+                       FontSize="{DynamicResource Typography.Size.SectionTitle}" FontWeight="SemiBold"
+                       Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
 
-            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                <!-- Pause / Resume -->
-                <Button Click="TogglePauseClick" Cursor="Hand" Margin="0,0,6,0">
+            <TextBlock Grid.Column="1" Text="{Binding CountsText}" Margin="8,0,0,0"
+                       FontFamily="{DynamicResource Typography.Family.Label}"
+                       FontSize="{DynamicResource Typography.Size.Label}"
+                       Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"/>
+
+            <!-- Search Box -->
+            <Grid Grid.Column="2" Margin="16,0,16,0" VerticalAlignment="Center">
+                <TextBox Style="{StaticResource SearchInputBox}"
+                         Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                         GotFocus="SearchGotFocus" LostFocus="SearchLostFocus"
+                         ToolTip="Search copies and screenshots"/>
+            </Grid>
+
+            <!-- Action Controls: Pause / Clear -->
+            <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Click="TogglePauseClick" Cursor="Hand" Margin="0,0,4,0">
                     <Button.Style>
                         <Style TargetType="Button" BasedOn="{StaticResource MiniActionBtn}">
                             <Setter Property="Width" Value="Auto"/>
@@ -106,124 +145,248 @@
                     </Button.Style>
                 </Button>
 
-                <!-- Clear All -->
                 <Button Style="{StaticResource MiniActionBtn}" Content="&#xE74D;" Click="ClearAllClick"
-                        ToolTip="Clear unpinned history"/>
+                        ToolTip="Clear unpinned copies"/>
             </StackPanel>
         </Grid>
 
-        <!-- ROW 1: Search Box (when > 8 items) -->
-        <Grid Grid.Row="1" Margin="0,0,0,8" Visibility="{Binding ShowSearchBox, Converter={StaticResource Visible}}">
-            <TextBox Style="{StaticResource SearchInputBox}" Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
-                     GotFocus="SearchGotFocus" LostFocus="SearchLostFocus"/>
-        </Grid>
+        <!-- ROW 1: Content Area -->
+        <Grid Grid.Row="1">
+            <!-- COMPACT EMPTY STATE (When both copies and screenshots are empty) -->
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,20"
+                        Visibility="{Binding BothEmpty, Converter={StaticResource Visible}}">
+                <TextBlock Text="&#xE8C8;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
+                           FontSize="28" Foreground="{DynamicResource Theme.TextSecondary}" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                <TextBlock Text="Clipboard history is empty" FontFamily="{DynamicResource Typography.Family.Heading}"
+                           FontSize="{DynamicResource Typography.Size.Secondary}" FontWeight="SemiBold"
+                           Foreground="{DynamicResource Theme.TextSecondary}" HorizontalAlignment="Center"/>
+                <TextBlock Text="Copied text, files, and screenshot snips will appear here."
+                           FontFamily="{DynamicResource Typography.Family.Body}"
+                           FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"
+                           HorizontalAlignment="Center" Margin="0,2,0,0"/>
+            </StackPanel>
 
-        <!-- ROW 2: Items List / Empty State -->
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
-                      MaxHeight="360" Focusable="False">
+            <!-- DUAL-HALF LAYOUT (When at least one half has items) -->
             <Grid>
-                <!-- Empty State -->
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,24"
-                            Visibility="{Binding DisplayedItems.Count, Converter={StaticResource Visible}}">
-                    <StackPanel.Style>
-                        <Style TargetType="StackPanel">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding DisplayedItems.Count}" Value="0">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </StackPanel.Style>
-                    <TextBlock Text="&#xE8C8;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
-                               FontSize="32" Foreground="{DynamicResource Theme.TextSecondary}" HorizontalAlignment="Center" Margin="0,0,0,8"/>
-                    <TextBlock Text="Clipboard history is empty" FontFamily="{DynamicResource Typography.Family.Heading}"
-                               FontSize="{DynamicResource Typography.Size.Secondary}" FontWeight="SemiBold"
-                               Foreground="{DynamicResource Theme.TextSecondary}" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Copied text, images, and files will appear here."
-                               FontFamily="{DynamicResource Typography.Family.Body}"
-                               FontSize="{DynamicResource Typography.Size.Label}" Foreground="{DynamicResource Theme.TextSecondary}"
-                               HorizontalAlignment="Center" Margin="0,2,0,0"/>
-                </StackPanel>
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding BothEmpty}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
 
-                <!-- Items -->
-                <ItemsControl ItemsSource="{Binding DisplayedItems}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Margin="0,2" CornerRadius="8" Background="{DynamicResource Theme.SurfaceRaised}"
-                                    BorderBrush="{DynamicResource Theme.CardRestBorder}" BorderThickness="1"
-                                    Padding="10,8" Cursor="Hand" MouseLeftButtonDown="ItemCardClick"
-                                    MouseMove="ItemCardMouseMove" ToolTip="Click to paste (or copy)">
-                                <Border.Style>
-                                    <Style TargetType="Border">
-                                        <Style.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
-                                                <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
-                                            </Trigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </Border.Style>
+                <Grid.ColumnDefinitions>
+                    <!-- Left Half: Recent copies -->
+                    <ColumnDefinition Width="*" x:Name="ColLeft"/>
+                    <!-- Divider -->
+                    <ColumnDefinition Width="Auto" x:Name="ColDivider"/>
+                    <!-- Right Half: Screenshots -->
+                    <ColumnDefinition Width="*" x:Name="ColRight"/>
+                </Grid.ColumnDefinitions>
 
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="28"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
+                <!-- LEFT HALF: Recent Copies -->
+                <Grid Grid.Column="0" Margin="0,0,4,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                                    <!-- Type Icon -->
-                                    <Border Grid.Column="0" Width="22" Height="22" CornerRadius="5"
-                                            Background="{DynamicResource Theme.SurfaceHover}" VerticalAlignment="Top" Margin="0,2,0,0">
-                                        <TextBlock Text="{Binding TypeGlyph}"
-                                                   FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
-                                                   FontSize="12" Foreground="{DynamicResource Theme.Accent}"
-                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    </Border>
+                    <Grid Grid.Row="0" Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Recent copies" FontFamily="{DynamicResource Typography.Family.Heading}"
+                                   FontSize="{DynamicResource Typography.Size.Label}" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="{Binding DisplayedCopies.Count, StringFormat='({0})'}"
+                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                   FontSize="{DynamicResource Typography.Size.Label}"
+                                   Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"/>
+                    </Grid>
 
-                                    <!-- Content Column -->
-                                    <StackPanel Grid.Column="1" Margin="8,0,8,0" VerticalAlignment="Center">
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                  MaxHeight="260" Focusable="False">
+                        <ItemsControl ItemsSource="{Binding DisplayedCopies}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="0,2" CornerRadius="6" Background="{DynamicResource Theme.SurfaceRaised}"
+                                            BorderBrush="{DynamicResource Theme.CardRestBorder}" BorderThickness="1"
+                                            Padding="8,6" Cursor="Hand" MouseLeftButtonDown="CopyItemClick"
+                                            MouseMove="CopyItemMouseMove" ToolTip="Click to paste (or copy)">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
+                                                        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+
                                         <Grid>
                                             <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="22"/>
                                                 <ColumnDefinition Width="*"/>
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Text="{Binding SourceAppName, TargetNullValue='Clipboard'}"
-                                                       FontFamily="{DynamicResource Typography.Family.Label}"
-                                                       FontSize="{DynamicResource Typography.Size.Label}" FontWeight="SemiBold"
-                                                       Foreground="{DynamicResource Theme.TextSecondary}" TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Grid.Column="1" Text="{Binding RelativeTime}"
-                                                       FontFamily="{DynamicResource Typography.Family.Numeric}"
-                                                       FontSize="{DynamicResource Typography.Size.Label}"
-                                                       Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
+
+                                            <!-- Type Icon -->
+                                            <Border Grid.Column="0" Width="18" Height="18" CornerRadius="4"
+                                                    Background="{DynamicResource Theme.SurfaceHover}" VerticalAlignment="Top" Margin="0,1,0,0">
+                                                <TextBlock Text="{Binding TypeGlyph}"
+                                                           FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
+                                                           FontSize="10" Foreground="{DynamicResource Theme.Accent}"
+                                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+
+                                            <!-- Content: Source, Time, Preview -->
+                                            <StackPanel Grid.Column="1" Margin="6,0,6,0" VerticalAlignment="Center">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding SourceAppName, TargetNullValue='Clipboard'}"
+                                                               FontFamily="{DynamicResource Typography.Family.Label}"
+                                                               FontSize="{DynamicResource Typography.Size.Mini}" FontWeight="SemiBold"
+                                                               Foreground="{DynamicResource Theme.TextSecondary}" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Grid.Column="1" Text="{Binding RelativeTime}"
+                                                               FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                                               FontSize="{DynamicResource Typography.Size.Mini}"
+                                                               Foreground="{DynamicResource Theme.TextSecondary}" Typography.NumeralAlignment="Tabular"/>
+                                                </Grid>
+                                                <TextBlock Text="{Binding PreviewText}" MaxHeight="32" TextWrapping="Wrap"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           FontFamily="{DynamicResource Typography.Family.Body}"
+                                                           FontSize="{DynamicResource Typography.Size.Label}"
+                                                           Foreground="{DynamicResource Theme.TextPrimary}" Margin="0,1,0,0"/>
+                                            </StackPanel>
+
+                                            <!-- Actions: Pin, Copy, Delete -->
+                                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Button Style="{StaticResource MiniActionBtn}" Content="{Binding PinGlyph}"
+                                                        Click="CopyItemPinClick" Tag="{Binding Id}" ToolTip="Pin"/>
+                                                <Button Style="{StaticResource MiniActionBtn}" Content="&#xE8C8;"
+                                                        Click="CopyItemCopyClick" Tag="{Binding Id}" ToolTip="Copy"/>
+                                                <Button Style="{StaticResource MiniActionBtn}" Content="&#xE74D;"
+                                                        Click="CopyItemDeleteClick" Tag="{Binding Id}" ToolTip="Delete"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+
+                <!-- THIN DIVIDER -->
+                <Rectangle Grid.Column="1" Width="1" Fill="{DynamicResource Theme.Border}" Margin="6,0"
+                           Visibility="{Binding HasBoth, Converter={StaticResource Visible}}"/>
+
+                <!-- RIGHT HALF: Screenshots (Grid Fills Width) -->
+                <Grid Grid.Column="2" Margin="4,0,0,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Screenshots Header & Snip Button -->
+                    <Grid Grid.Row="0" Margin="0,0,0,4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Screenshots" FontFamily="{DynamicResource Typography.Family.Heading}"
+                                   FontSize="{DynamicResource Typography.Size.Label}" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="1" Text="{Binding DisplayedScreenshots.Count, StringFormat='({0})'}"
+                                   FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                   FontSize="{DynamicResource Typography.Size.Label}"
+                                   Foreground="{DynamicResource Theme.TextSecondary}" VerticalAlignment="Center" Margin="4,0,8,0"/>
+
+                        <Button Grid.Column="2" Style="{StaticResource SnipBtn}" Click="SnipClick" ToolTip="Capture (Win+Shift+S)"/>
+                    </Grid>
+
+                    <!-- Screenshots Uniform Grid (Fills Width) -->
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                  MaxHeight="260" Focusable="False">
+                        <ItemsControl ItemsSource="{Binding DisplayedScreenshots}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="3"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Margin="3" Height="82" CornerRadius="6" Background="{DynamicResource Theme.SurfaceRaised}"
+                                            BorderBrush="{DynamicResource Theme.CardRestBorder}" BorderThickness="1"
+                                            ClipToBounds="True" Cursor="Hand" MouseLeftButtonDown="ScreenshotClick"
+                                            MouseMove="ScreenshotMouseMove" ToolTip="{Binding DisplayTitle}">
+                                        <Grid>
+                                            <!-- Thumbnail Image (Fills Aspect) -->
+                                            <Image Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                   Loaded="ScreenshotImageLoaded"/>
+
+                                            <!-- Bottom Badge -->
+                                            <Border VerticalAlignment="Bottom" Background="#B0000000" Padding="3,2">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding DimensionsText}" FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                                               FontSize="8.5" Foreground="#EEEEEE" Typography.NumeralAlignment="Tabular"/>
+                                                    <TextBlock Grid.Column="1" Text="{Binding RelativeTime}" FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                                               FontSize="8.5" Foreground="#B0B0B0" Typography.NumeralAlignment="Tabular"/>
+                                                </Grid>
+                                            </Border>
+
+                                            <!-- Hover Actions (Top Right) -->
+                                            <Border x:Name="HoverBar" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="2" Opacity="0">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Button Style="{StaticResource MiniActionBtn}" Content="{Binding PinGlyph}"
+                                                            Click="ScreenshotPinClick" Tag="{Binding Id}" ToolTip="Pin"/>
+                                                    <Button Style="{StaticResource MiniActionBtn}" Content="&#xE8C8;"
+                                                            Click="ScreenshotCopyClick" Tag="{Binding Id}" ToolTip="Copy Image"/>
+                                                    <Button Style="{StaticResource MiniActionBtn}" Content="&#xE8E5;"
+                                                            Click="ScreenshotOpenClick" Tag="{Binding Id}" ToolTip="Open"/>
+                                                    <Button Style="{StaticResource MiniActionBtn}" Content="&#xE74D;"
+                                                            Click="ScreenshotDeleteClick" Tag="{Binding Id}" ToolTip="Delete"/>
+                                                </StackPanel>
+                                            </Border>
                                         </Grid>
 
-                                        <!-- Text Preview -->
-                                        <TextBlock Text="{Binding PreviewText}" MaxHeight="36" TextWrapping="Wrap"
-                                                   TextTrimming="CharacterEllipsis"
-                                                   FontFamily="{DynamicResource Typography.Family.Body}"
-                                                   FontSize="{DynamicResource Typography.Size.Secondary}"
-                                                   Foreground="{DynamicResource Theme.TextPrimary}" Margin="0,2,0,0"/>
-                                    </StackPanel>
-
-                                    <!-- Action Buttons -->
-                                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                        <!-- Pin -->
-                                        <Button Style="{StaticResource MiniActionBtn}" Content="{Binding PinGlyph}"
-                                                Click="ItemPinClick" Tag="{Binding Id}" ToolTip="Pin item"/>
-                                        <!-- Copy -->
-                                        <Button Style="{StaticResource MiniActionBtn}" Content="&#xE8C8;"
-                                                Click="ItemCopyClick" Tag="{Binding Id}" ToolTip="Copy to clipboard"/>
-                                        <!-- Delete -->
-                                        <Button Style="{StaticResource MiniActionBtn}" Content="&#xE74D;"
-                                                Click="ItemDeleteClick" Tag="{Binding Id}" ToolTip="Delete"/>
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                                        <Border.Triggers>
+                                            <EventTrigger RoutedEvent="MouseEnter">
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetName="HoverBar" Storyboard.TargetProperty="Opacity"
+                                                                         To="1" Duration="0:0:0.12"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                            <EventTrigger RoutedEvent="MouseLeave">
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation Storyboard.TargetName="HoverBar" Storyboard.TargetProperty="Opacity"
+                                                                         To="0" Duration="0:0:0.12"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </EventTrigger>
+                                        </Border.Triggers>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
             </Grid>
-        </ScrollViewer>
+        </Grid>
     </Grid>
 </UserControl>
