@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - 2026-11-20
 
+### Added
+- Rebuilt Clipboard tab into compact BrimDeck-style layout with unified image rows and file transfer drop shelf.
+- Fixed tofu boxes on buttons and labels by explicitly assigning Body typography and icon fonts.
+
 ### Fixed
 - Inset content from visible notch walls using `IslandMetrics.WallInset` (30 DIP) and removed rounded content clip.
 

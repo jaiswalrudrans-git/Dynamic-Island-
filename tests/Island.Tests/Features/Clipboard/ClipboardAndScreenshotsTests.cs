@@ -1,9 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using Island.App.Design;
+using Island.App.Features.Clipboard.ViewModels;
+using Island.App.Features.Clipboard.Views;
 using Island.Core.Clipboard;
 using Island.Core.Screenshots;
+using Island.Core.Settings;
+using Island.Core.Themes;
 using Xunit;
 
 namespace Island.Tests;
@@ -210,5 +222,263 @@ public sealed class ClipboardAndScreenshotsTests : TestFolder
         Assert.Single(snips);
         Assert.Equal(1920, snips[0].Width);
         Assert.Equal(1080, snips[0].Height);
+    }
+
+    [Fact]
+    public void ClipboardRowViewModelFormatsImagesAndTextProperly()
+    {
+        var textItem = new ClipboardItem
+        {
+            Type = ClipboardItemType.Text,
+            Text = "Sample copied text",
+            SourceAppName = "Notepad"
+        };
+        var textRow = new ClipboardRowViewModel(textItem);
+        Assert.False(textRow.IsImage);
+        Assert.Equal("Sample copied text", textRow.DisplayLabel);
+        Assert.Equal("Notepad", textRow.SourceAppName);
+
+        var scItem = new ScreenshotItem
+        {
+            FilePath = "C:\\test\\snap.png",
+            Width = 885,
+            Height = 458
+        };
+        var imageRow = new ClipboardRowViewModel(scItem);
+        Assert.True(imageRow.IsImage);
+        Assert.Equal("Picture 885x458", imageRow.DisplayLabel);
+        Assert.Equal(885, imageRow.ImageWidth);
+        Assert.Equal(458, imageRow.ImageHeight);
+    }
+
+    [Fact]
+    public void ClipboardViewModelFiltersAllVsFavorites()
+    {
+        var clipStore = new ClipboardStore();
+        var scStore = new ScreenshotsStore();
+        var settings = new AppSettings();
+
+        clipStore.AddText("Item 1");
+        clipStore.AddText("Item 2");
+        clipStore.AddText("Item 3");
+
+        var items = clipStore.GetItems();
+        clipStore.TogglePin(items[1].Id); // Pin item 2
+
+        var vm = new ClipboardViewModel(
+            Dispatcher.CurrentDispatcher,
+            clipStore,
+            scStore,
+            () => settings,
+            (_, _) => { },
+            _ => { },
+            _ => { },
+            _ => { },
+            () => { });
+
+        Assert.Equal(3, vm.DisplayedRows.Count);
+
+        // Switch to Favorites
+        vm.ShowFavoritesOnly = true;
+        Assert.Single(vm.DisplayedRows);
+        Assert.True(vm.DisplayedRows[0].IsPinned);
+        Assert.Equal("Item 2", vm.DisplayedRows[0].DisplayLabel);
+
+        // Switch back to All
+        vm.ShowFavoritesOnly = false;
+        Assert.Equal(3, vm.DisplayedRows.Count);
+    }
+
+    [Fact]
+    public void ClipboardViewModelFileTransferShelfOperations()
+    {
+        var clipStore = new ClipboardStore();
+        var scStore = new ScreenshotsStore();
+        var settings = new AppSettings();
+
+        var vm = new ClipboardViewModel(
+            Dispatcher.CurrentDispatcher,
+            clipStore,
+            scStore,
+            () => settings,
+            (_, _) => { },
+            _ => { },
+            _ => { },
+            _ => { },
+            () => { });
+
+        vm.ClearDroppedFiles();
+        Assert.Empty(vm.DroppedFiles);
+        Assert.False(vm.HasDroppedFiles);
+
+        string tempFile1 = Path.Combine(Folder, "doc.txt");
+        string tempFile2 = Path.Combine(Folder, "archive.zip");
+        File.WriteAllText(tempFile1, "hello world");
+        File.WriteAllBytes(tempFile2, new byte[2048]);
+
+        vm.AddDroppedFiles([tempFile1, tempFile2]);
+        Assert.Equal(2, vm.DroppedFiles.Count);
+        Assert.True(vm.HasDroppedFiles);
+
+        // Adding duplicate is ignored
+        vm.AddDroppedFiles([tempFile1]);
+        Assert.Equal(2, vm.DroppedFiles.Count);
+
+        var first = vm.DroppedFiles[0];
+        Assert.Equal("doc.txt", first.FileName);
+        Assert.Equal("\uE8A5", first.IconGlyph); // Document glyph
+        Assert.Contains("B", first.SizeText);
+
+        var second = vm.DroppedFiles[1];
+        Assert.Equal("archive.zip", second.FileName);
+        Assert.Equal("\uF012", second.IconGlyph); // Zip archive glyph
+        Assert.Equal("2.0 KB", second.SizeText);
+
+        // Remove single file
+        vm.RemoveDroppedFile(first);
+        Assert.Single(vm.DroppedFiles);
+        Assert.Equal("archive.zip", vm.DroppedFiles[0].FileName);
+
+        // Clear all files
+        vm.ClearDroppedFiles();
+        Assert.Empty(vm.DroppedFiles);
+        Assert.False(vm.HasDroppedFiles);
+    }
+
+    [Fact]
+    public void RenderClipboardTabArtifacts()
+    {
+        var thread = new Thread(() =>
+        {
+            var app = Application.Current ?? new Application();
+
+            var tokensUri = new Uri("pack://application:,,,/Island.App;component/Design/DesignTokens.xaml");
+            if (!app.Resources.MergedDictionaries.Any(d => d.Source == tokensUri))
+            {
+                app.Resources.MergedDictionaries.Add(new ResourceDictionary { Source = tokensUri });
+            }
+            var catalog = new ThemeCatalog(Folder, _ => { });
+            var themeRes = new ThemeResources(app.Resources, catalog);
+            themeRes.Apply("Midnight", "Translucent");
+
+            // 1. Populated ViewModel
+            var clipStorePopulated = new ClipboardStore();
+            var scStorePopulated = new ScreenshotsStore();
+            var settings = new AppSettings();
+
+            clipStorePopulated.AddText("git commit -m \"feat(clipboard): BrimDeck-style clipboard\"", "Terminal");
+            clipStorePopulated.AddText("https://github.com/microsoft/terminal", "Chrome");
+            clipStorePopulated.AddText("Plain text snippet for testing", "VS Code");
+
+            var scItem = new ScreenshotItem
+            {
+                FilePath = "C:\\Screenshots\\2026-11-21_0834.png",
+                Width = 885,
+                Height = 458,
+                Timestamp = DateTime.UtcNow,
+                RawBytes = Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==")
+            };
+            scStorePopulated.Add(scItem);
+
+            var vmPopulated = new ClipboardViewModel(
+                Dispatcher.CurrentDispatcher,
+                clipStorePopulated,
+                scStorePopulated,
+                () => settings,
+                (_, _) => { },
+                _ => { },
+                _ => { },
+                _ => { },
+                () => { });
+
+            string testDoc = Path.Combine(Folder, "project_spec.pdf");
+            string testZip = Path.Combine(Folder, "build_assets.zip");
+            File.WriteAllText(testDoc, "sample pdf content");
+            File.WriteAllBytes(testZip, new byte[1024 * 50]);
+            vmPopulated.AddDroppedFiles([testDoc, testZip]);
+
+            var pagePopulated = new ClipboardPage(vmPopulated, _ => { });
+            var borderPopulated = new Border
+            {
+                Width = 640,
+                Background = (Brush)app.Resources["Theme.Background"],
+                Padding = new Thickness(16, 14, 16, 14),
+                Child = pagePopulated
+            };
+
+            borderPopulated.Measure(new Size(640, double.PositiveInfinity));
+            double desiredH = Math.Max(200, borderPopulated.DesiredSize.Height);
+            borderPopulated.Arrange(new Rect(0, 0, 640, desiredH));
+            borderPopulated.UpdateLayout();
+
+            var rtbPopulated = new RenderTargetBitmap(640, (int)desiredH, 96, 96, PixelFormats.Pbgra32);
+            rtbPopulated.Render(borderPopulated);
+
+            string outputDir = @"C:\Users\jaisw\.gemini\antigravity\brain\8747a9d5-c07a-4099-b1f2-2e7f736db774";
+            Directory.CreateDirectory(outputDir);
+            string popPath = Path.Combine(outputDir, "Clipboard_Populated.png");
+            using (var fs = File.Create(popPath))
+            {
+                var enc = new PngBitmapEncoder();
+                enc.Frames.Add(BitmapFrame.Create(rtbPopulated));
+                enc.Save(fs);
+            }
+
+            // Also copy to docs/screens/edges/
+            try
+            {
+                string docsDir = Path.Combine(Folder, "..", "..", "..", "..", "docs", "screens", "edges");
+                if (Directory.Exists(docsDir))
+                {
+                    File.Copy(popPath, Path.Combine(docsDir, "Clipboard_100dpi.png"), true);
+                }
+            }
+            catch { }
+
+            // 2. Empty ViewModel
+            var clipStoreEmpty = new ClipboardStore();
+            var scStoreEmpty = new ScreenshotsStore();
+            var vmEmpty = new ClipboardViewModel(
+                Dispatcher.CurrentDispatcher,
+                clipStoreEmpty,
+                scStoreEmpty,
+                () => settings,
+                (_, _) => { },
+                _ => { },
+                _ => { },
+                _ => { },
+                () => { });
+            vmEmpty.ClearDroppedFiles();
+
+            var pageEmpty = new ClipboardPage(vmEmpty, _ => { });
+            var borderEmpty = new Border
+            {
+                Width = 640,
+                Background = (Brush)app.Resources["Theme.Background"],
+                Padding = new Thickness(16, 14, 16, 14),
+                Child = pageEmpty
+            };
+
+            borderEmpty.Measure(new Size(640, double.PositiveInfinity));
+            double emptyH = Math.Max(100, borderEmpty.DesiredSize.Height);
+            borderEmpty.Arrange(new Rect(0, 0, 640, emptyH));
+            borderEmpty.UpdateLayout();
+
+            var rtbEmpty = new RenderTargetBitmap(640, (int)emptyH, 96, 96, PixelFormats.Pbgra32);
+            rtbEmpty.Render(borderEmpty);
+
+            string emptyPath = Path.Combine(outputDir, "Clipboard_Empty.png");
+            using (var fs = File.Create(emptyPath))
+            {
+                var enc = new PngBitmapEncoder();
+                enc.Frames.Add(BitmapFrame.Create(rtbEmpty));
+                enc.Save(fs);
+            }
+        });
+
+        thread.SetApartmentState(ApartmentState.STA);
+        thread.Start();
+        bool finished = thread.Join(TimeSpan.FromSeconds(30));
+        Assert.True(finished, "RenderClipboardTabArtifacts timed out");
     }
 }

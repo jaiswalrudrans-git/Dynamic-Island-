@@ -1,12 +1,12 @@
 # Clipboard
 
-Owns clipboard history, snips, pinned clips, search, screenshot gallery, and paste dispatching.
+Owns clipboard history, favorites, search, image previews, file transfer drop shelf, and paste dispatching.
 
 ## Key Files
-- `Views/ClipboardPage.xaml` / `.xaml.cs`: Dual-pane clipboard item list and screenshot gallery grid.
-- `ViewModels/ClipboardViewModel.cs`: Clipboard item filtering, pinning, deletion, and preview state.
-- `ViewModels/ScreenshotsViewModel.cs`: Screenshot thumbnail caching and watched folder monitoring.
-- `Services/ClipboardNative.cs`: Win32 clipboard listener hooks and foreground window tracking.
+- `Views/ClipboardPage.xaml` / `.xaml.cs`: Compact BrimDeck-style dual-half layout (Clipboard history + File transfer shelf).
+- `ViewModels/ClipboardViewModel.cs`: Unified clipboard and screenshot image rows, favorites filtering, drop shelf collection.
+- `ViewModels/ScreenshotsViewModel.cs`: Watched screenshots caching.
+- `Services/ClipboardNative.cs`: Win32 clipboard listener hooks, background paste dispatching (`WS_EX_NOACTIVATE` + `SendInput`).
 
 ## Dependencies
 - `Core/` (Island.Core.Clipboard, Island.Core.Screenshots stores and models)
