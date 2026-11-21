@@ -3,11 +3,11 @@ using System.Globalization;
 using System.Windows.Media;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Island.App.Services;
+using Island.App.Features.CalendarWeather.Services;
 using Island.Core.Calendar;
 using Island.Core.Weather;
 
-namespace Island.App.ViewModels;
+namespace Island.App.Features.CalendarWeather.ViewModels;
 
 public sealed record CalendarDayUi(
     int DayNumber,

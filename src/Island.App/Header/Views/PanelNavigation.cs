@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using Island.App.Features.CalendarWeather.Views;
 using Island.App.Features.Controls.Views;
 using Island.App.Features.Focus.Views;
 using Island.App.Features.Music.Views;

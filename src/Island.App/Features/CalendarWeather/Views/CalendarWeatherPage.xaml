@@ -1,4 +1,4 @@
-<UserControl x:Class="Island.App.Views.CalendarWeatherPage"
+<UserControl x:Class="Island.App.Features.CalendarWeather.Views.CalendarWeatherPage"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Focusable="False" Foreground="{DynamicResource Theme.TextPrimary}">

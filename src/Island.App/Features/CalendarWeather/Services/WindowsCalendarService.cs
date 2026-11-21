@@ -2,7 +2,7 @@ using System.IO;
 using Island.Core.Calendar;
 using Windows.ApplicationModel.Appointments;
 
-namespace Island.App.Services;
+namespace Island.App.Features.CalendarWeather.Services;
 
 public sealed class WindowsCalendarService
 {

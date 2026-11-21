@@ -1,9 +1,9 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Island.App.ViewModels;
+using Island.App.Features.CalendarWeather.ViewModels;
 
-namespace Island.App.Views;
+namespace Island.App.Features.CalendarWeather.Views;
 
 public partial class CalendarWeatherPage : UserControl
 {

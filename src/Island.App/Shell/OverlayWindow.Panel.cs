@@ -3,6 +3,9 @@ using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using Island.App.Features.CalendarWeather.Services;
+using Island.App.Features.CalendarWeather.ViewModels;
+using Island.App.Features.CalendarWeather.Views;
 using Island.App.Features.Controls.Services;
 using Island.App.Features.Controls.ViewModels;
 using Island.App.Features.Controls.Views;
@@ -174,7 +177,7 @@ public partial class OverlayWindow
             });
         };
         weatherClient = new(AppIdentity.DataDirectory, log);
-        calendarWeather = new(Dispatcher, calendarStore, weatherClient, new Island.App.Services.WindowsCalendarService(log));
+        calendarWeather = new(Dispatcher, calendarStore, weatherClient, new WindowsCalendarService(log));
         var calendarWeatherPage = new CalendarWeatherPage(calendarWeather, SetTypingFocus);
 
         screenshotsStore = new(log);
