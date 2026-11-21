@@ -2,7 +2,7 @@ using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Island.Core.Focus;
 
-namespace Island.App.ViewModels;
+namespace Island.App.Features.Focus.ViewModels;
 
 public sealed class FocusViewModel : ObservableObject, IDisposable
 {

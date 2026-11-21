@@ -1,6 +1,8 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Island.App.Features.Controls.ViewModels;
+using Island.App.Features.Focus.ViewModels;
 using Island.App.Features.Music.ViewModels;
 using Island.App.Features.SystemInfo.ViewModels;
 using Island.App.Header.ViewModels;

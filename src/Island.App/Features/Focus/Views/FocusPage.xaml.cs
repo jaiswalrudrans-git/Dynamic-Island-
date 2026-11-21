@@ -2,10 +2,10 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Island.App.ViewModels;
+using Island.App.Features.Focus.ViewModels;
 using Island.Core.Focus;
 
-namespace Island.App.Views;
+namespace Island.App.Features.Focus.Views;
 
 public partial class FocusPage : UserControl
 {

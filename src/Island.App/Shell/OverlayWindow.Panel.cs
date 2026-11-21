@@ -6,6 +6,8 @@ using System.Windows.Threading;
 using Island.App.Features.Controls.Services;
 using Island.App.Features.Controls.ViewModels;
 using Island.App.Features.Controls.Views;
+using Island.App.Features.Focus.ViewModels;
+using Island.App.Features.Focus.Views;
 using Island.App.Features.Music.Services;
 using Island.App.Features.Music.ViewModels;
 using Island.App.Features.Music.Views;
