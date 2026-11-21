@@ -4,6 +4,7 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 using Island.App.Services;
 using Island.App.ViewModels;
 using Island.Core.Settings;
@@ -38,12 +39,51 @@ public partial class MusicPage : UserControl
 
         model.PropertyChanged += (_, e) =>
         {
+            if (e.PropertyName == nameof(MusicViewModel.Title))
+            {
+                Dispatcher.InvokeAsync(UpdateTitleMarquee, DispatcherPriority.Loaded);
+            }
             if (e.PropertyName != nameof(MusicViewModel.CurrentLyric)) return;
             if (lastLyric.Length > 0 && lastLyric == model.PreviousLyric && !model.ReducedMotion && IsHitTestVisible)
                 LyricY.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(18, 0,
                     TimeSpan.FromMilliseconds(180 / model.AnimationSpeed)) { FillBehavior = FillBehavior.Stop });
             lastLyric = model.CurrentLyric;
         };
+    }
+
+    private void TitleGrid_SizeChanged(object sender, SizeChangedEventArgs e) => UpdateTitleMarquee();
+
+    private void UpdateTitleMarquee()
+    {
+        if (TrackTitleBlock == null || TitleTransform == null) return;
+        TitleTransform.BeginAnimation(TranslateTransform.XProperty, null);
+        if (model.ReducedMotion)
+        {
+            TitleTransform.X = 0;
+            return;
+        }
+
+        TrackTitleBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        if (TrackTitleBlock.Parent is FrameworkElement parent && parent.ActualWidth > 0)
+        {
+            double overflow = TrackTitleBlock.DesiredSize.Width - parent.ActualWidth;
+            if (overflow > 6)
+            {
+                var travel = TimeSpan.FromSeconds(Math.Max(3.0, overflow / 22.0));
+                var pause = TimeSpan.FromSeconds(1.5);
+                var anim = new DoubleAnimationUsingKeyFrames
+                {
+                    RepeatBehavior = RepeatBehavior.Forever,
+                    AutoReverse = true
+                };
+                anim.KeyFrames.Add(new LinearDoubleKeyFrame(0, pause));
+                anim.KeyFrames.Add(new LinearDoubleKeyFrame(-overflow - 4, pause + travel));
+                anim.KeyFrames.Add(new LinearDoubleKeyFrame(-overflow - 4, pause + travel + pause));
+                TitleTransform.BeginAnimation(TranslateTransform.XProperty, anim);
+                return;
+            }
+        }
+        TitleTransform.X = 0;
     }
 
     private async void Transport(object sender, RoutedEventArgs e) => await model.CommandAsync((string)((Button)sender).Tag);

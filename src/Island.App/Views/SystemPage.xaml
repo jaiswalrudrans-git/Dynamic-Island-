@@ -43,9 +43,9 @@
     <!-- 3-COLUMN x 2-ROW BALANCED BENTO GRID -->
     <Grid Margin="12,4,12,14">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="10"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>

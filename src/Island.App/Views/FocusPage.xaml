@@ -92,17 +92,16 @@
         </Style>
 
         <Style x:Key="PlayBtn" TargetType="Button">
-            <Setter Property="Width" Value="48"/>
-            <Setter Property="Height" Value="48"/>
+            <Setter Property="Width" Value="44"/>
+            <Setter Property="Height" Value="44"/>
             <Setter Property="Background" Value="{DynamicResource Theme.Accent}"/>
             <Setter Property="Foreground" Value="{DynamicResource Theme.Background}"/>
             <Setter Property="Focusable" Value="False"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Effect" Value="{DynamicResource Theme.NeonGlow}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Box" CornerRadius="12" Background="{TemplateBinding Background}">
+                        <Border x:Name="Box" CornerRadius="10" Background="{TemplateBinding Background}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -237,7 +236,7 @@
             <!-- Reset -->
             <Button Style="{StaticResource FocusControlBtn}" Click="ResetClick" ToolTip="Reset">
                 <TextBlock Text="&#xE777;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
-                           FontSize="15" Foreground="{DynamicResource Theme.TextPrimary}"
+                           FontSize="14" Foreground="{DynamicResource Theme.TextPrimary}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Button>
 
@@ -245,7 +244,7 @@
             <Button Style="{StaticResource PlayBtn}" Click="PlayPauseClick"
                     Margin="16,0" ToolTip="{Binding PlayPauseText}">
                 <TextBlock Text="{Binding PlayPauseGlyph}" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
-                           FontSize="20" Foreground="{DynamicResource Theme.Background}"
+                           FontSize="18" Foreground="{DynamicResource Theme.Background}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Button>
 
@@ -253,13 +252,13 @@
             <Button Style="{StaticResource FocusControlBtn}" Click="SkipClick" ToolTip="Skip Stage"
                     Visibility="{Binding IsPomodoro, Converter={StaticResource Visible}}">
                 <TextBlock Text="&#xE893;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
-                           FontSize="15" Foreground="{DynamicResource Theme.TextPrimary}"
+                           FontSize="14" Foreground="{DynamicResource Theme.TextPrimary}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Button>
             <Button Style="{StaticResource FocusControlBtn}" Click="LapClick" ToolTip="Lap"
                     Visibility="{Binding IsStopwatch, Converter={StaticResource Visible}}">
                 <TextBlock Text="&#xE7C0;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
-                           FontSize="15" Foreground="{DynamicResource Theme.TextPrimary}"
+                           FontSize="14" Foreground="{DynamicResource Theme.TextPrimary}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Button>
         </StackPanel>

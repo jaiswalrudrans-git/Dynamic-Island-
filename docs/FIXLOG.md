@@ -67,7 +67,23 @@ This log tracks every defect identified during the Stage A audit, the exact chan
 ---
 
 ## Stage D: Per-Tab Polish & Settings Sidebar
-- **Status**: Pending
+- **Status**: Completed
+- **Changes Implemented**:
+  1. **Music Tab Overhaul (`MusicPage.xaml`, `MusicPage.xaml.cs`, `MusicViewModel.cs`)**:
+     - Added horizontal marquee animation on long track titles (`TitleTransform`) with smooth keyframe pauses when text exceeds the container width, preventing island widening.
+     - Tightened layout to ~170 DIP target height (80x80 cover art, 28 DIP lyrics canvas, 40x40 play button, 32x32 transport buttons).
+     - Expanded player icon and metadata detection across Spotify, Edge, Chrome, Brave, Firefox, VLC, and Windows Media Player.
+  2. **System Tab Bento Grid Balance (`SystemPage.xaml`)**:
+     - Converted grid rows to `Height="*"` with `VerticalAlignment="Stretch"` ensuring all cards in Row 0 (CPU, GPU, Network) and Row 2 (RAM, Power, Top Processes) share equal, balanced card heights.
+     - Top Apps process list maintains full clearance with zero text truncation.
+  3. **Focus Tab Transport Polish (`FocusPage.xaml`)**:
+     - Replaced blurry drop shadow on the play button with a crisp accent pill matching native Windows 11 aesthetics.
+     - Explicitly enforced icon font fallback chains across transport buttons (`Reset`, `Play/Pause`, `Skip`, `Lap`), preventing missing glyph tofu.
+  4. **Settings Window Left-Sidebar Architecture (`MotionSettingsWindow.xaml`, `MotionSettingsWindow.xaml.cs`)**:
+     - Redesigned monolithic window into a modern 780x620 2-column layout with a 200 DIP left sidebar navigation.
+     - Categorized into 7 dedicated pages: Appearance, Clock Studio, Typography Themes, Tabs & Clipboard, Motion & Timing, System & Alerts, About.
+     - Implemented per-page "Reset this page" button that restores defaults exclusively for the active page.
+     - Built About page with version 2.1.0 details, layered window architecture notes, and third-party open-source credits.
 
 ---
 

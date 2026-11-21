@@ -50,7 +50,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="16,8,16,12">
+    <Grid Margin="14,4,14,8">
         <!-- Radial Cover Glow (Subtle ambient effect directly on the island) -->
         <Border CornerRadius="{StaticResource Radius.Card}" IsHitTestVisible="False">
             <Border.Background>
@@ -62,7 +62,7 @@
         </Border>
 
         <!-- Empty State (Compact ~80-90 DIP) -->
-        <Grid x:Name="Empty" Margin="16,12">
+        <Grid x:Name="Empty" Margin="16,10">
             <Grid.Style>
                 <Style TargetType="Grid">
                     <Style.Triggers>
@@ -73,10 +73,10 @@
                 </Style>
             </Grid.Style>
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock Text="&#xE8D6;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="26"
+                <TextBlock Text="&#xE8D6;" FontFamily="{StaticResource Font.Icons}" FontSize="24"
                            Foreground="{DynamicResource Theme.Accent}" HorizontalAlignment="Center"/>
                 <TextBlock Text="{Binding EmptyStatus}" FontSize="{StaticResource Font.Body}" FontWeight="SemiBold"
-                           Foreground="{DynamicResource Theme.TextPrimary}" Margin="0,6,0,2" HorizontalAlignment="Center"/>
+                           Foreground="{DynamicResource Theme.TextPrimary}" Margin="0,4,0,2" HorizontalAlignment="Center"/>
                 <TextBlock Text="Play audio in Spotify, a browser, or media player."
                            Foreground="{DynamicResource Theme.TextSecondary}" FontSize="{StaticResource Font.Label}"
                            HorizontalAlignment="Center"/>
@@ -97,14 +97,14 @@
             </Grid.RowDefinitions>
 
             <!-- Row 0: Player Chip & Spectrum Meter -->
-            <DockPanel Grid.Row="0" Margin="0,0,0,10">
-                <local:SpectrumMeter x:Name="Meter" DockPanel.Dock="Right" Width="32" Height="18"
+            <DockPanel Grid.Row="0" Margin="0,0,0,6">
+                <local:SpectrumMeter x:Name="Meter" DockPanel.Dock="Right" Width="30" Height="16"
                                     VerticalAlignment="Center" ToolTip="Default output spectrum"/>
 
                 <Button HorizontalAlignment="Left" Click="ChoosePlayer" Focusable="False"
                         ToolTip="Choose or pin player" AutomationProperties.Name="Choose or pin a player"
                         Background="{DynamicResource Theme.SurfaceRaised}" BorderBrush="{DynamicResource Theme.Border}"
-                        BorderThickness="1" Cursor="Hand" Padding="8,3">
+                        BorderThickness="1" Cursor="Hand" Padding="7,2">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
                             <Border CornerRadius="6" Background="{TemplateBinding Background}"
@@ -116,16 +116,16 @@
                     </Button.Template>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <!-- Player Icon (Spotify / Web / Player) -->
-                        <TextBlock Text="{Binding PlayerIconGlyph}" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                        <TextBlock Text="{Binding PlayerIconGlyph}" FontFamily="{StaticResource Font.Icons}"
                                    FontSize="{StaticResource Font.Secondary}" Foreground="{DynamicResource Theme.Accent}"
                                    VerticalAlignment="Center" Margin="0,0,6,0"/>
                         <!-- Player Name -->
                         <TextBlock Text="{Binding Player}" MaxWidth="280" TextTrimming="CharacterEllipsis"
                                    FontSize="{StaticResource Font.Label}" FontWeight="SemiBold"
                                    Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
-                        <TextBlock Margin="6,1,0,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE70D;"
+                        <TextBlock Margin="6,1,0,0" FontFamily="{StaticResource Font.Icons}" Text="&#xE70D;"
                                    FontSize="9" Foreground="{DynamicResource Theme.TextTertiary}" VerticalAlignment="Center"/>
-                        <TextBlock Margin="5,1,0,0" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE718;"
+                        <TextBlock Margin="5,1,0,0" FontFamily="{StaticResource Font.Icons}" Text="&#xE718;"
                                    FontSize="10" Foreground="{DynamicResource Theme.Accent}"
                                    Visibility="{Binding Pinned, Converter={StaticResource Visible}}" VerticalAlignment="Center"/>
                     </StackPanel>
@@ -133,20 +133,20 @@
             </DockPanel>
 
             <!-- Row 1: Cover Art & Track Info -->
-            <Grid Grid.Row="1" Margin="0,4,0,10">
+            <Grid Grid.Row="1" Margin="0,2,0,6">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="96"/>
-                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="14"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
                 <!-- Cover Art with Rounded Corners -->
-                <Grid Grid.Column="0" Width="96" Height="96" VerticalAlignment="Center">
+                <Grid Grid.Column="0" Width="80" Height="80" VerticalAlignment="Center">
                     <Border CornerRadius="{StaticResource Radius.Card}" Background="{DynamicResource Theme.SurfaceRaised}"
                             BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1"/>
-                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="32"
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="28"
                                Foreground="{DynamicResource Theme.TextTertiary}"
-                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" Text="&#xE8D6;"
+                               FontFamily="{StaticResource Font.Icons}" Text="&#xE8D6;"
                                Visibility="{Binding MissingCover, Converter={StaticResource Visible}}"/>
                     <Border CornerRadius="{StaticResource Radius.Card}" ClipToBounds="True">
                         <Border.Background>
@@ -157,36 +157,42 @@
 
                 <!-- Title, Artist & Lyrics -->
                 <StackPanel Grid.Column="2" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding Title}" FontFamily="{DynamicResource Typography.Family.Heading}" FontSize="20" FontWeight="SemiBold"
-                               Foreground="{DynamicResource Theme.TextPrimary}"
-                               TextTrimming="CharacterEllipsis" ToolTip="{Binding Title}"/>
+                    <Grid ClipToBounds="True" Height="24" SizeChanged="TitleGrid_SizeChanged">
+                        <TextBlock x:Name="TrackTitleBlock" Text="{Binding Title}" FontFamily="{DynamicResource Typography.Family.Heading}" FontSize="17" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource Theme.TextPrimary}" TextTrimming="CharacterEllipsis" ToolTip="{Binding Title}"
+                                   VerticalAlignment="Center">
+                            <TextBlock.RenderTransform>
+                                <TranslateTransform x:Name="TitleTransform"/>
+                            </TextBlock.RenderTransform>
+                        </TextBlock>
+                    </Grid>
                     <TextBlock Text="{Binding Artist}" FontFamily="{DynamicResource Typography.Family.Body}" FontSize="{DynamicResource Font.Body}"
-                               Foreground="{DynamicResource Theme.TextSecondary}" Margin="0,3,0,0"
+                               Foreground="{DynamicResource Theme.TextSecondary}" Margin="0,1,0,0"
                                TextTrimming="CharacterEllipsis"/>
 
                     <!-- Lyrics Display -->
-                    <Grid Margin="0,8,0,0" Height="36" ClipToBounds="True" Visibility="{Binding ShowLyrics, Converter={StaticResource Visible}}">
+                    <Grid Margin="0,4,0,0" Height="28" ClipToBounds="True" Visibility="{Binding ShowLyrics, Converter={StaticResource Visible}}">
                         <Canvas>
                             <Canvas.RenderTransform>
                                 <TranslateTransform x:Name="LyricY"/>
                             </Canvas.RenderTransform>
-                            <TextBlock Canvas.Top="-18" Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Canvas}}"
-                                       Text="{Binding PreviousLyric}" FontSize="{StaticResource Font.Label}"
-                                       Foreground="{DynamicResource Theme.TextTertiary}" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Canvas.Top="-16" Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Canvas}}"
+                                        Text="{Binding PreviousLyric}" FontSize="{StaticResource Font.Label}"
+                                        Foreground="{DynamicResource Theme.TextTertiary}" TextTrimming="CharacterEllipsis"/>
                             <TextBlock Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Canvas}}"
-                                       Text="{Binding LyricDisplay}" FontSize="{StaticResource Font.Secondary}"
-                                       FontWeight="SemiBold" Foreground="{DynamicResource Theme.Accent}"
-                                       TextTrimming="CharacterEllipsis" ToolTip="{Binding LyricDisplay}"/>
-                            <TextBlock Canvas.Top="18" Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Canvas}}"
-                                       Text="{Binding NextLyric}" FontSize="{StaticResource Font.Label}"
-                                       Foreground="{DynamicResource Theme.TextTertiary}" TextTrimming="CharacterEllipsis"/>
+                                        Text="{Binding LyricDisplay}" FontSize="{StaticResource Font.Secondary}"
+                                        FontWeight="SemiBold" Foreground="{DynamicResource Theme.Accent}"
+                                        TextTrimming="CharacterEllipsis" ToolTip="{Binding LyricDisplay}"/>
+                            <TextBlock Canvas.Top="16" Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=Canvas}}"
+                                        Text="{Binding NextLyric}" FontSize="{StaticResource Font.Label}"
+                                        Foreground="{DynamicResource Theme.TextTertiary}" TextTrimming="CharacterEllipsis"/>
                         </Canvas>
                     </Grid>
                 </StackPanel>
             </Grid>
 
             <!-- Row 2: Seek Rail -->
-            <Grid Grid.Row="2" Margin="0,2,0,8" Visibility="{Binding HasTimeline, Converter={StaticResource Visible}}">
+            <Grid Grid.Row="2" Margin="0,2,0,4" Visibility="{Binding HasTimeline, Converter={StaticResource Visible}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -200,14 +206,14 @@
                         IsMoveToPointEnabled="True" Cursor="Hand">
                     <Slider.Template>
                         <ControlTemplate TargetType="Slider">
-                            <Grid Height="20" Background="Transparent" Cursor="Hand">
+                            <Grid Height="18" Background="Transparent" Cursor="Hand">
                                 <Track x:Name="PART_Track" VerticalAlignment="Center">
                                     <Track.DecreaseRepeatButton>
                                         <RepeatButton Style="{StaticResource SeekRail}" Background="{DynamicResource Theme.Data}"
                                                       Command="Slider.DecreaseLarge"/>
                                     </Track.DecreaseRepeatButton>
                                     <Track.Thumb>
-                                        <Thumb Width="12" Height="12" Cursor="Hand">
+                                        <Thumb Width="10" Height="10" Cursor="Hand">
                                             <Thumb.Template>
                                                 <ControlTemplate TargetType="Thumb">
                                                     <Ellipse Fill="{DynamicResource Theme.TextPrimary}"/>
@@ -245,13 +251,10 @@
                 <Button Style="{StaticResource Transport}" Tag="Previous" Click="Transport" Content="&#xE892;"
                         IsEnabled="{Binding CanPrevious}" ToolTip="Previous track" Margin="8,0,0,0"/>
 
-                <!-- Play / Pause Main Button (Primary action with glow) -->
+                <!-- Play / Pause Main Button -->
                 <Button Style="{StaticResource Transport}" Tag="Toggle" Click="Transport" Content="{Binding PlayGlyph}"
-                        IsEnabled="{Binding CanToggle}" Background="{DynamicResource Theme.Accent}" Foreground="#121620"
-                        Width="48" Height="48" Margin="12,0" ToolTip="{Binding PlayHint}" FontSize="18">
-                    <Button.Effect>
-                        <DropShadowEffect Color="#FFFF2E97" BlurRadius="10" ShadowDepth="0" Opacity="0.75"/>
-                    </Button.Effect>
+                        IsEnabled="{Binding CanToggle}" Background="{DynamicResource Theme.Accent}" Foreground="{DynamicResource Theme.Background}"
+                        Width="40" Height="40" Margin="10,0" ToolTip="{Binding PlayHint}" FontSize="16">
                 </Button>
 
                 <Button Style="{StaticResource Transport}" Tag="Next" Click="Transport" Content="&#xE893;"

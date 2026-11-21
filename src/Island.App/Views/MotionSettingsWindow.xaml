@@ -2,355 +2,524 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Island.App.Views"
-        Width="420" SizeToContent="Height" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
-        Background="{DynamicResource Theme.Background}" Foreground="{DynamicResource Theme.Foreground}">
-    <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="720">
-        <StackPanel Margin="24">
-            <!-- Appearance Section -->
-            <TextBlock Text="Appearance" FontSize="24" FontWeight="SemiBold"/>
-            <Border Margin="0,14,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
-                <StackPanel>
-                    <DockPanel Margin="0,2,0,8">
-                        <TextBlock Text="Theme" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="ThemeSelector" HorizontalAlignment="Right" MinWidth="130"/>
-                    </DockPanel>
-                    <DockPanel Margin="0,4,0,8">
-                        <TextBlock Text="Surface style" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="SurfaceSelector" HorizontalAlignment="Right" MinWidth="130"/>
-                    </DockPanel>
-                    <DockPanel Margin="0,4,0,2">
-                        <TextBlock Text="Background transparency" VerticalAlignment="Center"/>
-                        <Border HorizontalAlignment="Right" Background="{DynamicResource Theme.SurfaceRaised}"
-                                BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="6"
-                                Padding="4,2">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBox x:Name="BgTranspBox" Width="28" BorderThickness="0" Background="Transparent"
-                                         Foreground="{DynamicResource Theme.Foreground}" TextAlignment="Right"
-                                         VerticalAlignment="Center" FontSize="12"/>
-                                <TextBlock Text="%" Foreground="{DynamicResource Theme.TextSecondary}" FontSize="11"
-                                           VerticalAlignment="Center" Margin="1,0,5,0"/>
-                                <Border Width="1" Height="14" Background="{DynamicResource Theme.Border}" VerticalAlignment="Center"/>
-                                <Button x:Name="BgTranspMinus" Content="−" Width="20" Height="20" Margin="3,0,1,0"
-                                        Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
-                                        BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
-                                <Button x:Name="BgTranspPlus" Content="+" Width="20" Height="20" Margin="1,0,2,0"
-                                        Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
-                                        BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
+        Width="780" Height="620" MinWidth="700" MinHeight="550"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource Theme.Background}" Foreground="{DynamicResource Theme.Foreground}"
+        FontFamily="{DynamicResource Typography.Family.Body}">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="Visible"/>
+
+        <!-- Sidebar Navigation Button Style -->
+        <Style x:Key="SidebarNavBtn" TargetType="Button">
+            <Setter Property="Height" Value="38"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource Theme.TextSecondary}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Box" CornerRadius="8" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Box" Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimary}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Reset Button Style -->
+        <Style x:Key="ResetPageBtn" TargetType="Button">
+            <Setter Property="Height" Value="28"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="{DynamicResource Theme.SurfaceRaised}"/>
+            <Setter Property="Foreground" Value="{DynamicResource Theme.TextSecondary}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Box" CornerRadius="6" Background="{TemplateBinding Background}"
+                                BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Box" Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource Theme.TextPrimary}"/>
+                                <Setter TargetName="Box" Property="BorderBrush" Value="{DynamicResource Theme.BorderStrong}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <!-- Left Sidebar Navigation (190 DIP) -->
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="1"/>
+            <!-- Right Settings Content -->
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- SIDEBAR -->
+        <Border Grid.Column="0" Background="{DynamicResource Theme.Surface}" Padding="14,16,14,16">
+            <DockPanel LastChildFill="True">
+                <!-- App Title Header -->
+                <StackPanel DockPanel.Dock="Top" Margin="6,0,0,16">
+                    <TextBlock Text="Island Settings" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                    <TextBlock Text="Customization &amp; Controls" FontSize="11" Foreground="{DynamicResource Theme.TextSecondary}" Margin="0,2,0,0"/>
+                </StackPanel>
+
+                <!-- Sidebar Buttons List -->
+                <StackPanel Orientation="Vertical">
+                    <Button x:Name="NavAppearanceBtn" Style="{StaticResource SidebarNavBtn}" Click="NavClick" Tag="Appearance">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE790;" FontFamily="{StaticResource Font.Icons}" FontSize="14" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Appearance" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="NavClockBtn" Style="{StaticResource SidebarNavBtn}" Click="NavClick" Tag="Clock">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE823;" FontFamily="{StaticResource Font.Icons}" FontSize="14" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Clock" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="NavTypographyBtn" Style="{StaticResource SidebarNavBtn}" Click="NavClick" Tag="Typography">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE8D2;" FontFamily="{StaticResource Font.Icons}" FontSize="14" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Typography" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="NavTabsBtn" Style="{StaticResource SidebarNavBtn}" Click="NavClick" Tag="Tabs">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE8C8;" FontFamily="{StaticResource Font.Icons}" FontSize="14" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Tabs &amp; Clipboard" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="NavMotionBtn" Style="{StaticResource SidebarNavBtn}" Click="NavClick" Tag="Motion">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE7C4;" FontFamily="{StaticResource Font.Icons}" FontSize="14" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Motion &amp; Timing" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="NavSystemBtn" Style="{StaticResource SidebarNavBtn}" Click="NavClick" Tag="System">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE950;" FontFamily="{StaticResource Font.Icons}" FontSize="14" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="System &amp; Alerts" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="NavAboutBtn" Style="{StaticResource SidebarNavBtn}" Click="NavClick" Tag="About">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="&#xE946;" FontFamily="{StaticResource Font.Icons}" FontSize="14" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="About" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Divider Line -->
+        <Border Grid.Column="1" Background="{DynamicResource Theme.Border}"/>
+
+        <!-- RIGHT CONTENT AREA -->
+        <Grid Grid.Column="2" Margin="24,18,24,18">
+            <Grid.RowDefinitions>
+                <!-- Top Header: Title + Reset Page Button -->
+                <RowDefinition Height="Auto"/>
+                <!-- Page Host ScrollViewer -->
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Top Header Strip -->
+            <DockPanel Grid.Row="0" Margin="0,0,0,16">
+                <Button DockPanel.Dock="Right" Style="{StaticResource ResetPageBtn}" Click="ResetCurrentPageClick" ToolTip="Restore default settings for this page">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE777;" FontFamily="{StaticResource Font.Icons}" FontSize="11" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock Text="Reset this page" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+                <TextBlock x:Name="PageHeaderTitle" Text="Appearance" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource Theme.TextPrimary}" VerticalAlignment="Center"/>
+            </DockPanel>
+
+            <!-- Scrollable Page Container with Thin Overlay Scrollbars -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <Grid>
+                    <!-- PAGE 1: APPEARANCE -->
+                    <StackPanel x:Name="PageAppearance" Visibility="Visible">
+                        <Border Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+                            <StackPanel>
+                                <DockPanel Margin="0,2,0,8">
+                                    <TextBlock Text="Theme" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                    <ComboBox x:Name="ThemeSelector" HorizontalAlignment="Right" MinWidth="140"/>
+                                </DockPanel>
+                                <DockPanel Margin="0,4,0,8">
+                                    <TextBlock Text="Surface style" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                    <ComboBox x:Name="SurfaceSelector" HorizontalAlignment="Right" MinWidth="140"/>
+                                </DockPanel>
+                                <DockPanel Margin="0,4,0,2">
+                                    <TextBlock Text="Background transparency" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                    <Border HorizontalAlignment="Right" Background="{DynamicResource Theme.SurfaceRaised}"
+                                            BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="6"
+                                            Padding="4,2">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBox x:Name="BgTranspBox" Width="28" BorderThickness="0" Background="Transparent"
+                                                     Foreground="{DynamicResource Theme.Foreground}" TextAlignment="Right"
+                                                     VerticalAlignment="Center" FontSize="12"/>
+                                            <TextBlock Text="%" Foreground="{DynamicResource Theme.TextSecondary}" FontSize="11"
+                                                       VerticalAlignment="Center" Margin="1,0,5,0"/>
+                                            <Border Width="1" Height="14" Background="{DynamicResource Theme.Border}" VerticalAlignment="Center"/>
+                                            <Button x:Name="BgTranspMinus" Content="−" Width="20" Height="20" Margin="3,0,1,0"
+                                                    Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
+                                                    BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                                            <Button x:Name="BgTranspPlus" Content="+" Width="20" Height="20" Margin="1,0,2,0"
+                                                    Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
+                                                    BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DockPanel>
+                                <Slider x:Name="BgTranspSlider" Minimum="0" Maximum="70" TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,0,0,8"/>
+                                <DockPanel Margin="0,2,0,2">
+                                    <TextBlock Text="Collapsed notch transparency" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                    <Border HorizontalAlignment="Right" Background="{DynamicResource Theme.SurfaceRaised}"
+                                            BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="6"
+                                            Padding="4,2">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBox x:Name="ColTranspBox" Width="28" BorderThickness="0" Background="Transparent"
+                                                     Foreground="{DynamicResource Theme.Foreground}" TextAlignment="Right"
+                                                     VerticalAlignment="Center" FontSize="12"/>
+                                            <TextBlock Text="%" Foreground="{DynamicResource Theme.TextSecondary}" FontSize="11"
+                                                       VerticalAlignment="Center" Margin="1,0,5,0"/>
+                                            <Border Width="1" Height="14" Background="{DynamicResource Theme.Border}" VerticalAlignment="Center"/>
+                                            <Button x:Name="ColTranspMinus" Content="−" Width="20" Height="20" Margin="3,0,1,0"
+                                                    Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
+                                                    BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                                            <Button x:Name="ColTranspPlus" Content="+" Width="20" Height="20" Margin="1,0,2,0"
+                                                    Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
+                                                    BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DockPanel>
+                                <Slider x:Name="ColTranspSlider" Minimum="0" Maximum="50" TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,0,0,8"/>
+                                <DockPanel Margin="0,4,0,8">
+                                    <TextBlock Text="Interface size" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                    <ComboBox x:Name="InterfaceSizeSelector" HorizontalAlignment="Right" MinWidth="140"/>
+                                </DockPanel>
+                                <DockPanel Margin="0,6,0,4">
+                                    <TextBlock Text="Fine UI scale" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding Value, ElementName=UiScaleSlider, StringFormat={}{0:P0}}" HorizontalAlignment="Right"/>
+                                </DockPanel>
+                                <Slider x:Name="UiScaleSlider" Minimum="0.9" Maximum="1.5" TickFrequency="0.05" IsSnapToTickEnabled="True" Margin="0,0,0,8"/>
+
+                                <!-- Neon Intensity -->
+                                <DockPanel Margin="0,4,0,2">
+                                    <TextBlock Text="Neon intensity" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                    <Border HorizontalAlignment="Right" Background="{DynamicResource Theme.SurfaceRaised}"
+                                            BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="6"
+                                            Padding="4,2">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBox x:Name="NeonIntensityBox" Width="28" BorderThickness="0" Background="Transparent"
+                                                     Foreground="{DynamicResource Theme.Foreground}" TextAlignment="Right"
+                                                     VerticalAlignment="Center" FontSize="12"/>
+                                            <TextBlock Text="%" Foreground="{DynamicResource Theme.TextSecondary}" FontSize="11"
+                                                       VerticalAlignment="Center" Margin="1,0,5,0"/>
+                                            <Border Width="1" Height="14" Background="{DynamicResource Theme.Border}" VerticalAlignment="Center"/>
+                                            <Button x:Name="NeonIntensityMinus" Content="−" Width="20" Height="20" Margin="3,0,1,0"
+                                                    Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
+                                                    BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                                            <Button x:Name="NeonIntensityPlus" Content="+" Width="20" Height="20" Margin="1,0,2,0"
+                                                    Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
+                                                    BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DockPanel>
+                                <Slider x:Name="NeonIntensitySlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,0,0,10"/>
+
+                                <!-- Bottom Neon Line Toggles -->
+                                <CheckBox x:Name="BottomNeonLineCheck" Content="Bottom-edge neon reactive line" Foreground="{DynamicResource Theme.Foreground}" Margin="0,4,0,6"/>
+                                <CheckBox x:Name="NeonMusicReactiveCheck" Content="Music beat reactive glow" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <CheckBox x:Name="NeonLoadReactiveCheck" Content="CPU/GPU workload reactive glow" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,12"/>
+
+                                <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,4,0,12"/>
+                                <TextBlock Text="Music &amp; Media" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}" Margin="0,0,0,8"/>
+                                <CheckBox x:Name="MusicPreview" Content="Show compact playback preview" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,4"/>
+                                <DockPanel Margin="0,4,0,8">
+                                    <TextBlock Text="Preview text" VerticalAlignment="Center"/>
+                                    <ComboBox x:Name="PreviewText" HorizontalAlignment="Right" MinWidth="140"/>
+                                </DockPanel>
+                                <CheckBox x:Name="Equalizer" Content="Show output equalizer" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,4"/>
+                                <CheckBox x:Name="Lyrics" Content="Look up synced lyrics on LRCLIB" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,4"/>
+                                <CheckBox x:Name="CoverGlow" Content="Tint player with album artwork" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,4"/>
                             </StackPanel>
                         </Border>
-                    </DockPanel>
-                    <Slider x:Name="BgTranspSlider" Minimum="0" Maximum="70" TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,0,0,8"/>
-                    <DockPanel Margin="0,2,0,2">
-                        <TextBlock Text="Collapsed notch transparency" VerticalAlignment="Center"/>
-                        <Border HorizontalAlignment="Right" Background="{DynamicResource Theme.SurfaceRaised}"
-                                BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="6"
-                                Padding="4,2">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBox x:Name="ColTranspBox" Width="28" BorderThickness="0" Background="Transparent"
-                                         Foreground="{DynamicResource Theme.Foreground}" TextAlignment="Right"
-                                         VerticalAlignment="Center" FontSize="12"/>
-                                <TextBlock Text="%" Foreground="{DynamicResource Theme.TextSecondary}" FontSize="11"
-                                           VerticalAlignment="Center" Margin="1,0,5,0"/>
-                                <Border Width="1" Height="14" Background="{DynamicResource Theme.Border}" VerticalAlignment="Center"/>
-                                <Button x:Name="ColTranspMinus" Content="−" Width="20" Height="20" Margin="3,0,1,0"
-                                        Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
-                                        BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
-                                <Button x:Name="ColTranspPlus" Content="+" Width="20" Height="20" Margin="1,0,2,0"
-                                        Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
-                                        BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- PAGE 2: CLOCK STUDIO -->
+                    <StackPanel x:Name="PageClock" Visibility="Collapsed">
+                        <Border Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+                            <StackPanel>
+                                <DockPanel Margin="0,0,0,10">
+                                    <TextBlock Text="Selected Clock Style" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                                    <TextBlock x:Name="CurrentStyleLabel" Text="Simple" FontWeight="Bold" HorizontalAlignment="Right" Foreground="{DynamicResource Theme.Accent}"/>
+                                </DockPanel>
+
+                                <!-- Responsive Grid of Clock Styles (3 columns x 5 rows) -->
+                                <UniformGrid x:Name="ClockStylesGrid" Columns="3" Margin="0,4,0,12"/>
+
+                                <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,4,0,12"/>
+
+                                <!-- Color Options -->
+                                <DockPanel Margin="0,0,0,8">
+                                    <TextBlock Text="Clock Accent Color" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                                    <TextBlock x:Name="CurrentColorLabel" Text="White" FontWeight="Bold" HorizontalAlignment="Right" Foreground="{DynamicResource Theme.Accent}"/>
+                                </DockPanel>
+                                <WrapPanel x:Name="ColorSwatchesPanel" Margin="0,2,0,10"/>
+
+                                <!-- Custom Color Hex Input -->
+                                <DockPanel x:Name="CustomColorRow" Margin="0,2,0,10" Visibility="Collapsed">
+                                    <TextBlock Text="Custom Hex Color" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                                    <TextBox x:Name="CustomColorBox" Text="#00E5FF" HorizontalAlignment="Right" Width="100" Padding="4,2"/>
+                                </DockPanel>
+
+                                <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,4,0,12"/>
+
+                                <!-- Toggles & Scaling -->
+                                <CheckBox x:Name="ShowNotchClockCheck" Content="Show clock inside collapsed notch" Foreground="{DynamicResource Theme.Foreground}" Margin="0,4,0,6"/>
+                                <CheckBox x:Name="Clock24HourCheck" Content="24-hour time format" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <CheckBox x:Name="ClockSecondsCheck" Content="Show seconds" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <CheckBox x:Name="ClockBlinkCheck" Content="Blinking colon separator" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <CheckBox x:Name="ClockZeroCheck" Content="Leading zero on single-digit hours" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,10"/>
+
+                                <DockPanel Margin="0,6,0,4">
+                                    <TextBlock Text="Clock size scale"/>
+                                    <TextBlock Text="{Binding Value, ElementName=ClockSizeSlider, StringFormat={}{0:P0}}" HorizontalAlignment="Right"/>
+                                </DockPanel>
+                                <Slider x:Name="ClockSizeSlider" Minimum="0.8" Maximum="1.5" TickFrequency="0.05" IsSnapToTickEnabled="True"/>
                             </StackPanel>
                         </Border>
-                    </DockPanel>
-                    <Slider x:Name="ColTranspSlider" Minimum="0" Maximum="50" TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,0,0,8"/>
-                    <DockPanel Margin="0,4,0,8">
-                        <TextBlock Text="Interface size" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="InterfaceSizeSelector" HorizontalAlignment="Right" MinWidth="130"/>
-                    </DockPanel>
-                    <DockPanel Margin="0,6,0,4">
-                        <TextBlock Text="Fine UI scale"/>
-                        <TextBlock Text="{Binding Value, ElementName=UiScaleSlider, StringFormat={}{0:P0}}" HorizontalAlignment="Right"/>
-                    </DockPanel>
-                    <Slider x:Name="UiScaleSlider" Minimum="0.9" Maximum="1.5" TickFrequency="0.05" IsSnapToTickEnabled="True" Margin="0,0,0,8"/>
+                    </StackPanel>
 
-                    <!-- Neon Intensity -->
-                    <DockPanel Margin="0,4,0,2">
-                        <TextBlock Text="Neon intensity" VerticalAlignment="Center"/>
-                        <Border HorizontalAlignment="Right" Background="{DynamicResource Theme.SurfaceRaised}"
-                                BorderBrush="{DynamicResource Theme.Border}" BorderThickness="1" CornerRadius="6"
-                                Padding="4,2">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBox x:Name="NeonIntensityBox" Width="28" BorderThickness="0" Background="Transparent"
-                                         Foreground="{DynamicResource Theme.Foreground}" TextAlignment="Right"
-                                         VerticalAlignment="Center" FontSize="12"/>
-                                <TextBlock Text="%" Foreground="{DynamicResource Theme.TextSecondary}" FontSize="11"
-                                           VerticalAlignment="Center" Margin="1,0,5,0"/>
-                                <Border Width="1" Height="14" Background="{DynamicResource Theme.Border}" VerticalAlignment="Center"/>
-                                <Button x:Name="NeonIntensityMinus" Content="−" Width="20" Height="20" Margin="3,0,1,0"
-                                        Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
-                                        BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
-                                <Button x:Name="NeonIntensityPlus" Content="+" Width="20" Height="20" Margin="1,0,2,0"
-                                        Padding="0" Background="Transparent" Foreground="{DynamicResource Theme.Foreground}"
-                                        BorderThickness="0" Cursor="Hand" FontWeight="Bold" VerticalContentAlignment="Center"/>
+                    <!-- PAGE 3: TYPOGRAPHY -->
+                    <StackPanel x:Name="PageTypography" Visibility="Collapsed">
+                        <Border Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+                            <StackPanel>
+                                <CheckBox x:Name="MatchTypographyCheck" Content="Match typography to clock style (automatic pairing)" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Foreground}" Margin="0,0,0,6"/>
+                                <CheckBox x:Name="MatchAccentCheck" Content="Match accent color to clock color" Foreground="{DynamicResource Theme.Foreground}" Margin="0,0,0,6"/>
+                                <CheckBox x:Name="LegibilityGuardCheck" Content="Legibility guard (ensures body/labels never use unreadable fonts)" Foreground="{DynamicResource Theme.Foreground}" Margin="0,0,0,12"/>
+
+                                <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,4,0,12"/>
+
+                                <DockPanel Margin="0,0,0,8">
+                                    <TextBlock Text="Typography Preset" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                                    <TextBlock x:Name="CurrentTypographyLabel" Text="Classic" FontWeight="Bold" HorizontalAlignment="Right" Foreground="{DynamicResource Theme.Accent}"/>
+                                </DockPanel>
+
+                                <!-- 12 Typography Presets Live Tiles (3 Columns) -->
+                                <UniformGrid x:Name="TypographyPresetsGrid" Columns="3" Margin="0,2,0,12"/>
+
+                                <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,4,0,12"/>
+
+                                <!-- Fine Tuning -->
+                                <DockPanel Margin="0,4,0,4">
+                                    <TextBlock Text="Font scale (90% - 130%)" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Value, ElementName=TypographyScaleSlider, StringFormat={}{0:P0}}" HorizontalAlignment="Right" Foreground="{DynamicResource Theme.Accent}"/>
+                                </DockPanel>
+                                <Slider x:Name="TypographyScaleSlider" Minimum="0.9" Maximum="1.3" TickFrequency="0.05" IsSnapToTickEnabled="True" Margin="0,0,0,10"/>
+
+                                <DockPanel Margin="0,4,0,8">
+                                    <TextBlock Text="Typography weight scale" VerticalAlignment="Center"/>
+                                    <ComboBox x:Name="TypographyWeightCombo" HorizontalAlignment="Right" MinWidth="130"/>
+                                </DockPanel>
+
+                                <CheckBox x:Name="TypographyUppercaseCheck" Content="Uppercase small labels" Foreground="{DynamicResource Theme.Foreground}" Margin="0,4,0,6"/>
+                                <CheckBox x:Name="TypographyTabularCheck" Content="Tabular lining numerals for stats" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <CheckBox x:Name="TypographyGlowCheck" Content="Text glow effect" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+
+                                <DockPanel x:Name="TypographyGlowRow" Margin="0,4,0,10">
+                                    <TextBlock Text="Glow intensity" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                                    <Slider x:Name="TypographyGlowSlider" Minimum="0.1" Maximum="1.0" TickFrequency="0.1" IsSnapToTickEnabled="True" Width="140" HorizontalAlignment="Right"/>
+                                </DockPanel>
+
+                                <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,4,0,12"/>
+
+                                <!-- Per-Role Font Overrides -->
+                                <TextBlock Text="Per-Role Overrides" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Foreground}" Margin="0,0,0,8"/>
+                                <DockPanel Margin="0,2,0,6">
+                                    <TextBlock Text="Display (Clock, Hero)" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                                    <ComboBox x:Name="RoleDisplayCombo" HorizontalAlignment="Right" MinWidth="160"/>
+                                </DockPanel>
+                                <DockPanel Margin="0,2,0,6">
+                                    <TextBlock Text="Heading (Cards, Tabs)" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                                    <ComboBox x:Name="RoleHeadingCombo" HorizontalAlignment="Right" MinWidth="160"/>
+                                </DockPanel>
+                                <DockPanel Margin="0,2,0,6">
+                                    <TextBlock Text="Body (Standard Text)" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                                    <ComboBox x:Name="RoleBodyCombo" HorizontalAlignment="Right" MinWidth="160"/>
+                                </DockPanel>
+                                <DockPanel Margin="0,2,0,6">
+                                    <TextBlock Text="Label (Small Badges)" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                                    <ComboBox x:Name="RoleLabelCombo" HorizontalAlignment="Right" MinWidth="160"/>
+                                </DockPanel>
+                                <DockPanel Margin="0,2,0,4">
+                                    <TextBlock Text="Numeric (Metrics, Stats)" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                                    <ComboBox x:Name="RoleNumericCombo" HorizontalAlignment="Right" MinWidth="160"/>
+                                </DockPanel>
                             </StackPanel>
                         </Border>
-                    </DockPanel>
-                    <Slider x:Name="NeonIntensitySlider" Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,0,0,10"/>
+                    </StackPanel>
 
-                    <!-- Bottom Neon Line Toggles -->
-                    <CheckBox x:Name="BottomNeonLineCheck" Content="Bottom-edge neon line" Foreground="{DynamicResource Theme.Foreground}" Margin="0,4,0,6"/>
-                    <CheckBox x:Name="NeonMusicReactiveCheck" Content="Music-reactive pulse while playing" Foreground="{DynamicResource Theme.Foreground}" Margin="18,0,0,6"/>
-                    <CheckBox x:Name="NeonLoadReactiveCheck" Content="Shift to yellow/red warning on high load or temp" Foreground="{DynamicResource Theme.Foreground}" Margin="18,0,0,4"/>
-                </StackPanel>
-            </Border>
+                    <!-- PAGE 4: TABS & CLIPBOARD -->
+                    <StackPanel x:Name="PageTabsClipboard" Visibility="Collapsed">
+                        <Border Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+                            <StackPanel>
+                                <TextBlock Text="Tab Navigation" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                                <DockPanel Margin="0,4,0,8">
+                                    <TextBlock Text="Tab bar position" VerticalAlignment="Center"/>
+                                    <ComboBox x:Name="TabBarPositionCombo" HorizontalAlignment="Right" MinWidth="140"/>
+                                </DockPanel>
+                                <DockPanel Margin="0,4,0,8">
+                                    <TextBlock Text="Tab label display" VerticalAlignment="Center"/>
+                                    <ComboBox x:Name="TabLabelModeCombo" HorizontalAlignment="Right" MinWidth="140"/>
+                                </DockPanel>
+                                <CheckBox x:Name="HeaderMouseWheelCheck" Content="Mouse wheel over header switches tabs" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <CheckBox x:Name="TabSwitchOnHoverCheck" Content="Switch tabs on hover (150 ms intent delay)" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,12"/>
 
-            <!-- Clock Studio Section -->
-            <TextBlock Text="Clock Studio" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
-            <Border Margin="0,14,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
-                <StackPanel>
-                    <CheckBox x:Name="ShowNotchClockCheck" Content="Show clock in collapsed notch" Foreground="{DynamicResource Theme.Foreground}" Margin="0,0,0,12"/>
+                                <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,4,0,12"/>
 
-                    <!-- Heading -->
-                    <DockPanel Margin="0,0,0,8">
-                        <TextBlock Text="Clock style" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Foreground}"/>
-                        <TextBlock x:Name="CurrentStyleLabel" Text="Simple" Foreground="{DynamicResource Theme.Accent}" HorizontalAlignment="Right" FontSize="12"/>
-                    </DockPanel>
+                                <TextBlock Text="Clipboard &amp; Screenshots" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                                <CheckBox x:Name="ClipboardEnabledCheck" Content="Enable clipboard history tracking" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <DockPanel Margin="0,8,0,4">
+                                    <TextBlock Text="History capacity" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Value, ElementName=ClipboardHistorySlider, StringFormat={}{0:0} items}" HorizontalAlignment="Right" Foreground="{DynamicResource Theme.Accent}"/>
+                                </DockPanel>
+                                <Slider x:Name="ClipboardHistorySlider" Minimum="10" Maximum="200" TickFrequency="10" IsSnapToTickEnabled="True" Margin="0,0,0,8"/>
+                                <CheckBox x:Name="ClipboardRememberCheck" Content="Remember history across restarts (encrypted with DPAPI)" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <CheckBox x:Name="ClipboardFilterSecretsCheck" Content="Privacy guard: filter password managers, tokens &amp; card numbers" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <CheckBox x:Name="ClipboardCollapseCheck" Content="Collapse island after clicking to paste" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <DockPanel Margin="0,6,0,8">
+                                    <TextBlock Text="Auto-expire items" VerticalAlignment="Center"/>
+                                    <ComboBox x:Name="ClipboardAutoExpireCombo" HorizontalAlignment="Right" MinWidth="140"/>
+                                </DockPanel>
+                                <DockPanel Margin="0,4,0,8">
+                                    <TextBlock Text="Single-click card action" VerticalAlignment="Center"/>
+                                    <ComboBox x:Name="ClipboardClickActionCombo" HorizontalAlignment="Right" MinWidth="140"/>
+                                </DockPanel>
+                                <TextBlock Text="Global hotkey: Ctrl + Alt + V opens Clipboard tab directly" FontSize="11" Foreground="{DynamicResource Theme.TextSecondary}" Margin="0,4,0,0"/>
 
-                    <!-- Style Preview Tiles Grid (Live Time) -->
-                    <UniformGrid x:Name="ClockStylesGrid" Columns="3" Margin="-4,0,-4,8"/>
+                                <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,8,0,12"/>
 
-                    <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,8,0,12"/>
+                                <TextBlock Text="Screenshots Watcher" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                                <CheckBox x:Name="ScreenshotsEnabledCheck" Content="Enable screenshots capture in clipboard tab" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <CheckBox x:Name="ScreenshotsClipboardCheck" Content="Capture snips from Win+Shift+S / Snipping Tool" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <CheckBox x:Name="ScreenshotsSaveSnipsCheck" Content="Save captured snips directly to Screenshots folder" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <DockPanel Margin="0,6,0,8">
+                                    <TextBlock Text="Thumbnail size" VerticalAlignment="Center"/>
+                                    <ComboBox x:Name="ScreenshotsThumbSizeCombo" HorizontalAlignment="Right" MinWidth="140"/>
+                                </DockPanel>
+                                <DockPanel Margin="0,4,0,8">
+                                    <TextBlock Text="Thumbnail click action" VerticalAlignment="Center"/>
+                                    <ComboBox x:Name="ScreenshotsClickActionCombo" HorizontalAlignment="Right" MinWidth="140"/>
+                                </DockPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
 
-                    <!-- Clock Color Row -->
-                    <DockPanel Margin="0,0,0,8">
-                        <TextBlock Text="Clock color" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Foreground}"/>
-                        <TextBlock x:Name="CurrentColorLabel" Text="White" Foreground="{DynamicResource Theme.Accent}" HorizontalAlignment="Right" FontSize="12"/>
-                    </DockPanel>
-                    <WrapPanel x:Name="ColorSwatchesPanel" Margin="0,0,0,8"/>
+                    <!-- PAGE 5: MOTION & TIMING -->
+                    <StackPanel x:Name="PageMotion" Visibility="Collapsed">
+                        <Border Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+                            <StackPanel>
+                                <CheckBox x:Name="Reduced" Content="Reduce motion (disable slide transitions)" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,10"/>
+                                <DockPanel Margin="0,14,0,4"><TextBlock Text="Animation speed" FontWeight="SemiBold"/><TextBlock Text="{Binding Value, ElementName=Speed, StringFormat={}{0:0.##}×}" HorizontalAlignment="Right" Foreground="{DynamicResource Theme.Accent}"/></DockPanel>
+                                <Slider x:Name="Speed" Minimum="0.5" Maximum="2" TickFrequency="0.25" IsSnapToTickEnabled="True" Margin="0,0,0,10"/>
+                                <DockPanel Margin="0,14,0,4"><TextBlock Text="Hover delay" FontWeight="SemiBold"/><TextBlock Text="{Binding Value, ElementName=Hover, StringFormat={}{0:0} ms}" HorizontalAlignment="Right" Foreground="{DynamicResource Theme.Accent}"/></DockPanel>
+                                <Slider x:Name="Hover" Minimum="0" Maximum="2000" TickFrequency="10" IsSnapToTickEnabled="True" Margin="0,0,0,10"/>
+                                <DockPanel Margin="0,14,0,4"><TextBlock Text="Collapse delay" FontWeight="SemiBold"/><TextBlock Text="{Binding Value, ElementName=Leave, StringFormat={}{0:0} ms}" HorizontalAlignment="Right" Foreground="{DynamicResource Theme.Accent}"/></DockPanel>
+                                <Slider x:Name="Leave" Minimum="0" Maximum="5000" TickFrequency="10" IsSnapToTickEnabled="True" Margin="0,0,0,8"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
 
-                    <!-- Custom Color Input Row (shown when Custom is selected) -->
-                    <DockPanel x:Name="CustomColorRow" Margin="0,4,0,8" Visibility="Collapsed">
-                        <TextBlock Text="Custom hex color" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
-                        <TextBox x:Name="CustomColorBox" Width="90" HorizontalAlignment="Right" Background="{DynamicResource Theme.SurfaceRaised}"
-                                 Foreground="{DynamicResource Theme.Foreground}" BorderBrush="{DynamicResource Theme.Border}"
-                                 BorderThickness="1" Padding="4,2" TextAlignment="Center"/>
-                    </DockPanel>
+                    <!-- PAGE 6: SYSTEM & ALERTS -->
+                    <StackPanel x:Name="PageSystemAlerts" Visibility="Collapsed">
+                        <Border Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+                            <StackPanel>
+                                <TextBlock Text="System Bento Settings" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                                <DockPanel Margin="0,4,0,8">
+                                    <TextBlock Text="Collapsed live stat" VerticalAlignment="Center"/>
+                                    <ComboBox x:Name="CollapsedStat" HorizontalAlignment="Right" MinWidth="130"/>
+                                </DockPanel>
+                                <DockPanel Margin="0,4,0,12">
+                                    <TextBlock Text="Top processes sort" VerticalAlignment="Center"/>
+                                    <ComboBox x:Name="ProcessSort" HorizontalAlignment="Right" MinWidth="130"/>
+                                </DockPanel>
 
-                    <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,8,0,12"/>
+                                <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,4,0,12"/>
 
-                    <!-- Options -->
-                    <CheckBox x:Name="Clock24HourCheck" Content="24-hour clock" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
-                    <CheckBox x:Name="ClockSecondsCheck" Content="Show seconds" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
-                    <CheckBox x:Name="ClockBlinkCheck" Content="Blinking colon" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
-                    <CheckBox x:Name="ClockZeroCheck" Content="Leading zero" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,8"/>
+                                <TextBlock Text="Alerts &amp; Collapsed OSD" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                                <CheckBox x:Name="AlertsEnabledCheck" Content="Enable collapsed alerts &amp; OSD" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <CheckBox x:Name="AlertVolumeCheck" Content="Volume &amp; mute OSD" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <CheckBox x:Name="AlertBrightnessCheck" Content="Brightness OSD" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <CheckBox x:Name="AlertMicCheck" Content="Microphone mute OSD" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <CheckBox x:Name="AlertBatteryCheck" Content="Battery &amp; charger alerts" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <CheckBox x:Name="AlertTempCheck" Content="Temperature warnings" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
+                                <CheckBox x:Name="AlertSoundCheck" Content="Play alert sound" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,10"/>
+                                <DockPanel Margin="0,6,0,4"><TextBlock Text="Alert duration"/><TextBlock Text="{Binding Value, ElementName=AlertDurationSlider, StringFormat={}{0:0} s}" HorizontalAlignment="Right" Foreground="{DynamicResource Theme.Accent}"/></DockPanel>
+                                <Slider x:Name="AlertDurationSlider" Minimum="1" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True" Margin="0,0,0,12"/>
 
-                    <DockPanel Margin="0,6,0,4">
-                        <TextBlock Text="Clock size" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding Value, ElementName=ClockSizeSlider, StringFormat={}{0:P0}}" HorizontalAlignment="Right"/>
-                    </DockPanel>
-                    <Slider x:Name="ClockSizeSlider" Minimum="0.8" Maximum="1.5" TickFrequency="0.05" IsSnapToTickEnabled="True"/>
-                </StackPanel>
-            </Border>
+                                <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,4,0,12"/>
 
-            <!-- Typography Studio Section -->
-            <TextBlock Text="Typography Studio" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
-            <Border Margin="0,14,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
-                <StackPanel>
-                    <CheckBox x:Name="MatchTypographyCheck" Content="Match typography to clock style (automatic pairing)"
-                              Foreground="{DynamicResource Theme.Foreground}" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                    <CheckBox x:Name="MatchAccentCheck" Content="Match accent color to clock color"
-                              Foreground="{DynamicResource Theme.Foreground}" Margin="0,0,0,6"/>
-                    <CheckBox x:Name="LegibilityGuardCheck" Content="Legibility guard (prevents unreadable small decorative text)"
-                              Foreground="{DynamicResource Theme.Foreground}" Margin="0,0,0,12"/>
+                                <TextBlock Text="Developer Diagnostics" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                                <CheckBox x:Name="LayoutDebugCheck" Content="Layout debug overlay (show content bounds &amp; slack DIPs)" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,4"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
 
-                    <!-- Heading -->
-                    <DockPanel Margin="0,4,0,8">
-                        <TextBlock Text="Typography Theme" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Foreground}"/>
-                        <TextBlock x:Name="CurrentTypographyLabel" Text="Classic" Foreground="{DynamicResource Theme.Accent}" HorizontalAlignment="Right" FontSize="12"/>
-                    </DockPanel>
+                    <!-- PAGE 7: ABOUT -->
+                    <StackPanel x:Name="PageAbout" Visibility="Collapsed">
+                        <Border Padding="20" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+                            <StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                    <TextBlock Text="&#xE946;" FontFamily="{StaticResource Font.Icons}" FontSize="28" Foreground="{DynamicResource Theme.Accent}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Island 2" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                                        <TextBlock Text="Version 2.1.0 · Production Release" FontSize="12" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                                    </StackPanel>
+                                </StackPanel>
 
-                    <!-- Typography Preset Tiles Grid -->
-                    <UniformGrid x:Name="TypographyPresetsGrid" Columns="3" Margin="-4,0,-4,8"/>
+                                <TextBlock Text="A lightweight, privacy-focused Dynamic Island for Windows desktop with live media controls, system resource monitors, tasks, focus timers, calendar, weather, and unified clipboard snips."
+                                           TextWrapping="Wrap" Foreground="{DynamicResource Theme.TextSecondary}" FontSize="12.5" LineHeight="18" Margin="0,0,0,14"/>
 
-                    <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,8,0,12"/>
+                                <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,4,0,12"/>
 
-                    <!-- Size Scale Slider (90% - 130%) -->
-                    <DockPanel Margin="0,4,0,4">
-                        <TextBlock Text="Font size scale" VerticalAlignment="Center" Foreground="{DynamicResource Theme.Foreground}"/>
-                        <TextBlock Text="{Binding Value, ElementName=TypographyScaleSlider, StringFormat={}{0:P0}}" HorizontalAlignment="Right" Foreground="{DynamicResource Theme.Accent}"/>
-                    </DockPanel>
-                    <Slider x:Name="TypographyScaleSlider" Minimum="0.9" Maximum="1.3" TickFrequency="0.05" IsSnapToTickEnabled="True" Margin="0,0,0,10"/>
+                                <TextBlock Text="Architecture &amp; Engine" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}" Margin="0,0,0,6"/>
+                                <TextBlock Text="• Windows 10 &amp; 11 Layered Window with WS_EX_NOACTIVATE&#x0a;• Pure Alpha Transparency (Zero background blur shaders)&#x0a;• Spring-driven non-blocking animation subsystem&#x0a;• Zero kernel drivers, DPAPI encrypted storage, 100% user-mode"
+                                           TextWrapping="Wrap" Foreground="{DynamicResource Theme.TextSecondary}" FontSize="12" LineHeight="18" Margin="0,0,0,14"/>
 
-                    <!-- Weight Picker -->
-                    <DockPanel Margin="0,4,0,8">
-                        <TextBlock Text="Typography weight" VerticalAlignment="Center" Foreground="{DynamicResource Theme.Foreground}"/>
-                        <ComboBox x:Name="TypographyWeightCombo" HorizontalAlignment="Right" MinWidth="110"/>
-                    </DockPanel>
+                                <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,4,0,12"/>
 
-                    <!-- Formatting Options -->
-                    <CheckBox x:Name="TypographyUppercaseCheck" Content="Uppercase small labels" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
-                    <CheckBox x:Name="TypographyTabularCheck" Content="Tabular numeric figures" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
-                    <CheckBox x:Name="TypographyGlowCheck" Content="Text glow effect" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,4"/>
-
-                    <!-- Glow Intensity -->
-                    <DockPanel x:Name="TypographyGlowRow" Margin="18,4,0,10" Visibility="Collapsed">
-                        <TextBlock Text="Glow intensity" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
-                        <Slider x:Name="TypographyGlowSlider" Minimum="0.1" Maximum="1.0" TickFrequency="0.05" Width="140" HorizontalAlignment="Right"/>
-                    </DockPanel>
-
-                    <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,4,0,12"/>
-
-                    <!-- Per-Role Font Overrides -->
-                    <TextBlock Text="Per-Role Overrides" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Theme.Foreground}" Margin="0,0,0,8"/>
-                    
-                    <DockPanel Margin="0,2,0,6">
-                        <TextBlock Text="Display (Clock, Hero)" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
-                        <ComboBox x:Name="RoleDisplayCombo" HorizontalAlignment="Right" MinWidth="150"/>
-                    </DockPanel>
-                    <DockPanel Margin="0,2,0,6">
-                        <TextBlock Text="Heading (Cards, Tabs)" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
-                        <ComboBox x:Name="RoleHeadingCombo" HorizontalAlignment="Right" MinWidth="150"/>
-                    </DockPanel>
-                    <DockPanel Margin="0,2,0,6">
-                        <TextBlock Text="Body (Standard Text)" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
-                        <ComboBox x:Name="RoleBodyCombo" HorizontalAlignment="Right" MinWidth="150"/>
-                    </DockPanel>
-                    <DockPanel Margin="0,2,0,6">
-                        <TextBlock Text="Label (Small Badges)" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
-                        <ComboBox x:Name="RoleLabelCombo" HorizontalAlignment="Right" MinWidth="150"/>
-                    </DockPanel>
-                    <DockPanel Margin="0,2,0,4">
-                        <TextBlock Text="Numeric (Metrics, Stats)" VerticalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"/>
-                        <ComboBox x:Name="RoleNumericCombo" HorizontalAlignment="Right" MinWidth="150"/>
-                    </DockPanel>
-                </StackPanel>
-            </Border>
-
-            <!-- Tabs & Navigation Section -->
-            <TextBlock Text="Tabs &amp; Navigation" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
-            <Border Margin="0,14,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
-                <StackPanel>
-                    <DockPanel Margin="0,4,0,8">
-                        <TextBlock Text="Tab bar position" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="TabBarPositionCombo" HorizontalAlignment="Right" MinWidth="130"/>
-                    </DockPanel>
-                    <DockPanel Margin="0,4,0,8">
-                        <TextBlock Text="Tab label display" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="TabLabelModeCombo" HorizontalAlignment="Right" MinWidth="130"/>
-                    </DockPanel>
-                    <CheckBox x:Name="HeaderMouseWheelCheck" Content="Mouse wheel over header switches tabs" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,6"/>
-                    <CheckBox x:Name="TabSwitchOnHoverCheck" Content="Switch tabs on hover (150 ms intent delay)" Foreground="{DynamicResource Theme.Foreground}" Margin="0,2,0,4"/>
-                </StackPanel>
-            </Border>
-
-            <!-- Motion Section -->
-            <TextBlock Text="Motion" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
-            <Border Margin="0,14,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
-                <StackPanel>
-                    <CheckBox x:Name="Reduced" Content="Reduce motion" Foreground="{DynamicResource Theme.Foreground}"/>
-                    <DockPanel Margin="0,18,0,4"><TextBlock Text="Animation speed"/><TextBlock Text="{Binding Value, ElementName=Speed, StringFormat={}{0:0.##}×}" HorizontalAlignment="Right"/></DockPanel>
-                    <Slider x:Name="Speed" Minimum="0.5" Maximum="2" TickFrequency="0.25" IsSnapToTickEnabled="True"/>
-                    <DockPanel Margin="0,14,0,4"><TextBlock Text="Hover delay"/><TextBlock Text="{Binding Value, ElementName=Hover, StringFormat={}{0:0} ms}" HorizontalAlignment="Right"/></DockPanel>
-                    <Slider x:Name="Hover" Minimum="0" Maximum="2000" TickFrequency="10" IsSnapToTickEnabled="True"/>
-                    <DockPanel Margin="0,14,0,4"><TextBlock Text="Collapse delay"/><TextBlock Text="{Binding Value, ElementName=Leave, StringFormat={}{0:0} ms}" HorizontalAlignment="Right"/></DockPanel>
-                    <Slider x:Name="Leave" Minimum="0" Maximum="5000" TickFrequency="10" IsSnapToTickEnabled="True"/>
-                </StackPanel>
-            </Border>
-
-            <!-- Music Section -->
-            <TextBlock Text="Music" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
-            <Border Margin="0,10,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
-                <StackPanel>
-                    <StackPanel.Resources><Style TargetType="CheckBox"><Setter Property="Foreground" Value="{DynamicResource Theme.Foreground}"/><Setter Property="Margin" Value="0,2,0,4"/></Style></StackPanel.Resources>
-                    <CheckBox x:Name="MusicPreview" Content="Show compact playback preview"/>
-                    <DockPanel Margin="0,4,0,8"><TextBlock Text="Preview text" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="PreviewText" HorizontalAlignment="Right" MinWidth="110"/></DockPanel>
-                    <CheckBox x:Name="Equalizer" Content="Show output equalizer"/>
-                    <CheckBox x:Name="Lyrics" Content="Look up synced lyrics on LRCLIB"/>
-                    <CheckBox x:Name="CoverGlow" Content="Tint player with album artwork"/>
-                </StackPanel>
-            </Border>
-
-            <!-- System & Notch Section -->
-            <TextBlock Text="System &amp; Notch" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
-            <Border Margin="0,10,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
-                <StackPanel>
-                    <DockPanel Margin="0,4,0,8"><TextBlock Text="Collapsed live stat" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="CollapsedStat" HorizontalAlignment="Right" MinWidth="110"/></DockPanel>
-                    <DockPanel Margin="0,4,0,0"><TextBlock Text="Top processes sort" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="ProcessSort" HorizontalAlignment="Right" MinWidth="110"/></DockPanel>
-                </StackPanel>
-            </Border>
-
-            <!-- Alerts & OSD Section -->
-            <TextBlock Text="Alerts &amp; OSD" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
-            <Border Margin="0,10,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
-                <StackPanel>
-                    <StackPanel.Resources><Style TargetType="CheckBox"><Setter Property="Foreground" Value="{DynamicResource Theme.Foreground}"/><Setter Property="Margin" Value="0,2,0,4"/></Style></StackPanel.Resources>
-                    <CheckBox x:Name="AlertsEnabledCheck" Content="Enable collapsed alerts &amp; OSD"/>
-                    <CheckBox x:Name="AlertVolumeCheck" Content="Volume &amp; mute OSD"/>
-                    <CheckBox x:Name="AlertBrightnessCheck" Content="Brightness OSD"/>
-                    <CheckBox x:Name="AlertMicCheck" Content="Microphone mute OSD"/>
-                    <CheckBox x:Name="AlertBatteryCheck" Content="Battery &amp; charger alerts"/>
-                    <CheckBox x:Name="AlertTempCheck" Content="Temperature warnings"/>
-                    <CheckBox x:Name="AlertSoundCheck" Content="Play alert sound"/>
-                    <DockPanel Margin="0,10,0,4"><TextBlock Text="Alert duration"/><TextBlock Text="{Binding Value, ElementName=AlertDurationSlider, StringFormat={}{0:0} s}" HorizontalAlignment="Right"/></DockPanel>
-                    <Slider x:Name="AlertDurationSlider" Minimum="1" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True"/>
-                </StackPanel>
-            </Border>
-
-            <!-- Clipboard History Section -->
-            <TextBlock Text="Clipboard History" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
-            <Border Margin="0,10,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
-                <StackPanel>
-                    <StackPanel.Resources><Style TargetType="CheckBox"><Setter Property="Foreground" Value="{DynamicResource Theme.Foreground}"/><Setter Property="Margin" Value="0,2,0,4"/></Style></StackPanel.Resources>
-                    <CheckBox x:Name="ClipboardEnabledCheck" Content="Enable clipboard history"/>
-                    <DockPanel Margin="0,8,0,4">
-                        <TextBlock Text="History capacity" VerticalAlignment="Center"/>
-                        <TextBlock Text="{Binding Value, ElementName=ClipboardHistorySlider, StringFormat={}{0:0} items}" HorizontalAlignment="Right" Foreground="{DynamicResource Theme.Accent}"/>
-                    </DockPanel>
-                    <Slider x:Name="ClipboardHistorySlider" Minimum="10" Maximum="200" TickFrequency="10" IsSnapToTickEnabled="True" Margin="0,0,0,8"/>
-                    <CheckBox x:Name="ClipboardRememberCheck" Content="Remember history across restarts (encrypted DPAPI)"/>
-                    <CheckBox x:Name="ClipboardFilterSecretsCheck" Content="Filter password/secret tokens &amp; credit cards"/>
-                    <CheckBox x:Name="ClipboardCollapseCheck" Content="Collapse island after clicking to paste"/>
-                    <DockPanel Margin="0,6,0,8">
-                        <TextBlock Text="Auto-expire items" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="ClipboardAutoExpireCombo" HorizontalAlignment="Right" MinWidth="130"/>
-                    </DockPanel>
-                    <DockPanel Margin="0,4,0,8">
-                        <TextBlock Text="Single-click card action" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="ClipboardClickActionCombo" HorizontalAlignment="Right" MinWidth="140"/>
-                    </DockPanel>
-                    <TextBlock Text="Global hotkey: Ctrl + Alt + V opens Clipboard tab directly" FontSize="11" Foreground="{DynamicResource Theme.TextSecondary}" Margin="0,4,0,0"/>
-                </StackPanel>
-            </Border>
-
-            <!-- Screenshots Section -->
-            <TextBlock Text="Screenshots" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
-            <Border Margin="0,10,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
-                <StackPanel>
-                    <StackPanel.Resources><Style TargetType="CheckBox"><Setter Property="Foreground" Value="{DynamicResource Theme.Foreground}"/><Setter Property="Margin" Value="0,2,0,4"/></Style></StackPanel.Resources>
-                    <CheckBox x:Name="ScreenshotsEnabledCheck" Content="Enable screenshots tab"/>
-                    <CheckBox x:Name="ScreenshotsClipboardCheck" Content="Capture snips from Win+Shift+S / Snipping Tool"/>
-                    <CheckBox x:Name="ScreenshotsSaveSnipsCheck" Content="Save captured snips directly to Screenshots folder"/>
-                    <DockPanel Margin="0,6,0,8">
-                        <TextBlock Text="Thumbnail size" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="ScreenshotsThumbSizeCombo" HorizontalAlignment="Right" MinWidth="140"/>
-                    </DockPanel>
-                    <DockPanel Margin="0,4,0,8">
-                        <TextBlock Text="Single-click card action" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="ScreenshotsClickActionCombo" HorizontalAlignment="Right" MinWidth="140"/>
-                    </DockPanel>
-                </StackPanel>
-            </Border>
-
-            <!-- Developer & Diagnostics Section -->
-            <TextBlock Text="Developer &amp; Diagnostics" FontSize="24" FontWeight="SemiBold" Margin="0,16,0,0"/>
-            <Border Margin="0,10,0,0" Padding="16" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
-                <StackPanel>
-                    <StackPanel.Resources><Style TargetType="CheckBox"><Setter Property="Foreground" Value="{DynamicResource Theme.Foreground}"/><Setter Property="Margin" Value="0,2,0,4"/></Style></StackPanel.Resources>
-                    <CheckBox x:Name="LayoutDebugCheck" Content="Layout debug overlay (show content bounds &amp; slack DIPs)"/>
-                </StackPanel>
-            </Border>
-        </StackPanel>
-    </ScrollViewer>
+                                <TextBlock Text="Open Source Credits" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}" Margin="0,0,0,6"/>
+                                <TextBlock Text="• CommunityToolkit.Mvvm (.NET Foundation)&#x0a;• Google OFL Fonts: Doto, Inter, Silkscreen, Space Grotesk, Share Tech Mono, Rajdhani, Chakra Petch, JetBrains Mono, Barlow Condensed, Caveat, Fredoka, Instrument Serif, Orbitron, Unbounded&#x0a;• Open-Meteo Weather API &amp; LRCLIB Synced Lyrics"
+                                           TextWrapping="Wrap" Foreground="{DynamicResource Theme.TextSecondary}" FontSize="12" LineHeight="18"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
 </Window>
