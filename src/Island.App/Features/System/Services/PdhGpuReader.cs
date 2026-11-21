@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Island.App.Interop;
+namespace Island.App.Features.SystemInfo.Services;
 
 internal sealed class PdhGpuReader : IDisposable
 {

@@ -3,11 +3,11 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Island.App.Services;
+using Island.App.Features.SystemInfo.Services;
 using Island.Core.Settings;
 using Island.Core.Telemetry;
 
-namespace Island.App.ViewModels;
+namespace Island.App.Features.SystemInfo.ViewModels;
 
 public sealed record CoreViewModel(int Index, double Percent, double Height, string Tooltip);
 

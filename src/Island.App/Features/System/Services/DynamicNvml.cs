@@ -2,7 +2,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Island.App.Interop;
+namespace Island.App.Features.SystemInfo.Services;
 
 public sealed record NvmlDeviceMetrics(
     string Name,

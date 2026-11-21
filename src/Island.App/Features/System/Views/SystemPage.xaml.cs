@@ -2,10 +2,10 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using Island.App.ViewModels;
+using Island.App.Features.SystemInfo.ViewModels;
 using Island.Core.Settings;
 
-namespace Island.App.Views;
+namespace Island.App.Features.SystemInfo.Views;
 
 public partial class SystemPage : UserControl
 {

@@ -3,11 +3,10 @@ using System.IO;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using Island.App.Core;
-using Island.App.Interop;
 using Island.Core.Settings;
 using Island.Core.Telemetry;
 
-namespace Island.App.Services;
+namespace Island.App.Features.SystemInfo.Services;
 
 public sealed class SystemHardwareMonitor : IDisposable
 {

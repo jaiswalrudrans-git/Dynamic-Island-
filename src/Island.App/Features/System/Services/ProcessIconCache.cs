@@ -6,7 +6,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace Island.App.Services;
+namespace Island.App.Features.SystemInfo.Services;
 
 internal static class ProcessIconCache
 {

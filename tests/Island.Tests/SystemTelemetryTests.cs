@@ -1,3 +1,5 @@
+using Island.App.Features.SystemInfo.Services;
+using Island.App.Features.SystemInfo.ViewModels;
 using Island.App.Interop;
 using Island.App.ViewModels;
 using Island.Core.Settings;
