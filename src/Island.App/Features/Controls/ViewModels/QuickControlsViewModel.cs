@@ -8,12 +8,23 @@ public sealed class QuickControlsViewModel : ObservableObject, IDisposable
 {
     private readonly Dispatcher dispatcher;
     private readonly QuickControlsManager manager;
+    private bool isSettingProgrammatically;
     private bool disposed;
 
     public float VolumeFraction
     {
         get => manager.Volume;
-        set => manager.SetVolume(value);
+        set
+        {
+            if (isSettingProgrammatically) return;
+            if (Math.Abs(manager.Volume - value) > 0.0001f)
+            {
+                manager.SetVolume(value, isFinal: false);
+                OnPropertyChanged(nameof(VolumeFraction));
+                OnPropertyChanged(nameof(VolumePercentText));
+                OnPropertyChanged(nameof(VolumeGlyph));
+            }
+        }
     }
 
     public string VolumePercentText => $"{(int)Math.Round(manager.Volume * 100)}%";
@@ -24,7 +35,16 @@ public sealed class QuickControlsViewModel : ObservableObject, IDisposable
     public int Brightness
     {
         get => manager.Brightness;
-        set => manager.SetBrightness(value);
+        set
+        {
+            if (isSettingProgrammatically) return;
+            if (manager.Brightness != value)
+            {
+                manager.SetBrightness(value, isFinal: false);
+                OnPropertyChanged(nameof(Brightness));
+                OnPropertyChanged(nameof(BrightnessText));
+            }
+        }
     }
 
     public string BrightnessText => $"{manager.Brightness}%";
@@ -55,8 +75,24 @@ public sealed class QuickControlsViewModel : ObservableObject, IDisposable
     private void OnStateChanged()
     {
         if (disposed) return;
-        dispatcher.InvokeAsync(() => OnPropertyChanged(string.Empty));
+        dispatcher.InvokeAsync(() =>
+        {
+            isSettingProgrammatically = true;
+            try
+            {
+                OnPropertyChanged(string.Empty);
+            }
+            finally
+            {
+                isSettingProgrammatically = false;
+            }
+        });
     }
+
+    public void CommitVolume() => manager.CommitVolume();
+    public void CommitBrightness() => manager.CommitBrightness();
+    public void NotifyVolumeDragStarted() => manager.NotifyVolumeDragStarted();
+    public void NotifyBrightnessDragStarted() => manager.NotifyBrightnessDragStarted();
 
     public void ToggleMute() => manager.ToggleMute();
     public void ToggleMicMute() => manager.ToggleMicMute();

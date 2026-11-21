@@ -13,6 +13,7 @@ public sealed class QuickControlsManager : IMMNotificationClient, IDisposable
     private readonly Dispatcher dispatcher;
     private readonly Action<string>? log;
     private readonly object gate = new();
+    private readonly object brightnessGate = new();
 
     private MMDeviceEnumerator? enumerator;
     private MMDevice? renderDevice;
@@ -28,6 +29,12 @@ public sealed class QuickControlsManager : IMMNotificationClient, IDisposable
     private bool? isWifiOn;
     private bool? isBtOn;
     private bool disposed;
+
+    private readonly SliderCoalescer volumeCoalescer;
+    private readonly SliderCoalescer brightnessCoalescer;
+
+    private ManagementScope? brightnessScope;
+    private List<ManagementObject>? cachedBrightnessMethods;
 
     public float Volume => currentVolume;
     public bool IsMuted => isMuted;
@@ -69,6 +76,9 @@ public sealed class QuickControlsManager : IMMNotificationClient, IDisposable
     {
         this.dispatcher = dispatcher;
         this.log = log;
+
+        volumeCoalescer = new SliderCoalescer(val => WriteVolumeAudio((float)val), intervalMs: 33, echoTolerance: 0.0101);
+        brightnessCoalescer = new SliderCoalescer(val => WriteBrightnessWmi((int)Math.Round(val)), intervalMs: 33, echoTolerance: 1.01);
 
         InitializeAudio();
         _ = InitializeRadiosAsync();
@@ -137,10 +147,22 @@ public sealed class QuickControlsManager : IMMNotificationClient, IDisposable
 
     private void OnRenderVolumeNotification(AudioVolumeNotificationData data)
     {
+        bool muteChanged;
+        lock (gate)
+        {
+            muteChanged = isMuted != data.Muted;
+            if (muteChanged) isMuted = data.Muted;
+        }
+
+        if (volumeCoalescer.ShouldIgnoreIncomingNotification(data.MasterVolume))
+        {
+            if (muteChanged) dispatcher.InvokeAsync(() => StateChanged?.Invoke());
+            return;
+        }
+
         lock (gate)
         {
             currentVolume = data.MasterVolume;
-            isMuted = data.Muted;
         }
         dispatcher.InvokeAsync(() => StateChanged?.Invoke());
     }
@@ -154,22 +176,40 @@ public sealed class QuickControlsManager : IMMNotificationClient, IDisposable
         dispatcher.InvokeAsync(() => StateChanged?.Invoke());
     }
 
-    public void SetVolume(float volume)
+    private void WriteVolumeAudio(float volume)
     {
-        lock (gate)
+        try
         {
-            try
+            lock (gate)
             {
                 if (renderDevice != null)
                 {
-                    renderDevice.AudioEndpointVolume.MasterVolumeLevelScalar = Math.Clamp(volume, 0, 1);
-                    currentVolume = volume;
+                    renderDevice.AudioEndpointVolume.MasterVolumeLevelScalar = Math.Clamp(volume, 0f, 1f);
                 }
             }
-            catch { }
         }
-        StateChanged?.Invoke();
+        catch { }
     }
+
+    public void SetVolume(float volume, bool isFinal = false)
+    {
+        volume = Math.Clamp(volume, 0f, 1f);
+        lock (gate)
+        {
+            currentVolume = volume;
+        }
+        volumeCoalescer.RequestValue(volume, isFinal);
+    }
+
+    public void CommitVolume(float? volume = null)
+    {
+        float target;
+        lock (gate) target = volume ?? currentVolume;
+        volumeCoalescer.RequestValue(target, isFinal: true);
+    }
+
+    public void NotifyVolumeDragStarted() => volumeCoalescer.NotifyDragStarted();
+    public void NotifyVolumeDragCompleted() => volumeCoalescer.NotifyDragCompleted();
 
     public void ToggleMute()
     {
@@ -207,31 +247,70 @@ public sealed class QuickControlsManager : IMMNotificationClient, IDisposable
         StateChanged?.Invoke();
     }
 
-    public void SetBrightness(int percent)
+    private void EnsureBrightnessWmiCached()
     {
-        percent = Math.Clamp(percent, 0, 100);
-        lock (gate) currentBrightness = percent;
-        StateChanged?.Invoke();
+        if (cachedBrightnessMethods != null && cachedBrightnessMethods.Count > 0) return;
+        try
+        {
+            brightnessScope ??= new ManagementScope(@"\\.\root\wmi");
+            if (!brightnessScope.IsConnected) brightnessScope.Connect();
 
-        Task.Run(() =>
+            using var searcher = new ManagementObjectSearcher(brightnessScope, new SelectQuery("WmiMonitorBrightnessMethods"));
+            var list = new List<ManagementObject>();
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                list.Add(obj);
+            }
+            cachedBrightnessMethods = list;
+        }
+        catch
+        {
+            cachedBrightnessMethods = null;
+        }
+    }
+
+    private void WriteBrightnessWmi(int percent)
+    {
+        lock (brightnessGate)
         {
             try
             {
-                using var searcher = new ManagementObjectSearcher(
-                    new ManagementScope(@"\\.\root\wmi"),
-                    new SelectQuery("WmiMonitorBrightnessMethods"));
-
-                foreach (ManagementObject obj in searcher.Get())
+                EnsureBrightnessWmiCached();
+                if (cachedBrightnessMethods != null)
                 {
-                    using (obj)
+                    foreach (var obj in cachedBrightnessMethods)
                     {
                         obj.InvokeMethod("WmiSetBrightness", new object[] { 1, (byte)percent });
                     }
                 }
             }
-            catch { }
-        });
+            catch
+            {
+                cachedBrightnessMethods?.ForEach(m => m.Dispose());
+                cachedBrightnessMethods = null;
+            }
+        }
     }
+
+    public void SetBrightness(int percent, bool isFinal = false)
+    {
+        percent = Math.Clamp(percent, 0, 100);
+        lock (gate)
+        {
+            currentBrightness = percent;
+        }
+        brightnessCoalescer.RequestValue(percent, isFinal);
+    }
+
+    public void CommitBrightness(int? percent = null)
+    {
+        int target;
+        lock (gate) target = percent ?? currentBrightness;
+        brightnessCoalescer.RequestValue(target, isFinal: true);
+    }
+
+    public void NotifyBrightnessDragStarted() => brightnessCoalescer.NotifyDragStarted();
+    public void NotifyBrightnessDragCompleted() => brightnessCoalescer.NotifyDragCompleted();
 
     private async Task QueryBrightnessAsync()
     {
@@ -249,8 +328,11 @@ public sealed class QuickControlsManager : IMMNotificationClient, IDisposable
                     {
                         if (obj["CurrentBrightness"] is byte b)
                         {
-                            lock (gate) currentBrightness = b;
-                            _ = dispatcher.InvokeAsync(() => StateChanged?.Invoke());
+                            if (!brightnessCoalescer.ShouldIgnoreIncomingNotification(b))
+                            {
+                                lock (gate) currentBrightness = b;
+                                _ = dispatcher.InvokeAsync(() => StateChanged?.Invoke());
+                            }
                             break;
                         }
                     }
@@ -330,11 +412,7 @@ public sealed class QuickControlsManager : IMMNotificationClient, IDisposable
 
     public void TakeScreenshot()
     {
-        try
-        {
-            Process.Start(new ProcessStartInfo("ms-screenclip:") { UseShellExecute = true });
-        }
-        catch { }
+        try { Process.Start(new ProcessStartInfo("ms-screenclip:") { UseShellExecute = true }); } catch { }
     }
 
     public void LockPc()
@@ -349,20 +427,12 @@ public sealed class QuickControlsManager : IMMNotificationClient, IDisposable
 
     public void OpenDndSettings()
     {
-        try
-        {
-            Process.Start(new ProcessStartInfo("ms-settings:quiethours") { UseShellExecute = true });
-        }
-        catch { }
+        try { Process.Start(new ProcessStartInfo("ms-settings:quiethours") { UseShellExecute = true }); } catch { }
     }
 
     public void OpenTaskManager()
     {
-        try
-        {
-            Process.Start(new ProcessStartInfo("taskmgr") { UseShellExecute = true });
-        }
-        catch { }
+        try { Process.Start(new ProcessStartInfo("taskmgr") { UseShellExecute = true }); } catch { }
     }
 
     public void OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId)
@@ -396,6 +466,15 @@ public sealed class QuickControlsManager : IMMNotificationClient, IDisposable
 
             try
             {
+                volumeCoalescer.Dispose();
+                brightnessCoalescer.Dispose();
+
+                lock (brightnessGate)
+                {
+                    cachedBrightnessMethods?.ForEach(m => m.Dispose());
+                    cachedBrightnessMethods = null;
+                }
+
                 if (enumerator != null) enumerator.UnregisterEndpointNotificationCallback(this);
                 if (renderDevice != null) renderDevice.AudioEndpointVolume.OnVolumeNotification -= OnRenderVolumeNotification;
                 if (captureDevice != null) captureDevice.AudioEndpointVolume.OnVolumeNotification -= OnCaptureVolumeNotification;

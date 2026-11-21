@@ -15,6 +15,11 @@ public partial class QuickControlsPage : UserControl
         DataContext = model;
     }
 
+    private void VolumeSlider_DragStarted(object? sender, EventArgs e) => model.NotifyVolumeDragStarted();
+    private void VolumeSlider_DragCompleted(object? sender, EventArgs e) => model.CommitVolume();
+    private void BrightnessSlider_DragStarted(object? sender, EventArgs e) => model.NotifyBrightnessDragStarted();
+    private void BrightnessSlider_DragCompleted(object? sender, EventArgs e) => model.CommitBrightness();
+
     private void VolumeMuteClick(object sender, RoutedEventArgs e) => model.ToggleMute();
     private void MicClick(object sender, RoutedEventArgs e) => model.ToggleMicMute();
     private async void WifiClick(object sender, RoutedEventArgs e) => await model.ToggleWifiAsync();

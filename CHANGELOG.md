@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed tofu boxes on buttons and labels by explicitly assigning Body typography and icon fonts.
 
 ### Fixed
+- Fixed volume and brightness sliders with click-to-position, pointer capture, and smooth dragging.
+- Added non-blocking coalesced background writers with echo suppression and drag lock window.
 - Inset content from visible notch walls using `IslandMetrics.WallInset` (30 DIP) and removed rounded content clip.
 
 ### Refactoring
