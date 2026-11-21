@@ -5,12 +5,12 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using Island.App.Features.Music.Services;
+using Island.App.Features.Music.ViewModels;
 using Island.App.Header.Views;
-using Island.App.Services;
-using Island.App.ViewModels;
 using Island.Core.Settings;
 
-namespace Island.App.Views;
+namespace Island.App.Features.Music.Views;
 
 public partial class MusicPage : UserControl
 {

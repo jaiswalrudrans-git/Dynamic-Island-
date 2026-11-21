@@ -6,7 +6,7 @@ using Windows.Media.Control;
 using Session = Windows.Media.Control.GlobalSystemMediaTransportControlsSession;
 using Manager = Windows.Media.Control.GlobalSystemMediaTransportControlsSessionManager;
 
-namespace Island.App.Services;
+namespace Island.App.Features.Music.Services;
 
 internal sealed record PlayerChoice(Session Session, string Id, string Label);
 internal sealed record MediaTrack(string Title, string Artist, string Album, MediaArtwork? Art);

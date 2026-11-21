@@ -3,12 +3,12 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Island.App.Services;
+using Island.App.Features.Music.Services;
 using Island.Core.Music;
 using Island.Core.Settings;
 using Windows.Media;
 
-namespace Island.App.ViewModels;
+namespace Island.App.Features.Music.ViewModels;
 
 internal sealed class MusicViewModel : ObservableObject, IDisposable
 {

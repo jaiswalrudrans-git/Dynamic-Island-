@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
-namespace Island.App.Views;
+namespace Island.App.Features.Music.Views;
 
 public sealed class ScrollingLabel : Canvas
 {

@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shell="clr-namespace:Island.App.Shell"
         xmlns:header="clr-namespace:Island.App.Header.Views"
+        xmlns:music="clr-namespace:Island.App.Features.Music.Views"
         xmlns:views="clr-namespace:Island.App.Views"
         Width="1040" Height="680" WindowStyle="None" ResizeMode="NoResize"
         WindowStartupLocation="Manual" Background="Transparent" AllowsTransparency="True"
@@ -119,8 +120,8 @@
                         <TextBlock Text="&#xE8D6;" Foreground="{DynamicResource Theme.TextSecondary}" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         <Border CornerRadius="5"><Border.Background><ImageBrush ImageSource="{Binding Cover}" Stretch="UniformToFill"/></Border.Background></Border>
                     </Grid>
-                    <views:ScrollingLabel x:Name="PreviewLabel" Width="148" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <views:SpectrumMeter x:Name="CompactMeter" Width="25" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    <music:ScrollingLabel x:Name="PreviewLabel" Width="148" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <music:SpectrumMeter x:Name="CompactMeter" Width="25" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 </Grid>
 
                 <!-- Compact Stat Preview -->

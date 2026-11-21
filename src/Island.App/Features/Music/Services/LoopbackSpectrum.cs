@@ -6,7 +6,7 @@ using NAudio.CoreAudioApi.Interfaces;
 using NAudio.Dsp;
 using NAudio.Wave;
 
-namespace Island.App.Services;
+namespace Island.App.Features.Music.Services;
 
 internal sealed class SpectrumAnalyzer(int rate, int channels)
 {

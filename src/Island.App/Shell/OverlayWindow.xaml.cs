@@ -5,6 +5,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Island.App.Core;
+using Island.App.Features.Music.ViewModels;
 using Island.App.Header.ViewModels;
 using Island.App.Header.Views;
 using Island.App.Interop;

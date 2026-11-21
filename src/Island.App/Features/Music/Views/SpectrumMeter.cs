@@ -1,8 +1,8 @@
 using System.Windows;
 using System.Windows.Media;
-using Island.App.Services;
+using Island.App.Features.Music.Services;
 
-namespace Island.App.Views;
+namespace Island.App.Features.Music.Views;
 
 public sealed class SpectrumMeter : FrameworkElement
 {

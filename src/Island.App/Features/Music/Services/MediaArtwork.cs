@@ -3,7 +3,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Windows.Storage.Streams;
 
-namespace Island.App.Services;
+namespace Island.App.Features.Music.Services;
 
 internal sealed record MediaArtwork(BitmapSource Image, Color Dominant)
 {
