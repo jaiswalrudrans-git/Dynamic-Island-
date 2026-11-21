@@ -18,8 +18,25 @@ public partial class App : Application
     private static extern bool AttachConsole(int dwProcessId);
     private const int ATTACH_PARENT_PROCESS = -1;
 
+    [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+    public static extern uint RegisterWindowMessage(string lpString);
+
+    [DllImport("user32.dll")]
+    public static extern bool PostMessage(nint hWnd, uint Msg, nint wParam, nint lParam);
+
+    public static readonly uint WM_ISLAND_ACTIVATE = RegisterWindowMessage("ISLAND_ACTIVATE_NOTIFICATION");
+    private static System.Threading.Mutex? singleInstanceMutex;
+
     protected override void OnStartup(StartupEventArgs e)
     {
+        singleInstanceMutex = new System.Threading.Mutex(true, @"Local\Island_App_SingleInstance_Mutex", out bool createdNew);
+        if (!createdNew)
+        {
+            PostMessage((nint)0xffff, WM_ISLAND_ACTIVATE, 0, 0);
+            Shutdown(0);
+            return;
+        }
+
         base.OnStartup(e);
         AttachConsole(ATTACH_PARENT_PROCESS);
 
@@ -36,10 +53,18 @@ public partial class App : Application
         DispatcherUnhandledException += (s, args) =>
         {
             log.Write($"Dispatcher unhandled exception: {args.Exception}");
+            args.Handled = true; // Recover from recoverable dispatch exceptions
         };
         AppDomain.CurrentDomain.UnhandledException += (s, args) =>
         {
-            log.Write($"AppDomain unhandled exception: {args.ExceptionObject}");
+            string err = $"AppDomain unhandled exception: {args.ExceptionObject}";
+            log.Write(err);
+            try { File.AppendAllText(Path.Combine(directory, "crash.log"), $"{DateTime.Now:O} {err}{Environment.NewLine}"); } catch { }
+        };
+        TaskScheduler.UnobservedTaskException += (s, args) =>
+        {
+            log.Write($"TaskScheduler unobserved task exception: {args.Exception}");
+            args.SetObserved();
         };
 
         try
@@ -87,6 +112,7 @@ public partial class App : Application
             }
 
             var tray = new IslandTray(overlay);
+            overlay.AttachTray(tray);
             overlay.Closed += (_, _) =>
             {
                 log.Write("OverlayWindow Closed fired.");
@@ -100,6 +126,21 @@ public partial class App : Application
             Console.WriteLine($"[Island] Startup failed: {ex.Message}");
             log.Write($"Startup failed: {ex.Message}");
             Shutdown(1);
+        }
+    }
+
+    protected override void OnExit(ExitEventArgs e)
+    {
+        base.OnExit(e);
+        if (singleInstanceMutex != null)
+        {
+            try
+            {
+                singleInstanceMutex.ReleaseMutex();
+            }
+            catch { }
+            singleInstanceMutex.Dispose();
+            singleInstanceMutex = null;
         }
     }
 }

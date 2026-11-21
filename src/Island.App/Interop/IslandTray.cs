@@ -32,6 +32,16 @@ internal sealed class IslandTray : IDisposable
         tray.DoubleClick += (_, _) => overlay.OpenSettings();
     }
 
+    public void Refresh()
+    {
+        try
+        {
+            tray.Visible = false;
+            tray.Visible = true;
+        }
+        catch { }
+    }
+
     public void Dispose()
     {
         tray.Visible = false;

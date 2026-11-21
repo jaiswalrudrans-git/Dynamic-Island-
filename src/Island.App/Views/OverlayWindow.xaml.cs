@@ -16,9 +16,13 @@ public partial class OverlayWindow : Window
     private readonly Action<string> log;
     private readonly ClockViewModel clock = new();
     private readonly DispatcherTimer tick = new(DispatcherPriority.Background);
+    private IslandTray? tray;
     private HwndSource? source;
     private bool placementPending;
     private bool isTyping;
+    private static readonly uint WM_TASKBARCREATED = App.RegisterWindowMessage("TaskbarCreated");
+
+    internal void AttachTray(IslandTray trayInstance) => tray = trayInstance;
 
     public OverlayWindow(SettingsStore settings, Action<string> log)
     {
@@ -76,6 +80,19 @@ public partial class OverlayWindow : Window
 
     private nint WindowMessage(nint hwnd, int message, nint wParam, nint lParam, ref bool handled)
     {
+        if ((uint)message == App.WM_ISLAND_ACTIVATE)
+        {
+            OpenPanel();
+            handled = true;
+            return 0;
+        }
+        if ((uint)message == WM_TASKBARCREATED)
+        {
+            tray?.Refresh();
+            handled = true;
+            return 0;
+        }
+
         switch (message)
         {
             case 0x0312 when wParam == EscapeId: // WM_HOTKEY
