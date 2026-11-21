@@ -179,15 +179,25 @@
             </StackPanel>
         </Border>
 
-        <!-- ROW 1: Mode Title & Cycle Dots ("Work · 1 of 4" - Only in Pomodoro mode) -->
+        <!-- ROW 1: Mode Title & Subtitle ("Work · 1 of 4", "Countdown Timer", "Stopwatch") -->
         <TextBlock Grid.Row="1" Text="{Binding CycleSubtitle}" FontSize="{DynamicResource Typography.Size.Secondary}"
-                   FontFamily="{DynamicResource Typography.Family.Heading}"
+                   FontFamily="{DynamicResource Typography.Family.Body}"
                    FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextSecondary}"
-                   HorizontalAlignment="Center" Margin="0,8,0,6"
-                   Visibility="{Binding IsPomodoro, Converter={StaticResource Visible}}"/>
+                   HorizontalAlignment="Center" Margin="0,8,0,6"/>
 
         <!-- ROW 2: Circular Progress Ring with Responsive Digital Timer -->
-        <Grid Grid.Row="2" x:Name="RingGrid" Height="150" HorizontalAlignment="Center">
+        <Grid Grid.Row="2" x:Name="RingGrid" HorizontalAlignment="Center">
+            <Grid.Style>
+                <Style TargetType="Grid">
+                    <Setter Property="Height" Value="144"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsStopwatch}" Value="True">
+                            <Setter Property="Height" Value="68"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Grid.Style>
+
             <!-- Background Track Ring -->
             <Ellipse Width="138" Height="138" Stroke="{DynamicResource Theme.Border}"
                      StrokeThickness="5" HorizontalAlignment="Center" VerticalAlignment="Center"
@@ -200,21 +210,21 @@
                   HorizontalAlignment="Center" VerticalAlignment="Center"
                   Visibility="{Binding ShowProgress, Converter={StaticResource Visible}}"/>
 
-            <!-- Digital Timer (Lining tabular figures, gracefully sized with comfortable margin from circle) -->
-            <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center">
+            <!-- Digital Timer (Lining tabular figures, unconstrained width so it never clips any digit) -->
+            <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform">
                 <Viewbox.Style>
                     <Style TargetType="Viewbox">
                         <Setter Property="MaxWidth" Value="92"/>
                         <Setter Property="MaxHeight" Value="32"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsStopwatch}" Value="True">
-                                <Setter Property="MaxWidth" Value="220"/>
+                                <Setter Property="MaxWidth" Value="320"/>
                                 <Setter Property="MaxHeight" Value="52"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Viewbox.Style>
-                <TextBlock Text="{Binding DisplayTime}" FontWeight="Bold"
+                <TextBlock Text="{Binding DisplayTime}" FontWeight="Bold" FontSize="42"
                            Foreground="{DynamicResource Theme.TextPrimary}"
                            FontFamily="{DynamicResource Typography.Family.Display}"
                            Effect="{DynamicResource Typography.TextGlow}"
@@ -236,7 +246,7 @@
             <!-- Reset -->
             <Button Style="{StaticResource FocusControlBtn}" Click="ResetClick" ToolTip="Reset">
                 <TextBlock Text="&#xE777;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
-                           FontSize="14" Foreground="{DynamicResource Theme.TextPrimary}"
+                           FontSize="14" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Button>
 
@@ -244,7 +254,7 @@
             <Button Style="{StaticResource PlayBtn}" Click="PlayPauseClick"
                     Margin="16,0" ToolTip="{Binding PlayPauseText}">
                 <TextBlock Text="{Binding PlayPauseGlyph}" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
-                           FontSize="18" Foreground="{DynamicResource Theme.Background}"
+                           FontSize="18" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Button>
 
@@ -252,13 +262,13 @@
             <Button Style="{StaticResource FocusControlBtn}" Click="SkipClick" ToolTip="Skip Stage"
                     Visibility="{Binding IsPomodoro, Converter={StaticResource Visible}}">
                 <TextBlock Text="&#xE893;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
-                           FontSize="14" Foreground="{DynamicResource Theme.TextPrimary}"
+                           FontSize="14" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Button>
             <Button Style="{StaticResource FocusControlBtn}" Click="LapClick" ToolTip="Lap"
                     Visibility="{Binding IsStopwatch, Converter={StaticResource Visible}}">
                 <TextBlock Text="&#xE7C0;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
-                           FontSize="14" Foreground="{DynamicResource Theme.TextPrimary}"
+                           FontSize="14" Foreground="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Button>
         </StackPanel>

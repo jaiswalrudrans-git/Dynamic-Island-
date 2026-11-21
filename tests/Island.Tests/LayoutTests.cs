@@ -95,7 +95,7 @@ public sealed class LayoutTests : TestFolder
 
         // Base content widths for tabs: Music, System, Tasks, QuickControls, Focus, CalendarWeather, Clipboard (Unified Copies & Screenshots)
         double[] tabContentWidths = [580, 680, 580, 620, 580, 680, 680];
-        double[] tabContentHeights = [170, 415, 180, 260, 320, 340, 280];
+        double[] tabContentHeights = [170, 240, 140, 220, 240, 240, 240];
 
         for (int i = 0; i < tabContentWidths.Length; i++)
         {
@@ -137,12 +137,12 @@ public sealed class LayoutTests : TestFolder
 
         (double w, double h)[] tabs = [
             (580, 170), // Music
-            (680, 415), // System (guarantees Top Apps has full headroom)
-            (580, 180), // Tasks
-            (620, 260), // Quick Controls
-            (580, 320), // Focus
-            (680, 340), // Calendar & Weather
-            (680, 280)  // Clipboard (Unified Copies & Screenshots)
+            (680, 240), // System (clean 3x2 Bento Grid)
+            (580, 140), // Tasks
+            (620, 220), // Quick Controls
+            (580, 240), // Focus
+            (680, 240), // Calendar & Weather
+            (680, 240)  // Clipboard (Unified Copies & Screenshots)
         ];
 
         for (int i = 0; i < tabs.Length; i++)

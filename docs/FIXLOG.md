@@ -173,3 +173,32 @@ This log tracks every defect identified during the Stage A audit, the exact chan
      - Stored 16 "Before" screenshots in `docs/screens/spacing/before/`.
      - Stored 16 "After" screenshots in `docs/screens/spacing/after/`.
      - Total passing tests: 189/189 with 0 warnings and 0 errors.
+
+
+---
+
+## Visual Defect Rectification & Typography Integration
+- **Status**: Completed
+- **Issues Addressed (from Visual Audit & Live Run Snapshots)**:
+  1. **Focus Transport & Header Tool Buttons Tofu Rectification**:
+     - *Issue*: Header Pin/Settings and Focus Reset/Play/Skip buttons displayed vertical missing-glyph `.notdef` tofu rectangles with stacked hex characters `E718`, `E713`, `E777`, `E768`.
+     - *Root Cause*: Elements lacked static fallback to `Font.Icons` and inherited dynamic window text families (`Inter` / `Doto`) which lack MDL2 Private Use Area glyphs.
+     - *Fix*: Enforced `FontFamily="{StaticResource Font.Icons}"` (`Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji`) across `OverlayWindow.xaml` and `FocusPage.xaml`. Explicitly registered `["Font.Icons"]` in `TypographyResources.cs` dynamic resource dictionary. Bound icon `Foreground` to parent button foreground via RelativeSource for interactive hover/active states.
+  2. **Stopwatch Digital Numeral Clipping (`:0:00.<`)**:
+     - *Issue*: The first and last digits of `00:00.0` were cut off on the sides under Dot Matrix / wide display themes.
+     - *Root Cause*: `Viewbox` constrained `MaxWidth="220"`, which choked the wider `Doto` characters, combined with an unnecessary 150 DIP circular ring placeholder when progress arc is collapsed.
+     - *Fix*: Expanded Stopwatch `Viewbox` `MaxWidth="320"` with `Stretch="Uniform"` and auto-compacted Stopwatch mode `RingGrid` height to 68 DIP. Numerals now render with ample horizontal clearance and zero clipping.
+  3. **Focus Subtitle Typography Legibility**:
+     - *Issue*: "Work · 1 of 4", "Countdown Timer", and "Stopwatch" subtitles were rendered in unreadable dot-matrix heading fonts.
+     - *Root Cause*: Subtitle used `Typography.Family.Heading`.
+     - *Fix*: Replaced subtitle font with `Typography.Family.Body` (`Inter` / Segoe Variable), ensuring small secondary text remains crisp and highly legible across all presets.
+  4. **Resource Monitor (System Tab) Typography Integration**:
+     - *Issue*: User reported *"in the reource monitor page the font has not been used only"*. The System tab appeared identical to standard Segoe UI.
+     - *Root Cause*: No elements in `SystemPage.xaml` utilized `Typography.Family.Display`, and `Heading` in `Dot Matrix` preset defaulted to `InterFamily`.
+     - *Fix*: Paired `SpaceGroteskFamily` for `Heading` in `Dot Matrix` preset, giving card titles ("CPU", "Memory", "GPU", "Power", "Network", "Top Apps") a futuristic tech aesthetic. Elevated CPU Ring Gauge numeral to `FontSize="15"`, `FontWeight="Bold"` with `Typography.Family.Numeric` (`Doto` matrix numerals) and lining tabular alignment. Metrics (RAM GB, GPU %, W, KB/s) prominently display in the theme's numeric font.
+  5. **Header Tab Bar LeftOfClock Layout Breathing Room**:
+     - *Issue*: When `TabBarPosition` was configured to `LeftOfClock`, the tab bar was squeezed or clipped down to 72 DIP, causing icon collision with the clock.
+     - *Fix*: Enforced minimum content width of 600 DIP when `TabBarPosition == "LeftOfClock"`, giving generous horizontal space for tab buttons, dead-centered clock, and pin/settings buttons.
+  6. **Island Spacing & Auto-Sizing Optimization**:
+     - *Issue*: Giant empty black voids at the bottom of the island on multiple tabs.
+     - *Fix*: Refactored `PanelNavigation.GetDesiredSize` height safety floors to match flat layout realities (Music: 90, System: 220, Tasks: 75, Controls: 200, Focus: 160, Calendar: 220, Clipboard: 140). The island snugly hugs content touching the 14 DIP uniform padding line on all sides.

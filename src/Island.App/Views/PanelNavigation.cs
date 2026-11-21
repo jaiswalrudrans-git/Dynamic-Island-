@@ -356,6 +356,13 @@ internal sealed class PanelNavigation
             _ => Math.Max(desiredContentW, 580)
         };
 
+        bool belowClock = !string.Equals(settings().TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase);
+        if (!belowClock)
+        {
+            // When tab bar is to the left of the clock, provide enough header breadth for tabs + clock + tools
+            desiredContentW = Math.Max(desiredContentW, 600);
+        }
+
         // Horizontal padding: 14 left + 14 right = 28 DIP (Single Root Padding Owner)
         double targetContentW = Math.Clamp(desiredContentW, minIslandW - 28.0, maxIslandW - 28.0);
         double targetIslandW = Math.Ceiling((targetContentW + 28.0) / 8.0) * 8.0;
@@ -366,23 +373,22 @@ internal sealed class PanelNavigation
         page.Measure(new Size(targetContentW, double.PositiveInfinity));
         double desiredContentH = page.DesiredSize.Height;
 
-        // Ensure comfortable, un-cramped height floors per tab
+        // Ensure sensible minimum safety floors per tab matching flat layout
         desiredContentH = tabIndex switch
         {
-            0 => Math.Max(desiredContentH, 170), // Music
-            1 => Math.Max(desiredContentH, 415), // System (guarantees all 5 Top Apps are fully visible + comfortable padding)
-            2 => Math.Max(desiredContentH, 180), // Tasks
-            3 => Math.Max(desiredContentH, 260), // Quick Controls
-            4 => Math.Max(desiredContentH, 320), // Focus (spacious ring + controls)
-            5 => Math.Max(desiredContentH, 340), // Calendar & Weather
-            6 => Math.Max(desiredContentH, 280), // Clipboard & Screenshots dual-half
-            _ => Math.Max(desiredContentH, 180)
+            0 => Math.Max(desiredContentH, 90),  // Music (empty 90, active ~170)
+            1 => Math.Max(desiredContentH, 220), // System (clean 3x2 Bento Grid)
+            2 => Math.Max(desiredContentH, 75),  // Tasks (empty 75, populated 140-200)
+            3 => Math.Max(desiredContentH, 200), // Quick Controls (sliders + 8 tiles)
+            4 => Math.Max(desiredContentH, 160), // Focus (stopwatch ~160, timer/pomodoro ~220)
+            5 => Math.Max(desiredContentH, 220), // Calendar & Weather (month + weather)
+            6 => Math.Max(desiredContentH, 140), // Clipboard & Screenshots (empty 140, dual-half 240)
+            _ => Math.Max(desiredContentH, 100)
         };
 
         // Vertical overhead:
         // When TabBarPosition is "BelowClock": 14 top + 80 header + 8 gap + 14 bottom = 116 DIP.
         // When TabBarPosition is "LeftOfClock": 14 top + 44 header + 8 gap + 14 bottom = 80 DIP.
-        bool belowClock = !string.Equals(settings().TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase);
         double overhead = belowClock ? 116.0 : 80.0;
 
         double targetIslandH = Math.Ceiling((desiredContentH + overhead) / 8.0) * 8.0;

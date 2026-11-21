@@ -48,6 +48,25 @@
   - Capture "Before" vs. "After" screenshots of every tab into `docs/screens/spacing/`.
   - Catalog every removed padding/margin and container border in `docs/FIXLOG.md`.
   - Full build verification via `.\build.ps1` (Release build, warnings as errors, all unit/layout/lint tests passing).
+
+### Post-Audit Visual Rectification & Typography Optimization (From Live Audit Snapshots):
+- [x] **Focus & Header Tool Glyph Tofu Elimination**:
+  - Enforced `FontFamily="{StaticResource Font.Icons}"` (`Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji`) on `PinButton`, `GearButton`, and Focus transport buttons (Reset, Play/Pause, Skip, Lap).
+  - Explicitly registered `["Font.Icons"]` in `TypographyResources.cs` dynamic resource dictionary.
+  - Bound TextBlock `Foreground` to parent button foreground via `RelativeSource` for dynamic accent/hover states.
+- [x] **Stopwatch Digit Clipping (`:0:00.<`) Elimination**:
+  - Expanded Stopwatch timer `Viewbox` `MaxWidth="320"` with `Stretch="Uniform"`, completely eliminating side-clipping of digits on wide fonts.
+  - Compacted Stopwatch mode `RingGrid` height to 68 DIP, eliminating 80+ DIP of wasted vertical void.
+- [x] **Focus Subtitle Typography Optimization**:
+  - Replaced noisy dot-matrix heading font with clean, legible `Typography.Family.Body` (`Inter` / `SegoeTextFamily`) on "Work · 1 of 4", "Countdown Timer", and "Stopwatch".
+- [x] **Resource Monitor (System Tab) Typography Integration**:
+  - Paired `SpaceGroteskFamily` headings for `Dot Matrix` preset, giving card titles ("CPU", "Memory", "GPU", "Power", "Network", "Top Apps") a futuristic tech aesthetic.
+  - Sized CPU Ring Gauge numeral to `FontSize="15"`, `FontWeight="Bold"` with `Typography.Family.Numeric` and tabular alignment.
+  - Metrics across RAM, GPU, Power, and Network now prominently display in the theme's numeric font.
+- [x] **Header Tab Bar LeftOfClock Layout Breathing Room**:
+  - Enforced minimum content width of 600 DIP when `TabBarPosition == "LeftOfClock"`, giving generous horizontal space for tab buttons, dead-centered clock, and pin/settings buttons.
+- [x] **Production Verification**:
+  - Clean Release build with `TreatWarningsAsErrors=true`. All 194 tests passing.
   - Commit and STOP.
   - Run `build.ps1`, verify all tests pass, commit and STOP.
 

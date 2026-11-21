@@ -63,8 +63,8 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
         new("Classic", "Classic", "Segoe UI Variable system typography",
             SegoeFamily, SegoeTextFamily, SegoeTextFamily, SegoeTextFamily, SegoeTextFamily),
 
-        new("Dot Matrix", "Dot Matrix", "Doto matrix numerals paired with Inter",
-            DotoFamily, InterFamily, InterFamily, InterFamily, DotoFamily),
+        new("Dot Matrix", "Dot Matrix", "Doto matrix numerals paired with Space Grotesk",
+            DotoFamily, SpaceGroteskFamily, InterFamily, InterFamily, DotoFamily),
 
         new("LED", "LED Segment", "Share Tech Mono digital italic feel",
             ShareTechMonoFamily, ShareTechMonoFamily, InterFamily, ShareTechMonoFamily, ShareTechMonoFamily),
@@ -81,8 +81,8 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
         new("Condensed Impact", "Condensed Impact", "Bebas Neue display with Barlow Condensed",
             BebasNeueFamily, BarlowCondensedFamily, BarlowCondensedFamily, BarlowCondensedFamily, BarlowCondensedFamily),
 
-        new("Pixel Arcade", "Pixel Arcade", "Silkscreen retro pixel display with Share Tech Mono",
-            SilkscreenFamily, InterFamily, InterFamily, InterFamily, ShareTechMonoFamily),
+        new("Pixel Arcade", "Pixel Arcade", "Silkscreen retro pixel display with Space Grotesk",
+            SilkscreenFamily, SpaceGroteskFamily, InterFamily, InterFamily, ShareTechMonoFamily),
 
         new("Terminal Mono", "Terminal Mono", "JetBrains Mono monospace throughout",
             JetBrainsMonoFamily, JetBrainsMonoFamily, JetBrainsMonoFamily, JetBrainsMonoFamily, JetBrainsMonoFamily),
@@ -91,7 +91,7 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
             FredokaFamily, FredokaFamily, InterFamily, InterFamily, FredokaFamily),
 
         new("Handwritten Accent", "Handwritten Accent", "Caveat handwritten display with clean body text",
-            CaveatFamily, InterFamily, InterFamily, InterFamily, InterFamily),
+            CaveatFamily, SpaceGroteskFamily, InterFamily, InterFamily, InterFamily),
 
         new("Retro Wave", "Retro Wave", "Orbitron with Rajdhani retro-synth typography",
             OrbitronFamily, RajdhaniFamily, RajdhaniFamily, RajdhaniFamily, RajdhaniFamily, HasGlow: true)
@@ -181,6 +181,7 @@ public sealed class TypographyResources(ResourceDictionary applicationResources)
             ["Font.FamilyMono"] = numeric,
             ["Font.Display"] = display,
             ["Font.Text"] = body,
+            ["Font.Icons"] = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"),
 
             // Roles: Weights
             ["Typography.Weight.Display"] = wDisplay,

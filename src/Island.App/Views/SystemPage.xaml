@@ -43,9 +43,9 @@
     <!-- 3-COLUMN x 2-ROW BALANCED BENTO GRID (Flat, no card chrome) -->
     <Grid Margin="0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="16"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -106,7 +106,7 @@
                               StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
                         <TextBlock Text="{Binding CpuUsageFormatted}"
                                    FontFamily="{DynamicResource Typography.Family.Numeric}"
-                                   FontSize="{DynamicResource Typography.Size.Secondary}" FontWeight="Bold"
+                                   FontSize="15" FontWeight="Bold"
                                    HorizontalAlignment="Center" VerticalAlignment="Center"
                                    Foreground="{DynamicResource Theme.TextPrimary}" Typography.NumeralAlignment="Tabular"/>
                     </Grid>
@@ -419,7 +419,7 @@
                                         <ColumnDefinition Width="8"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="&#xE71D;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
+                                    <TextBlock Text="&#xE71D;" FontFamily="{StaticResource Font.Icons}"
                                                FontSize="11" Foreground="{DynamicResource Theme.TextSecondary}"
                                                VerticalAlignment="Center" Margin="0,0,5,0"/>
                                     <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis"
