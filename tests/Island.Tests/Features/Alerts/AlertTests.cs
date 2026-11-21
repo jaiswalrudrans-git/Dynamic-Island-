@@ -1,5 +1,5 @@
 using System.Windows.Threading;
-using Island.App.ViewModels;
+using Island.App.Features.Alerts.ViewModels;
 using Island.Core.Alerts;
 using Island.Core.Settings;
 using Xunit;

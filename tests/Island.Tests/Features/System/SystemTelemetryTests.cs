@@ -1,7 +1,5 @@
 using Island.App.Features.SystemInfo.Services;
 using Island.App.Features.SystemInfo.ViewModels;
-using Island.App.Interop;
-using Island.App.ViewModels;
 using Island.Core.Settings;
 using Island.Core.Telemetry;
 using Xunit;
@@ -179,7 +177,7 @@ public sealed class SystemTelemetryTests
     public async Task SystemHardwareMonitorCollectsRealHardwareSnapshot()
     {
         var settings = new AppSettings();
-        using var monitor = new Island.App.Services.SystemHardwareMonitor(settings);
+        using var monitor = new SystemHardwareMonitor(settings);
         var tcs = new TaskCompletionSource<SystemSnapshot>();
 
         monitor.SnapshotUpdated += snapshot =>
