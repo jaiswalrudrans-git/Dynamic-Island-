@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
+using Island.App.Core;
 using Island.App.Interop;
 using Island.Core.Settings;
 using Island.Core.Telemetry;

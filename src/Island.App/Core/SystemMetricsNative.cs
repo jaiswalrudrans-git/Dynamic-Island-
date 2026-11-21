@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Island.App.Interop;
+namespace Island.App.Core;
 
 internal static class SystemMetricsNative
 {
