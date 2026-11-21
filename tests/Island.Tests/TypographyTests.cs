@@ -377,7 +377,7 @@ public sealed class TypographyTests
         string? projectRoot = FindProjectRoot();
         Assert.NotNull(projectRoot);
 
-        string xamlPath = Path.Combine(projectRoot, "src", "Island.App", "Views", "SystemPage.xaml");
+        string xamlPath = Directory.GetFiles(Path.Combine(projectRoot, "src", "Island.App"), "SystemPage.xaml", SearchOption.AllDirectories).First();
         string xaml = File.ReadAllText(xamlPath);
 
         Assert.Contains("Typography.Family.Heading", xaml);
@@ -394,7 +394,7 @@ public sealed class TypographyTests
         string? projectRoot = FindProjectRoot();
         Assert.NotNull(projectRoot);
 
-        string focusXamlPath = Path.Combine(projectRoot, "src", "Island.App", "Views", "FocusPage.xaml");
+        string focusXamlPath = Directory.GetFiles(Path.Combine(projectRoot, "src", "Island.App"), "FocusPage.xaml", SearchOption.AllDirectories).First();
         string focusXaml = File.ReadAllText(focusXamlPath);
 
         // Buttons must use Segoe Fluent Icons text blocks directly
@@ -411,7 +411,7 @@ public sealed class TypographyTests
         string? projectRoot = FindProjectRoot();
         Assert.NotNull(projectRoot);
 
-        string overlayXamlPath = Path.Combine(projectRoot, "src", "Island.App", "Views", "OverlayWindow.xaml");
+        string overlayXamlPath = Directory.GetFiles(Path.Combine(projectRoot, "src", "Island.App"), "OverlayWindow.xaml", SearchOption.AllDirectories).First();
         string overlayXaml = File.ReadAllText(overlayXamlPath);
 
         // IconButton must use ContentPresenter so WPF renders UIElement iconBlock directly without .ToString()

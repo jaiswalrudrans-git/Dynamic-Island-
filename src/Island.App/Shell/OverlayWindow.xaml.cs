@@ -7,9 +7,10 @@ using System.Windows.Threading;
 using Island.App.Core;
 using Island.App.Interop;
 using Island.App.ViewModels;
+using Island.App.Views;
 using Island.Core.Settings;
 
-namespace Island.App.Views;
+namespace Island.App.Shell;
 
 public partial class OverlayWindow : Window
 {

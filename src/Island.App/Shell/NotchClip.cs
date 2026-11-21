@@ -1,7 +1,7 @@
 using System.Windows;
 using System.Windows.Media;
 
-namespace Island.App.Views;
+namespace Island.App.Shell;
 
 // Mutate a retained clip in window coordinates. Layout and HWND bounds stay fixed.
 internal sealed class NotchClip

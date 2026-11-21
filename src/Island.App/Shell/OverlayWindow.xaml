@@ -1,7 +1,8 @@
-<Window x:Class="Island.App.Views.OverlayWindow"
+<Window x:Class="Island.App.Shell.OverlayWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:Island.App.Views"
+        xmlns:shell="clr-namespace:Island.App.Shell"
+        xmlns:views="clr-namespace:Island.App.Views"
         Width="1040" Height="680" WindowStyle="None" ResizeMode="NoResize"
         WindowStartupLocation="Manual" Background="Transparent" AllowsTransparency="True"
         Topmost="True" ShowActivated="False" ShowInTaskbar="False"
@@ -60,7 +61,7 @@
         <Grid x:Name="ReducedBase" Width="136" Height="35" HorizontalAlignment="Center" VerticalAlignment="Top"
               Visibility="Hidden" IsHitTestVisible="False">
             <Path Fill="{DynamicResource Theme.Surface}" Data="M0,0 H136 Q128,0 128,8 V18 Q128,35 110,35 H26 Q8,35 8,18 V8 Q8,0 0,0 Z"/>
-            <local:ClockFace x:Name="ReducedClock" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <views:ClockFace x:Name="ReducedClock" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
 
         <!-- Soft outer shadow matching notch silhouette -->
@@ -117,8 +118,8 @@
                         <TextBlock Text="&#xE8D6;" Foreground="{DynamicResource Theme.TextSecondary}" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         <Border CornerRadius="5"><Border.Background><ImageBrush ImageSource="{Binding Cover}" Stretch="UniformToFill"/></Border.Background></Border>
                     </Grid>
-                    <local:ScrollingLabel x:Name="PreviewLabel" Width="148" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    <local:SpectrumMeter x:Name="CompactMeter" Width="25" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                    <views:ScrollingLabel x:Name="PreviewLabel" Width="148" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <views:SpectrumMeter x:Name="CompactMeter" Width="25" Height="16" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                 </Grid>
 
                 <!-- Compact Stat Preview -->
@@ -148,7 +149,7 @@
                 </Grid>
 
                 <!-- Default Collapsed Clock Face -->
-                <local:ClockFace x:Name="CompactClock" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <views:ClockFace x:Name="CompactClock" HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Grid>
 
             <!-- Expanded Island Header (Two-row layout: Row 1 = Clock+Date centered; Row 2 = Centered Tab Bar) -->
@@ -173,7 +174,7 @@
 
                     <!-- Center: Clock & Date (TRUE DEAD CENTER of the entire Island) -->
                     <StackPanel Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <local:ClockFace x:Name="HeaderClock" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <views:ClockFace x:Name="HeaderClock" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         <TextBlock x:Name="HeaderDate" Text="{Binding Date}" HorizontalAlignment="Center" Foreground="{DynamicResource Theme.TextSecondary}"
                                    FontFamily="{DynamicResource Typography.Family.Body}" FontSize="{DynamicResource Typography.Size.Secondary}" Margin="0,2,0,0"/>
                     </StackPanel>

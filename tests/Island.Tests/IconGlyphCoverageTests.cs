@@ -55,10 +55,10 @@ public sealed class IconGlyphCoverageTests
         string? projectRoot = FindProjectRoot();
         Assert.NotNull(projectRoot);
 
-        string viewsDir = Path.Combine(projectRoot, "src", "Island.App", "Views");
-        Assert.True(Directory.Exists(viewsDir));
+        string appDir = Path.Combine(projectRoot, "src", "Island.App");
+        Assert.True(Directory.Exists(appDir));
 
-        var xamlFiles = Directory.GetFiles(viewsDir, "*.xaml", SearchOption.AllDirectories);
+        var xamlFiles = Directory.GetFiles(appDir, "*.xaml", SearchOption.AllDirectories);
         string[] decorativeNames = ["Doto", "Orbitron", "DotMatrix", "Typography.Family.Display", "Typography.Family.Heading"];
 
         foreach (var file in xamlFiles)

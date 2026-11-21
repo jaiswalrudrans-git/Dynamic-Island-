@@ -1,9 +1,8 @@
 using System.Drawing;
 using System.Windows.Forms;
 using Island.Core;
-using Island.App.Views;
 
-namespace Island.App.Interop;
+namespace Island.App.Shell;
 
 internal sealed class IslandTray : IDisposable
 {

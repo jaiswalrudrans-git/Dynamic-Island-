@@ -23,6 +23,12 @@ public sealed class SpacingAndChromeLintTests
         return null;
     }
 
+    private static string FindXaml(string projectRoot, string fileName)
+    {
+        var found = Directory.GetFiles(Path.Combine(projectRoot, "src", "Island.App"), fileName, SearchOption.AllDirectories).FirstOrDefault();
+        return found ?? Path.Combine(projectRoot, "src", "Island.App", "Views", fileName);
+    }
+
     [Fact]
     public void DesignTokensDefinesRequiredSpacingAndTileTokens()
     {
@@ -70,7 +76,7 @@ public sealed class SpacingAndChromeLintTests
         string? projectRoot = FindProjectRoot();
         Assert.NotNull(projectRoot);
 
-        string filePath = Path.Combine(projectRoot, "src", "Island.App", "Views", fileName);
+        string filePath = FindXaml(projectRoot, fileName);
         Assert.True(File.Exists(filePath), $"{fileName} must exist at {filePath}");
 
         var doc = XDocument.Load(filePath);
@@ -101,7 +107,7 @@ public sealed class SpacingAndChromeLintTests
         string? projectRoot = FindProjectRoot();
         Assert.NotNull(projectRoot);
 
-        string filePath = Path.Combine(projectRoot, "src", "Island.App", "Views", fileName);
+        string filePath = FindXaml(projectRoot, fileName);
         Assert.True(File.Exists(filePath), $"{fileName} must exist at {filePath}");
 
         var doc = XDocument.Load(filePath);
@@ -124,7 +130,7 @@ public sealed class SpacingAndChromeLintTests
         string? projectRoot = FindProjectRoot();
         Assert.NotNull(projectRoot);
 
-        string filePath = Path.Combine(projectRoot, "src", "Island.App", "Views", fileName);
+        string filePath = FindXaml(projectRoot, fileName);
         Assert.True(File.Exists(filePath), $"{fileName} must exist at {filePath}");
 
         string content = File.ReadAllText(filePath);
@@ -142,7 +148,7 @@ public sealed class SpacingAndChromeLintTests
         string? projectRoot = FindProjectRoot();
         Assert.NotNull(projectRoot);
 
-        string filePath = Path.Combine(projectRoot, "src", "Island.App", "Views", fileName);
+        string filePath = FindXaml(projectRoot, fileName);
         Assert.True(File.Exists(filePath), $"{fileName} must exist at {filePath}");
 
         var doc = XDocument.Load(filePath);
