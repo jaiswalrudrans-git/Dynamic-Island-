@@ -212,6 +212,42 @@ public partial class OverlayWindow : Window
         base.OnClosed(e);
     }
 
+    private void DisposePanel()
+    {
+        alerts.ActiveAlertChanged -= OnAlertChanged;
+        system.SnapshotUpdated -= tempAlerts.OnSnapshot;
+        audioOsd.Dispose();
+        brightnessOsd.Dispose();
+        powerAlerts.Dispose();
+        tempAlerts.Dispose();
+        alerts.Dispose();
+        alertQueue.Dispose();
+        music.Dispose();
+        system.Dispose();
+        tasks.Dispose();
+        taskStore.Dispose();
+        focus.Dispose();
+        focusManager.Dispose();
+        controls.Dispose();
+        quickControls.Dispose();
+        calendarWeather.Dispose();
+        calendarStore.Dispose();
+        weatherClient.Dispose();
+        CompactMeter.Attach(null);
+        intent.Stop();
+        StopFrames();
+        motion.Target(false);
+        SyncEscape();
+        if (clipboardHotkeyRegistered && source != null)
+        {
+            UnregisterHotKey(source.Handle, ClipboardHotkeyId);
+            clipboardHotkeyRegistered = false;
+        }
+        clipboardStore?.Dispose();
+        screenshotsWatcher?.Dispose();
+        preferences?.Close();
+    }
+
     [DllImport("user32.dll")]
     private static extern bool SetForegroundWindow(nint hwnd);
     [DllImport("user32.dll")]
