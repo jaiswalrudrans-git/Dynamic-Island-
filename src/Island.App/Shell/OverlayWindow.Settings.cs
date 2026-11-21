@@ -5,7 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Island.App.Features.Music.ViewModels;
 using Island.App.Features.SystemInfo.ViewModels;
-using Island.App.Views;
+using Island.App.Features.Settings.Views;
 using Island.Core.Settings;
 
 namespace Island.App.Shell;

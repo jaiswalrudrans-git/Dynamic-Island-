@@ -4,7 +4,6 @@
         xmlns:shell="clr-namespace:Island.App.Shell"
         xmlns:header="clr-namespace:Island.App.Header.Views"
         xmlns:music="clr-namespace:Island.App.Features.Music.Views"
-        xmlns:views="clr-namespace:Island.App.Views"
         Width="1040" Height="680" WindowStyle="None" ResizeMode="NoResize"
         WindowStartupLocation="Manual" Background="Transparent" AllowsTransparency="True"
         Topmost="True" ShowActivated="False" ShowInTaskbar="False"

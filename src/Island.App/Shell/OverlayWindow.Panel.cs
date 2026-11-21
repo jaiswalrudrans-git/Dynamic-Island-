@@ -25,7 +25,7 @@ using Island.App.Header.ViewModels;
 using Island.App.Header.Views;
 using Island.App.Features.Alerts.Services;
 using Island.App.Features.Alerts.ViewModels;
-using Island.App.Views;
+using Island.App.Features.Settings.Views;
 using Island.Core;
 using Island.Core.Alerts;
 using Island.Core.Calendar;

@@ -1,0 +1,30 @@
+<UserControl x:Class="Island.App.Features.Settings.About.AboutPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Border Padding="20" Background="{DynamicResource Theme.Surface}" CornerRadius="12">
+        <StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                <TextBlock Text="&#xE946;" FontFamily="{StaticResource Font.Icons}" FontSize="28" Foreground="{DynamicResource Theme.Accent}" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Island 2" FontSize="18" FontWeight="Bold" Foreground="{DynamicResource Theme.TextPrimary}"/>
+                    <TextBlock Text="Version 2.1.0 · Production Release" FontSize="12" Foreground="{DynamicResource Theme.TextSecondary}"/>
+                </StackPanel>
+            </StackPanel>
+
+            <TextBlock Text="A lightweight, privacy-focused Dynamic Island for Windows desktop with live media controls, system resource monitors, tasks, focus timers, calendar, weather, and unified clipboard snips."
+                       TextWrapping="Wrap" Foreground="{DynamicResource Theme.TextSecondary}" FontSize="12.5" LineHeight="18" Margin="0,0,0,14"/>
+
+            <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,4,0,12"/>
+
+            <TextBlock Text="Architecture &amp; Engine" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}" Margin="0,0,0,6"/>
+            <TextBlock Text="• Windows 10 &amp; 11 Layered Window with WS_EX_NOACTIVATE&#x0a;• Pure Alpha Transparency (Zero background blur shaders)&#x0a;• Spring-driven non-blocking animation subsystem&#x0a;• Zero kernel drivers, DPAPI encrypted storage, 100% user-mode"
+                       TextWrapping="Wrap" Foreground="{DynamicResource Theme.TextSecondary}" FontSize="12" LineHeight="18" Margin="0,0,0,14"/>
+
+            <Border Height="1" Background="{DynamicResource Theme.Border}" Margin="0,4,0,12"/>
+
+            <TextBlock Text="Open Source Credits" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextPrimary}" Margin="0,0,0,6"/>
+            <TextBlock Text="• CommunityToolkit.Mvvm (.NET Foundation)&#x0a;• Google OFL Fonts: Doto, Inter, Silkscreen, Space Grotesk, Share Tech Mono, Rajdhani, Chakra Petch, JetBrains Mono, Barlow Condensed, Caveat, Fredoka, Instrument Serif, Orbitron, Unbounded&#x0a;• Open-Meteo Weather API &amp; LRCLIB Synced Lyrics"
+                       TextWrapping="Wrap" Foreground="{DynamicResource Theme.TextSecondary}" FontSize="12" LineHeight="18"/>
+        </StackPanel>
+    </Border>
+</UserControl>

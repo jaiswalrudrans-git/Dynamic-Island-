@@ -5,7 +5,6 @@ using System.Windows.Media;
 using Island.App.Design;
 using Island.App.Header.Views;
 using Island.App.Shell;
-using Island.App.Views;
 using Island.App.Core;
 using Island.Core;
 using Island.Core.Services;

@@ -13,7 +13,6 @@ using Island.App.Features.Music.Views;
 using Island.App.Features.SystemInfo.Views;
 using Island.App.Features.Tasks.Views;
 using Island.App.Header.ViewModels;
-using Island.App.Views;
 using Island.Core.Motion;
 using Island.Core.Settings;
 
