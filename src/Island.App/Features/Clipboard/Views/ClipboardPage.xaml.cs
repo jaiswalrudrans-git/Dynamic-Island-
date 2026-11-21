@@ -6,10 +6,10 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Island.App.ViewModels;
+using Island.App.Features.Clipboard.ViewModels;
 using Island.Core.Clipboard;
 
-namespace Island.App.Views;
+namespace Island.App.Features.Clipboard.Views;
 
 public partial class ClipboardPage : UserControl
 {

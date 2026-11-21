@@ -9,7 +9,7 @@ using Island.Core.Clipboard;
 using Island.Core.Screenshots;
 using Island.Core.Settings;
 
-namespace Island.App.ViewModels;
+namespace Island.App.Features.Clipboard.ViewModels;
 
 public sealed class ClipboardItemViewModel
 {

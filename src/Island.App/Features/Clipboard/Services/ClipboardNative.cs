@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Island.App.Interop;
+namespace Island.App.Features.Clipboard.Services;
 
 internal static class ClipboardNative
 {

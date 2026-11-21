@@ -1,6 +1,5 @@
 using System.Windows.Threading;
 using Island.App.Core;
-using Island.App.Interop;
 using Island.Core.Alerts;
 using Island.Core.Settings;
 

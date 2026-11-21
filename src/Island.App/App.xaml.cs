@@ -6,7 +6,7 @@ using Island.App.Design;
 using Island.App.Header.Views;
 using Island.App.Shell;
 using Island.App.Views;
-using Island.App.Interop;
+using Island.App.Core;
 using Island.Core;
 using Island.Core.Services;
 using Island.Core.Settings;
