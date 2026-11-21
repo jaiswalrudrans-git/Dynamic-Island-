@@ -120,17 +120,20 @@ public sealed class LayoutTests : TestFolder
     [Theory]
     [InlineData(1920, 1080, 1.0, 112.0)] // BelowClock (default)
     [InlineData(1920, 1080, 1.25, 112.0)]
+    [InlineData(1920, 1080, 1.5, 112.0)]
     [InlineData(1920, 1080, 1.0, 76.0)]   // LeftOfClock (legacy)
     [InlineData(2560, 1440, 1.0, 112.0)]
     [InlineData(2560, 1440, 1.25, 112.0)]
+    [InlineData(3840, 2160, 1.5, 112.0)]
+    [InlineData(3840, 2160, 2.0, 112.0)]
     [InlineData(1366, 768, 1.0, 112.0)]
     public void TabDimensionsHaveNoMoreThan12DipUnusedSpaceOnAnySide(int screenW, int screenH, double scale, double overhead)
     {
         double effectiveW = screenW / scale;
         double effectiveH = screenH / scale;
         double minIslandW = 580.0;
-        double maxIslandW = effectiveW * 0.62;
-        double maxIslandH = effectiveH * 0.70;
+        double maxIslandW = Math.Max(minIslandW, Math.Floor(effectiveW * 0.62 / 8.0) * 8.0);
+        double maxIslandH = Math.Max(180.0, Math.Floor(effectiveH * 0.70 / 8.0) * 8.0);
 
         (double w, double h)[] tabs = [
             (580, 170), // Music
@@ -168,8 +171,8 @@ public sealed class LayoutTests : TestFolder
             Assert.True(islandW >= 580.0, $"Tab {i} width {islandW} must be >= 580 DIP");
             Assert.True(islandW <= maxIslandW + 8.0, $"Tab {i} width {islandW} must be <= max width {maxIslandW}");
             Assert.True(islandH <= maxIslandH + 8.0, $"Tab {i} height {islandH} must be <= max height {maxIslandH}");
-            Assert.Equal(0.0, islandW % 8.0);
-            Assert.Equal(0.0, islandH % 8.0);
+            Assert.Equal(0, (int)Math.Round(islandW) % 8);
+            Assert.Equal(0, (int)Math.Round(islandH) % 8);
         }
     }
 

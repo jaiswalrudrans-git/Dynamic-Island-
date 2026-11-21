@@ -336,8 +336,8 @@ internal sealed class PanelNavigation
         double screenW = SystemParameters.WorkArea.Width > 0 ? SystemParameters.WorkArea.Width : 1920;
         double screenH = SystemParameters.WorkArea.Height > 0 ? SystemParameters.WorkArea.Height : 1080;
         double minIslandW = 580.0;
-        double maxIslandW = Math.Max(minIslandW, screenW * 0.62);
-        double maxIslandH = Math.Max(180, screenH * 0.70);
+        double maxIslandW = Math.Max(minIslandW, Math.Floor(screenW * 0.62 / 8.0) * 8.0);
+        double maxIslandH = Math.Max(180, Math.Floor(screenH * 0.70 / 8.0) * 8.0);
 
         // Pass 1: Measure unconstrained to determine content's natural desired width
         page.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
