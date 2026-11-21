@@ -5,7 +5,6 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using Island.App.Features.Clipboard.Services;
 using Island.App.Header.ViewModels;
-using Island.App.ViewModels;
 using Island.Core.Clipboard;
 using Island.Core.Screenshots;
 

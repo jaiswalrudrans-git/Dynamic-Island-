@@ -3,7 +3,7 @@ using Island.App.Core;
 using Island.Core.Alerts;
 using Island.Core.Settings;
 
-namespace Island.App.Services.Alerts;
+namespace Island.App.Features.Alerts.Services;
 
 public sealed class PowerAlertWatcher : IDisposable
 {

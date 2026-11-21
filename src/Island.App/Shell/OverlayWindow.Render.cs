@@ -6,7 +6,6 @@ using Island.App.Features.Focus.ViewModels;
 using Island.App.Features.Music.ViewModels;
 using Island.App.Features.SystemInfo.ViewModels;
 using Island.App.Header.ViewModels;
-using Island.App.ViewModels;
 
 namespace Island.App.Shell;
 

@@ -4,7 +4,7 @@ using Island.Core.Settings;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
 
-namespace Island.App.Services.Alerts;
+namespace Island.App.Features.Alerts.Services;
 
 public sealed class AudioOsdWatcher : IMMNotificationClient, IDisposable
 {

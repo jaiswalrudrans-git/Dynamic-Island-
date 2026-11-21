@@ -5,7 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Island.Core.Alerts;
 using Island.Core.Settings;
 
-namespace Island.App.ViewModels;
+namespace Island.App.Features.Alerts.ViewModels;
 
 public sealed class AlertsViewModel : ObservableObject, IDisposable
 {

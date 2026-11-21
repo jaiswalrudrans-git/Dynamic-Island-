@@ -3,7 +3,7 @@ using System.Windows.Threading;
 using Island.Core.Alerts;
 using Island.Core.Settings;
 
-namespace Island.App.Services.Alerts;
+namespace Island.App.Features.Alerts.Services;
 
 public sealed class BrightnessOsdWatcher : IDisposable
 {
