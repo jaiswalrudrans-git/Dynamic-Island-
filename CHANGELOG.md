@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - 2026-11-20
 
+### Fixed
+- Inset content from visible notch walls using `IslandMetrics.WallInset` (30 DIP) and removed rounded content clip.
+
 ### Refactoring
 - Restructured src/Island.App and tests/Island.Tests into isolated feature folders per AGENTS.md.
 

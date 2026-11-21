@@ -1257,7 +1257,7 @@ public sealed class AuditCaptureRunner
                         _ => 170
                     };
 
-                    int widthDip = (int)(Math.Ceiling((contentW + 32.0) / 8.0) * 8.0);
+                    int widthDip = (int)(Math.Ceiling((contentW + 60.0) / 8.0) * 8.0);
                     int heightDip = (int)(Math.Ceiling((contentH + 116.0) / 8.0) * 8.0);
 
                     var islandShell = new Border
@@ -1268,7 +1268,7 @@ public sealed class AuditCaptureRunner
                         BorderBrush = new SolidColorBrush(Color.FromArgb(60, 255, 255, 255)),
                         BorderThickness = new Thickness(1),
                         CornerRadius = new CornerRadius(28),
-                        Padding = new Thickness(16, 14, 16, 14)
+                        Padding = new Thickness(30, 14, 30, 14)
                     };
 
                     foreach (var key in appResources.Keys)
@@ -1368,17 +1368,69 @@ public sealed class AuditCaptureRunner
                     Grid.SetRow(tabBarGrid, 1);
                     layout.Children.Add(tabBarGrid);
 
-                    // Content Container with rounded clip inset by 1 px
+                    // Content Container with rectangular clip (no corner rounding cutting into content)
                     var contentHost = new Border
                     {
                         Width = contentW,
                         Height = contentH,
-                        Clip = new RectangleGeometry(new Rect(0, 0, contentW, contentH), 27, 27)
+                        Clip = new RectangleGeometry(new Rect(0, 0, contentW, contentH))
                     };
 
                     var contentStack = new StackPanel();
 
-                    if (tab == "System")
+                    if (tab == "Music")
+                    {
+                        var dock = new DockPanel { Margin = new Thickness(0, 0, 0, 6) };
+                        var meter = new TextBlock { Text = "•••", FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets"), FontSize = 14, Foreground = new SolidColorBrush(Color.FromRgb(88, 166, 255)), VerticalAlignment = VerticalAlignment.Center };
+                        DockPanel.SetDock(meter, Dock.Right);
+                        dock.Children.Add(meter);
+
+                        var braveChip = new Border
+                        {
+                            Background = new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)),
+                            CornerRadius = new CornerRadius(6),
+                            Padding = new Thickness(7, 2, 7, 2),
+                            HorizontalAlignment = HorizontalAlignment.Left
+                        };
+                        var chipSp = new StackPanel { Orientation = Orientation.Horizontal };
+                        chipSp.Children.Add(new TextBlock { Text = "\uE774", FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets"), FontSize = 12, Foreground = new SolidColorBrush(Color.FromRgb(88, 166, 255)), Margin = new Thickness(0, 0, 6, 0), VerticalAlignment = VerticalAlignment.Center });
+                        chipSp.Children.Add(new TextBlock { Text = "Brave", FontSize = 12.5, FontWeight = FontWeights.SemiBold, Foreground = Brushes.White, VerticalAlignment = VerticalAlignment.Center });
+                        braveChip.Child = chipSp;
+                        dock.Children.Add(braveChip);
+                        contentStack.Children.Add(dock);
+
+                        // Cover & Track Info
+                        var trackGrid = new Grid { Margin = new Thickness(0, 2, 0, 6) };
+                        trackGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(80) });
+                        trackGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(14) });
+                        trackGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+                        var cover = new Border { Width = 80, Height = 80, Background = new SolidColorBrush(Color.FromRgb(25, 30, 38)), CornerRadius = new CornerRadius(16), Child = new TextBlock { Text = "\uE8D6", FontFamily = new FontFamily("Segoe Fluent Icons, Segoe MDL2 Assets"), FontSize = 28, Foreground = Brushes.Gray, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center } };
+                        Grid.SetColumn(cover, 0);
+                        trackGrid.Children.Add(cover);
+
+                        var meta = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+                        meta.Children.Add(new TextBlock { Text = "Starboy", FontFamily = (FontFamily)appResources["Typography.Family.Heading"], FontSize = 17, FontWeight = FontWeights.SemiBold, Foreground = Brushes.White });
+                        meta.Children.Add(new TextBlock { Text = "The Weeknd, Daft Punk", FontFamily = (FontFamily)appResources["Typography.Family.Body"], FontSize = 14, Foreground = new SolidColorBrush(Color.FromRgb(150, 155, 170)), Margin = new Thickness(0, 2, 0, 0) });
+                        Grid.SetColumn(meta, 2);
+                        trackGrid.Children.Add(meta);
+                        contentStack.Children.Add(trackGrid);
+
+                        // Seek rail with time labels
+                        var seekGrid = new Grid { Margin = new Thickness(0, 2, 0, 4) };
+                        seekGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+                        seekGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                        seekGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+                        seekGrid.Children.Add(new TextBlock { Text = "1:24", FontFamily = (FontFamily)appResources["Typography.Family.Numeric"], FontSize = 12.5, Foreground = Brushes.Gray });
+                        var barBorder = new Border { Height = 4, Background = new SolidColorBrush(Color.FromRgb(88, 166, 255)), CornerRadius = new CornerRadius(2), Margin = new Thickness(10, 0, 10, 0), VerticalAlignment = VerticalAlignment.Center };
+                        Grid.SetColumn(barBorder, 1);
+                        seekGrid.Children.Add(barBorder);
+                        var durText = new TextBlock { Text = "3:50", FontFamily = (FontFamily)appResources["Typography.Family.Numeric"], FontSize = 12.5, Foreground = Brushes.Gray };
+                        Grid.SetColumn(durText, 2);
+                        seekGrid.Children.Add(durText);
+                        contentStack.Children.Add(seekGrid);
+                    }
+                    else if (tab == "System")
                     {
                         var bento = new Grid();
                         bento.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -1392,7 +1444,15 @@ public sealed class AuditCaptureRunner
                         bento.Children.Add(leftStack);
 
                         var rightStack = new StackPanel { Margin = new Thickness(6, 0, 0, 0) };
-                        rightStack.Children.Add(new TextBlock { Text = "Top Apps", FontFamily = (FontFamily)appResources["Typography.Family.Heading"], FontSize = 13, FontWeight = FontWeights.SemiBold, Foreground = Brushes.White });
+                        var netRow = new Grid();
+                        netRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                        netRow.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Auto) });
+                        netRow.Children.Add(new TextBlock { Text = "Net Activity", FontFamily = (FontFamily)appResources["Typography.Family.Heading"], FontSize = 13, FontWeight = FontWeights.SemiBold, Foreground = Brushes.White });
+                        var speedText = new TextBlock { Text = "127.6 KB/s", FontFamily = (FontFamily)appResources["Typography.Family.Numeric"], FontSize = 12.5, Foreground = new SolidColorBrush(Color.FromRgb(0, 229, 255)), HorizontalAlignment = HorizontalAlignment.Right };
+                        Grid.SetColumn(speedText, 1);
+                        netRow.Children.Add(speedText);
+                        rightStack.Children.Add(netRow);
+
                         string[] top = ["\uE71D agy  458 MB", "\uE71D Island  356 MB", "\uE71D Antigravity  280 MB", "\uE71D Chrome  276 MB", "\uE71D msedge  262 MB"];
                         foreach (var app in top)
                         {

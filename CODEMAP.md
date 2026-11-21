@@ -22,7 +22,8 @@
 ## Fix Index ("To fix X, look in Y")
 - **Header and tab icons**: `src/Island.App/Header/Views/ClockFace.cs`, `src/Island.App/Header/Views/PanelNavigation.cs`, `src/Island.App/Design/DesignTokens.xaml`
 - **Island sizing**: `src/Island.App/Shell/OverlayWindow.Sizing.cs`, `src/Island.App/Header/Views/PanelNavigation.cs` (demands)
-- **Island padding**: `src/Island.App/Shell/OverlayWindow.xaml` (`RootPaddingBorder`), `src/Island.App/Design/DesignTokens.xaml` (`Island.Padding.*`)
+- **Island padding**: WallInset (30 DIP = shoulder 14 + padding 16) in DesignMetrics;
+  Body.Width = Header.Width = IslandWidth - 2 * WallInset; Pages clips to rectangular bounds.
 - **Fonts**: `src/Island.App/Design/TypographyResources.cs`, `src/Island.App/Assets/Fonts/`
 - **Themes**: `src/Island.App/Design/ThemeResources.cs`, `src/Island.App/Design/DesignTokens.xaml`
 - **Tab switching**: `src/Island.App/Header/Views/PanelNavigation.cs`, `src/Island.App/Shell/OverlayWindow.Interactions.cs`

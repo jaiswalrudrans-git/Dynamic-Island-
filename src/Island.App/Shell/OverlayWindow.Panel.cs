@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using Island.App.Design;
 using Island.App.Features.CalendarWeather.Services;
 using Island.App.Features.CalendarWeather.ViewModels;
 using Island.App.Features.CalendarWeather.Views;
@@ -254,7 +255,7 @@ public partial class OverlayWindow
         targetIslandHeight = initSize.Height;
         bool belowClock = !string.Equals(settings.Current.TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase);
         double overhead = belowClock ? 116.0 : 80.0;
-        double initContentW = Math.Max(580 - 32, Math.Round(initSize.Width - 32));
+        double initContentW = Math.Max(580 - IslandMetrics.HorizontalInset, Math.Round(initSize.Width - IslandMetrics.HorizontalInset));
         double initContentH = Math.Max(60, Math.Round(initSize.Height - overhead));
         Header.Width = initContentW;
         Body.Width = initContentW;

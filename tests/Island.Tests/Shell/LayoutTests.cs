@@ -99,7 +99,7 @@ public sealed class LayoutTests : TestFolder
 
         for (int i = 0; i < tabContentWidths.Length; i++)
         {
-            double islandW = tabContentWidths[i] + 32;
+            double islandW = tabContentWidths[i] + 60;
             double islandH = tabContentHeights[i] + 116; // Header (Row 1: 44, Row 2: 36) + margins (14+8+14)
 
             islandW = Math.Clamp(islandW, minWidth, maxWidth);
@@ -149,22 +149,22 @@ public sealed class LayoutTests : TestFolder
         {
             var (contentW, contentH) = tabs[i];
 
-            double targetContentW = Math.Clamp(contentW, minIslandW - 32.0, maxIslandW - 32.0);
-            double islandW = Math.Ceiling((targetContentW + 32.0) / 8.0) * 8.0;
+            double targetContentW = Math.Clamp(contentW, minIslandW - 60.0, maxIslandW - 60.0);
+            double islandW = Math.Ceiling((targetContentW + 60.0) / 8.0) * 8.0;
             islandW = Math.Clamp(islandW, minIslandW, maxIslandW);
 
             double islandH = Math.Ceiling((contentH + overhead) / 8.0) * 8.0;
             islandH = Math.Clamp(islandH, 120.0, maxIslandH);
 
-            // Bounds calculations: 16 DIP horizontal, 14 DIP vertical outer padding
-            double leftUnused = 16.0;
-            double rightUnused = (islandW - 32.0) - targetContentW + 16.0;
+            // Bounds calculations: 30 DIP (14 shoulder + 16 wall padding) horizontal, 14 DIP vertical outer padding
+            double leftWallDist = 30.0 - 14.0;
+            double rightWallDist = (islandW - 60.0) - targetContentW + 30.0 - 14.0;
             double topUnused = 14.0;
             double bottomUnused = (islandH - overhead) - contentH + 14.0;
 
             // Extra slack beyond safe padding must be <= 8 DIP (< 12 DIP)
-            Assert.True(Math.Abs(leftUnused - 16.0) <= 0.001, $"Tab {i} left padding must be exactly 16 DIP");
-            Assert.True(rightUnused - 16.0 <= 8.0, $"Tab {i} right unused slack {rightUnused - 16.0} > 8 DIP");
+            Assert.True(Math.Abs(leftWallDist - 16.0) <= 0.001, $"Tab {i} left wall padding must be exactly 16 DIP");
+            Assert.True(rightWallDist - 16.0 <= 8.0, $"Tab {i} right unused slack {rightWallDist - 16.0} > 8 DIP");
             Assert.True(Math.Abs(topUnused - 14.0) <= 0.001, $"Tab {i} top padding must be exactly 14 DIP");
             Assert.True(bottomUnused - 14.0 <= 8.0, $"Tab {i} bottom unused slack {bottomUnused - 14.0} > 8 DIP");
 
@@ -209,6 +209,77 @@ public sealed class LayoutTests : TestFolder
         Assert.NotNull(dict["Typography.Family.Numeric"]);
         Assert.True((double)dict["Typography.Size.Body"] >= 14.0);
         Assert.True((double)dict["Typography.Size.HeaderTime"] >= 20.0);
+    }
+
+    [Theory]
+    [InlineData("Music", 580, 170, 1.0)]
+    [InlineData("Music", 580, 170, 1.25)]
+    [InlineData("System", 680, 264, 1.0)]
+    [InlineData("System", 680, 264, 1.25)]
+    [InlineData("Controls", 620, 230, 1.0)]
+    [InlineData("Controls", 620, 230, 1.25)]
+    [InlineData("Clipboard", 680, 250, 1.0)]
+    [InlineData("Clipboard", 680, 250, 1.25)]
+    public void TabsContentDistanceToVisibleNotchWall(string tabName, double contentW, double contentH, double dpiScale)
+    {
+        double effectiveW = 1920 / dpiScale;
+        double effectiveH = 1080 / dpiScale;
+        double minIslandW = 580.0;
+        double maxIslandW = Math.Max(minIslandW, Math.Floor(effectiveW * 0.62 / 8.0) * 8.0);
+        double maxIslandH = Math.Max(180.0, Math.Floor(effectiveH * 0.70 / 8.0) * 8.0);
+
+        double insetX = 60.0; // 2 * WallInset (shoulder 14 + side padding 16)
+        double targetContentW = Math.Clamp(contentW, minIslandW - insetX, maxIslandW - insetX);
+        double islandW = Math.Ceiling((targetContentW + insetX) / 8.0) * 8.0;
+        islandW = Math.Clamp(islandW, minIslandW, maxIslandW);
+
+        double overhead = 116.0;
+        double islandH = Math.Ceiling((contentH + overhead) / 8.0) * 8.0;
+        islandH = Math.Clamp(islandH, 120.0, maxIslandH);
+
+        double liveContentW = islandW - insetX;
+        double liveContentH = islandH - overhead;
+
+        // Island geometry at full progress:
+        double centerX = islandW / 2.0;
+        double shoulder = 14.0;
+        double radius = 24.0; // bottom corner radius at progress = 1.0
+
+        // Visible straight wall geometry:
+        double visibleWallLeft = shoulder;
+        double visibleWallRight = islandW - shoulder;
+
+        // Content position: centered in island, width = liveContentW
+        double contentLeft = centerX - liveContentW / 2.0; // 30 DIP from bounding box
+        double contentRight = centerX + liveContentW / 2.0; // islandW - 30 DIP from bounding box
+
+        double distLeft = contentLeft - visibleWallLeft;
+        double distRight = visibleWallRight - contentRight;
+
+        // At least 16 DIP from straight walls on left and right
+        Assert.True(distLeft >= 16.0 - 0.001, $"{tabName} left distance {distLeft} < 16 DIP");
+        Assert.True(distRight >= 16.0 - 0.001, $"{tabName} right distance {distRight} < 16 DIP");
+
+        // Vertical content bounds: top starts at 102 DIP, height = liveContentH
+        double contentTop = 102.0;
+        double contentBottom = contentTop + liveContentH; // islandH - 14 DIP
+
+        double distBottom = islandH - contentBottom;
+        Assert.True(distBottom >= 14.0 - 0.001, $"{tabName} bottom distance {distBottom} < 14 DIP");
+
+        // Verify none of the content rectangle's corners sit inside the bottom corner arcs
+        // Corner curve center: (visibleWallLeft + radius, islandH - radius)
+        double cornerCenterLX = visibleWallLeft + radius;
+        double cornerCenterY = islandH - radius;
+        double dxL = contentLeft - cornerCenterLX;
+        double dyL = contentBottom - cornerCenterY;
+        double distCornerL = Math.Sqrt(dxL * dxL + dyL * dyL);
+        Assert.True(distCornerL <= radius, $"{tabName} bottom-left corner is inside corner cut arc");
+
+        double cornerCenterRX = visibleWallRight - radius;
+        double dxR = contentRight - cornerCenterRX;
+        double distCornerR = Math.Sqrt(dxR * dxR + dyL * dyL);
+        Assert.True(distCornerR <= radius, $"{tabName} bottom-right corner is inside corner cut arc");
     }
 
     private static string? FindProjectRoot()

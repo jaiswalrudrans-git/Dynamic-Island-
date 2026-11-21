@@ -30,6 +30,8 @@
 
     <!-- SINGLE ROOT PADDING OWNER (16 DIP left/right, 14 DIP top/bottom) -->
     <Thickness x:Key="Padding.Island">16,14,16,14</Thickness>
+    <sys:Double x:Key="Island.WallInset">30</sys:Double>
+    <sys:Double x:Key="Island.HorizontalInset">60</sys:Double>
     <Thickness x:Key="Padding.Card">0</Thickness>
     <Thickness x:Key="Padding.Page">0</Thickness>
     <Thickness x:Key="Margin.Card">0</Thickness>

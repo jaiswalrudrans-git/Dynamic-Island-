@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using Island.App.Design;
 using Island.App.Features.CalendarWeather.Views;
 using Island.App.Features.Clipboard.Views;
 using Island.App.Features.Controls.Views;
@@ -339,11 +340,12 @@ internal sealed class PanelNavigation
             _ => Math.Max(desiredContentW, 580)
         };
 
-        // Horizontal padding: 16 left + 16 right = 32 DIP (Single Root Padding Owner)
-        double targetContentW = Math.Clamp(desiredContentW, minIslandW - 32.0, maxIslandW - 32.0);
-        double targetIslandW = Math.Ceiling((targetContentW + 32.0) / 8.0) * 8.0;
+        // Horizontal inset: 2 * WallInset (30 DIP each side = shoulder 14 + side padding 16)
+        double insetX = IslandMetrics.HorizontalInset;
+        double targetContentW = Math.Clamp(desiredContentW, minIslandW - insetX, maxIslandW - insetX);
+        double targetIslandW = Math.Ceiling((targetContentW + insetX) / 8.0) * 8.0;
         targetIslandW = Math.Clamp(targetIslandW, minIslandW, maxIslandW);
-        targetContentW = targetIslandW - 32.0;
+        targetContentW = targetIslandW - insetX;
 
         // Pass 2: Measure with the target content width so text wrapping & reflow compute exact height
         page.Measure(new Size(targetContentW, double.PositiveInfinity));

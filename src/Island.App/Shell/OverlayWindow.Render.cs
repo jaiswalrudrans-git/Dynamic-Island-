@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Island.App.Design;
 using Island.App.Features.Controls.ViewModels;
 using Island.App.Features.Focus.ViewModels;
 using Island.App.Features.Music.ViewModels;
@@ -33,12 +34,12 @@ public partial class OverlayWindow
 
             bool belowClock = !string.Equals(settings.Current.TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase);
             double overhead = belowClock ? 116.0 : 80.0;
-            double liveContentW = Math.Max(300, Math.Round(curW - 32));
+            double liveContentW = Math.Max(300, Math.Round(curW - 2 * IslandMetrics.WallInset));
             double liveContentH = Math.Max(60, Math.Round(curH - overhead));
             if (Header.Width != liveContentW) Header.Width = liveContentW;
             if (Body.Width != liveContentW) Body.Width = liveContentW;
             if (Body.Height != liveContentH) Body.Height = liveContentH;
-            Pages.Clip = new RectangleGeometry(new Rect(0, 0, liveContentW, liveContentH), 27, 27);
+            Pages.Clip = new RectangleGeometry(new Rect(0, 0, liveContentW, liveContentH));
         }
         IslandBackground.Opacity = shape;
         CollapsedBackground.Opacity = Math.Max(0, 1.0 - shape);
@@ -100,7 +101,7 @@ public partial class OverlayWindow
                 Canvas.SetLeft(DebugHud, iLeft + 8);
                 Canvas.SetTop(DebugHud, curH + 6);
                 double overheadDbg = !string.Equals(settings.Current.TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase) ? 116.0 : 80.0;
-                double slackX = Math.Max(0, (curW - 32) - Body.Width);
+                double slackX = Math.Max(0, (curW - 2 * IslandMetrics.WallInset) - Body.Width);
                 double slackY = Math.Max(0, (curH - overheadDbg) - Body.Height);
                 string tabName = navigation != null ? PanelTab.All[navigation.SelectedIndex].Name : "Tab";
                 DebugHudText.Text = $"Tab: {tabName} | Island: {curW:0}x{curH:0} | Content: {Body.Width:0}x{Body.Height:0} | Safe Inset: 16/14 DIP | Slack: X={slackX:0} Y={slackY:0} DIP";

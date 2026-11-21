@@ -1,4 +1,5 @@
 using System.Windows;
+using Island.App.Design;
 
 namespace Island.App.Shell;
 
@@ -11,7 +12,7 @@ public partial class OverlayWindow
         targetIslandHeight = size.Height;
         bool belowClock = !string.Equals(settings.Current.TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase);
         double overhead = belowClock ? 116.0 : 80.0;
-        double contentW = Math.Max(580 - 32, Math.Round(size.Width - 32));
+        double contentW = Math.Max(580 - IslandMetrics.HorizontalInset, Math.Round(size.Width - IslandMetrics.HorizontalInset));
         double contentH = Math.Max(60, Math.Round(size.Height - overhead));
         if (Header.Width != contentW) Header.Width = contentW;
         if (Body.Width != contentW) Body.Width = contentW;

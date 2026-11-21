@@ -60,7 +60,7 @@ public sealed class IslandEdgeSafetyTests
 
         const double overhead = 116.0; // 14 top + 80 header + 8 gap + 14 bottom
         double targetContentW = contentW;
-        double islandW = Math.Ceiling((targetContentW + 32.0) / 8.0) * 8.0;
+        double islandW = Math.Ceiling((targetContentW + 60.0) / 8.0) * 8.0;
         double islandH = Math.Ceiling((contentH + overhead) / 8.0) * 8.0;
 
         const double minLeftRightSafeMargin = 16.0;
@@ -68,7 +68,7 @@ public sealed class IslandEdgeSafetyTests
         const double cornerRadius = 28.0;
 
         // Verify mathematical island shell bounds
-        Assert.True(islandW >= targetContentW + 32.0, $"Island width {islandW} must accommodate content {targetContentW} + 32 DIP margin");
+        Assert.True(islandW >= targetContentW + 60.0, $"Island width {islandW} must accommodate content {targetContentW} + 60 DIP margin");
         Assert.True(islandH >= contentH + overhead, $"Island height {islandH} must accommodate content {contentH} + 116 DIP overhead");
 
         // Verify corner geometry:
