@@ -1,10 +1,10 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Island.App.ViewModels;
+using Island.App.Features.Tasks.ViewModels;
 using Island.Core.Tasks;
 
-namespace Island.App.Views;
+namespace Island.App.Features.Tasks.Views;
 
 public partial class TasksPage : UserControl
 {

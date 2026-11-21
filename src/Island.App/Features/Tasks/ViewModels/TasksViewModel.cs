@@ -3,7 +3,7 @@ using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Island.Core.Tasks;
 
-namespace Island.App.ViewModels;
+namespace Island.App.Features.Tasks.ViewModels;
 
 public sealed record TaskItemUi(
     string Id,
