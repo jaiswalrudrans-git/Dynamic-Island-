@@ -58,14 +58,14 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="12,4">
+    <Grid Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Top Input & Filter Bar -->
-        <Border Grid.Row="0" Style="{StaticResource IslandCard}" Padding="10,6" Margin="{StaticResource Margin.Row}">
+        <!-- Top Input & Filter Bar (Interactive Control) -->
+        <Border Grid.Row="0" Style="{StaticResource IslandCard}" Padding="10,6" Margin="0,0,0,8">
             <DockPanel LastChildFill="True">
                 <!-- Filters on the Right -->
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center" Margin="8,0,0,0">
@@ -144,7 +144,7 @@
         <Grid Grid.Row="1">
             <!-- Compact 1-line Empty State -->
             <Border Visibility="{Binding IsEmpty, Converter={StaticResource Visible}}"
-                    Style="{StaticResource IslandCard}" Padding="12,10" HorizontalAlignment="Stretch">
+                    Background="Transparent" BorderThickness="0" Padding="0" HorizontalAlignment="Stretch">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <TextBlock Text="&#xE9D5;" FontFamily="{StaticResource Font.Icons}"
                                FontSize="14" Foreground="{DynamicResource Theme.TextTertiary}" Margin="0,0,8,0" VerticalAlignment="Center"/>
@@ -159,7 +159,7 @@
                 <ItemsControl ItemsSource="{Binding FilteredTasks}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border x:Name="TaskCard" Style="{StaticResource IslandCard}" Padding="12,8" Margin="0,0,0,6">
+                            <Border x:Name="TaskCard" Style="{StaticResource FlatListRow}">
                                 <DockPanel LastChildFill="True">
                                     <!-- Priority Dot Left -->
                                     <Ellipse DockPanel.Dock="Left" Width="8" Height="8" Fill="{Binding PriorityBrush}"

@@ -50,7 +50,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="14,4,14,8">
+    <Grid Margin="0">
         <!-- Radial Cover Glow (Subtle ambient effect directly on the island) -->
         <Border CornerRadius="{StaticResource Radius.Card}" IsHitTestVisible="False">
             <Border.Background>
@@ -62,7 +62,7 @@
         </Border>
 
         <!-- Empty State (Compact ~80-90 DIP) -->
-        <Grid x:Name="Empty" Margin="16,10">
+        <Grid x:Name="Empty" Margin="0">
             <Grid.Style>
                 <Style TargetType="Grid">
                     <Style.Triggers>

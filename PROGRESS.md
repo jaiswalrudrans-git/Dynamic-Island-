@@ -1,5 +1,58 @@
 # Milestone progress
 
+## M-Unified-Flat-Layout-And-Spacing-Overhaul · [COMPLETED]
+
+**Goal**: Merge the earlier visual/layout fixes (clock centering, CPU core grid optimization, unclipped RAM top apps, spacious natural timer/pomodoro, typography pairing) with the flat layout and spacing cleanup (single 14 DIP padding owner, removal of all non-interactive card chrome, hover-only row pills, spacing gap tokens, and automated XAML spacing lint test) across ALL tabs.
+
+### Merged Phases:
+- [x] **Phase 1: Header, Clock Centering & Single-Padding Root Architecture**
+  - Ensure island content root is the sole padding owner with uniform outer padding of 14 DIP (all four sides, bottom equal to sides).
+  - Row 0 (44 DIP): Center clock face and date dead center of the island with optical balance spacer on left matching pin/settings on right.
+  - Row 1 (36 DIP): Centered tab bar with spring-animated sliding pill.
+  - Establish spacing tokens in `DesignTokens.xaml`: `Padding.Island` = 14 DIP, `Spacing.Group` = 16 (or 20), `Spacing.Item` = 8, `Spacing.Inline` = 6, `Divider.Brush` = `#0FFFFFFF` (6% white), `Divider.Height` = 1, `Row.Hover.Background` = `#0DFFFFFF` (5% white), `Row.Hover.Radius` = 10, `Row.Padding` = `8,6,8,6`, Quick Controls tile radius 14, padding 10.
+  - Update auto-sizing calculations in `PanelNavigation.cs` and `OverlayWindow.Panel.cs` for 14 DIP root padding (28 DIP horizontal overhead, adjusted vertical overhead).
+
+- [x] **Phase 2: System Tab Overhaul — Flat Layout, Optimized CPU Cores & Uncut Top Apps**
+  - Strip card backgrounds (`Theme.Surface`), outer borders, and inner card paddings from CPU, RAM, GPU, Storage, Network, Power, and Top Apps containers in `SystemPage.xaml`.
+  - Optimize CPU core layout: eliminate orphan single core on its own row, balancing core bars evenly across columns.
+  - Fix Top Apps RAM list: ensure full unclipped headroom for all 5 top processes with process icons and comfortable bottom clearance.
+  - Flatten list rows: transparent resting state; hover state applies soft 5% white pill with radius 10 and fixed row height (6 DIP vertical, 8 horizontal padding, zero layout shift).
+  - Group metrics with spacing, muted section labels, and 1px 6% white dividers.
+
+- [x] **Phase 3: Focus & Timer Tab Overhaul — Flat Spacious Layout Without Cramming**
+  - Eliminate the "rough, forced, shrunk" cramped feeling: let the countdown timer, pomodoro ring, and stopwatch take their natural breathing space without wasting space.
+  - Strip outer card background, borders, and rounded card chrome around timer and ring.
+  - Retain Rule 3 interactive controls: segmented control pills (Pomodoro / Timer / Stopwatch) and crisp transport buttons (Play/Pause, Reset, Skip) with explicit Windows icon fallback chains.
+  - Tabular figures on timer digits to prevent digit jitter.
+
+- [x] **Phase 4: Unified Clipboard & Screenshots Tab — Flat Dual-Half Layout**
+  - Remove card containers and borders from both halves in `ClipboardPage.xaml`.
+  - Flatten recent copies list rows: transparent resting state, 5% white hover pill (radius 10, fixed row height).
+  - Preserve Rule 3 interactive controls: search box, clear/pause buttons, snip button, and screenshot thumbnail cards.
+  - Single-click paste into previous app via `SendInput` (`WS_EX_NOACTIVATE`), privacy filtering for passwords/secrets.
+
+- [x] **Phase 5: Music, Quick Controls & Calendar/Weather Tabs — Flat Compact Layout**
+  - **Music Tab**: Strip outer card container and border; place title marquee, metadata, spectrum scrubber, and media controls flat on island background (~170 DIP height).
+  - **Quick Controls Tab**: Harmonize 8 toggle tiles according to Rule 3 (interactive control chrome: tile fill, radius 14, padding 10); ensure volume and brightness sliders touch 14 DIP padding line cleanly without inner margins.
+  - **Calendar & Weather Tab**: Remove card containers around weather summary, 5-day forecast, and calendar grid; lay out flat with 16 DIP group gap and 1px 6% white dividers; preserve interactive chips/arrows.
+
+- [x] **Phase 6: Automated Spacing & Margin Lint Test Suite**
+  - Add `tests/Island.Tests/SpacingAndChromeLintTests.cs`:
+    - Parses XAML of all tab views.
+    - Fails if any tab view contains hardcoded `Margin="..."` or `Padding="..."` greater than 0 outside the token dictionary or allowed interactive controls (Quick Controls tiles, Buttons, TextBoxes, Sliders, Segmented controls).
+    - Fails if any non-interactive `Border` has `CornerRadius` > 0 with a background fill (guaranteeing no card chrome).
+
+- [x] **Phase 7: Multi-Theme/DPI Auto-Fit Verification, Visual Evidence & Final Delivery**
+  - Verify auto-fitting across 100% and 125% DPI with Classic, Dot Matrix, and Techno typography presets (ensure zero `ScrollViewer` scrollbars and zero text clipping).
+  - Readability check: verify all sections remain visually distinct through spacing, section labels, and dividers (never adding card backgrounds).
+  - Capture "Before" vs. "After" screenshots of every tab into `docs/screens/spacing/`.
+  - Catalog every removed padding/margin and container border in `docs/FIXLOG.md`.
+  - Full build verification via `.\build.ps1` (Release build, warnings as errors, all unit/layout/lint tests passing).
+  - Commit and STOP.
+  - Run `build.ps1`, verify all tests pass, commit and STOP.
+
+---
+
 ## M-LeadEngineer-Production-Audit · 2026-11-21
 
 Comprehensive lead engineer audit, stabilization, and production overhaul resolving regressions and polishing all views across stages A through G:

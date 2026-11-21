@@ -9,11 +9,31 @@
     <sys:Double x:Key="Space.Lg">16</sys:Double>
     <sys:Double x:Key="Space.Xl">24</sys:Double>
 
-    <Thickness x:Key="Padding.Card">12</Thickness>
-    <Thickness x:Key="Padding.Page">12</Thickness>
-    <Thickness x:Key="Padding.Island">12</Thickness>
-    <Thickness x:Key="Margin.Card">0,0,0,8</Thickness>
-    <Thickness x:Key="Margin.Row">0,0,0,8</Thickness>
+    <!-- UNIFIED SPACING GAP TOKENS (Group gap 16/20, Item gap 8, Inline gap 6) -->
+    <sys:Double x:Key="Spacing.Group">16</sys:Double>
+    <sys:Double x:Key="Spacing.GroupWide">20</sys:Double>
+    <sys:Double x:Key="Spacing.Item">8</sys:Double>
+    <sys:Double x:Key="Spacing.Inline">6</sys:Double>
+
+    <!-- DIVIDER TOKENS (1px 6% white) -->
+    <SolidColorBrush x:Key="Divider.Brush" Color="#0FFFFFFF"/>
+    <sys:Double x:Key="Divider.Height">1</sys:Double>
+
+    <!-- LIST ROW HOVER TOKENS (Hover-only 5% white, radius 10, fixed row height) -->
+    <SolidColorBrush x:Key="Row.Hover.Background" Color="#0DFFFFFF"/>
+    <CornerRadius x:Key="Row.Hover.Radius">10</CornerRadius>
+    <Thickness x:Key="Row.Padding">8,6,8,6</Thickness>
+
+    <!-- INTERACTIVE CONTROL TOKENS (Quick Controls Tiles) -->
+    <CornerRadius x:Key="Radius.Tile">14</CornerRadius>
+    <Thickness x:Key="Padding.Tile">10</Thickness>
+
+    <!-- SINGLE ROOT PADDING OWNER (14 DIP all four sides) -->
+    <Thickness x:Key="Padding.Island">14</Thickness>
+    <Thickness x:Key="Padding.Card">0</Thickness>
+    <Thickness x:Key="Padding.Page">0</Thickness>
+    <Thickness x:Key="Margin.Card">0</Thickness>
+    <Thickness x:Key="Margin.Row">0</Thickness>
     <sys:Double x:Key="Height.Header">44</sys:Double>
 
     <!-- CORNER RADII (Card 16, Control 12, Pill 999, Chip 6) -->
@@ -83,6 +103,43 @@
     <FontFamily x:Key="Font.Display">pack://application:,,,/Fonts/#Orbitron, Segoe UI Variable Display, Segoe UI</FontFamily>
     <FontFamily x:Key="Font.Text">Segoe UI Variable Text, Segoe UI</FontFamily>
     <FontFamily x:Key="Font.Icons">Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji</FontFamily>
+
+    <!-- FLAT LIST ROW STYLE (Hover-only 5% white, radius 10, fixed row height) -->
+    <Style x:Key="FlatListRow" TargetType="Border">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="CornerRadius" Value="{StaticResource Row.Hover.Radius}"/>
+        <Setter Property="Padding" Value="{StaticResource Row.Padding}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource Row.Hover.Background}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- FLAT 1PX DIVIDER (6% white) -->
+    <Style x:Key="FlatDivider" TargetType="Border">
+        <Setter Property="Height" Value="{StaticResource Divider.Height}"/>
+        <Setter Property="Background" Value="{StaticResource Divider.Brush}"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="Margin" Value="0"/>
+    </Style>
+
+    <!-- INTERACTIVE CONTROL TILE (Quick Controls Tiles: Fill, radius 14, padding 10) -->
+    <Style x:Key="QuickControlsTile" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceRaised}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.CardRestBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="{StaticResource Radius.Tile}"/>
+        <Setter Property="Padding" Value="{StaticResource Padding.Tile}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
 
     <!-- CARD STYLE (Subtle fill, 1px top highlight, outline only on hover/focus) -->
     <Style x:Key="IslandCard" TargetType="Border">

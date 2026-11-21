@@ -93,7 +93,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="12,2,12,10">
+    <Grid Margin="0">
         <Grid.RowDefinitions>
             <!-- Row 0: Unified Header Strip -->
             <RowDefinition Height="Auto"/>
@@ -213,21 +213,9 @@
                         <ItemsControl ItemsSource="{Binding DisplayedCopies}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <Border Margin="0,2" CornerRadius="6" Background="{DynamicResource Theme.SurfaceRaised}"
-                                            BorderBrush="{DynamicResource Theme.CardRestBorder}" BorderThickness="1"
-                                            Padding="8,6" Cursor="Hand" MouseLeftButtonDown="CopyItemClick"
-                                            MouseMove="CopyItemMouseMove" ToolTip="Click to paste (or copy)">
-                                        <Border.Style>
-                                            <Style TargetType="Border">
-                                                <Style.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter Property="Background" Value="{DynamicResource Theme.SurfaceHover}"/>
-                                                        <Setter Property="BorderBrush" Value="{DynamicResource Theme.Border}"/>
-                                                    </Trigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-
+                                    <Border Style="{StaticResource FlatListRow}" Cursor="Hand"
+                                            MouseLeftButtonDown="CopyItemClick" MouseMove="CopyItemMouseMove"
+                                            ToolTip="Click to paste (or copy)">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="22"/>
@@ -284,9 +272,9 @@
                     </ScrollViewer>
                 </Grid>
 
-                <!-- THIN DIVIDER -->
-                <Rectangle Grid.Column="1" Width="1" Fill="{DynamicResource Theme.Border}" Margin="6,0"
-                           Visibility="{Binding HasBoth, Converter={StaticResource Visible}}"/>
+                <!-- THIN DIVIDER (1px 6% white) -->
+                <Border Grid.Column="1" Width="1" Style="{StaticResource FlatDivider}" Margin="8,0"
+                        Visibility="{Binding HasBoth, Converter={StaticResource Visible}}"/>
 
                 <!-- RIGHT HALF: Screenshots (Grid Fills Width) -->
                 <Grid Grid.Column="2" Margin="4,0,0,0">

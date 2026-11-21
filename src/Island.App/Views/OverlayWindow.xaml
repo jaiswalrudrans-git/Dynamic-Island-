@@ -152,7 +152,7 @@
             </Grid>
 
             <!-- Expanded Island Header (Two-row layout: Row 1 = Clock+Date centered; Row 2 = Centered Tab Bar) -->
-            <Grid x:Name="Header" Height="80" Margin="0,12,0,0" HorizontalAlignment="Center" VerticalAlignment="Top"
+            <Grid x:Name="Header" Height="80" Margin="0,14,0,0" HorizontalAlignment="Center" VerticalAlignment="Top"
                   Opacity="0" IsHitTestVisible="False" PreviewMouseWheel="Header_PreviewMouseWheel">
                 <Grid.RenderTransform><TranslateTransform x:Name="HeaderY"/></Grid.RenderTransform>
                 <Grid.RowDefinitions>
@@ -209,7 +209,7 @@
             </Grid>
 
             <!-- Expanded Island Body: Content sits DIRECTLY on island surface (No double boxing!) -->
-            <Border x:Name="Body" Margin="0,100,0,0" HorizontalAlignment="Center" VerticalAlignment="Top"
+            <Border x:Name="Body" Margin="0,102,0,0" HorizontalAlignment="Center" VerticalAlignment="Top"
                     Opacity="0" Background="Transparent" CornerRadius="0" IsHitTestVisible="False">
                 <Border.RenderTransform><TranslateTransform x:Name="BodyY"/></Border.RenderTransform>
                 <Grid x:Name="Pages" ClipToBounds="True"/>

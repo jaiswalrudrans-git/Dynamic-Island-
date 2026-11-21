@@ -231,8 +231,8 @@ public partial class OverlayWindow
         targetIslandWidth = initSize.Width;
         targetIslandHeight = initSize.Height;
         bool belowClock = !string.Equals(settings.Current.TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase);
-        double overhead = belowClock ? 112.0 : 76.0;
-        double initContentW = Math.Max(580 - 24, Math.Round(initSize.Width - 24));
+        double overhead = belowClock ? 116.0 : 80.0;
+        double initContentW = Math.Max(580 - 28, Math.Round(initSize.Width - 28));
         double initContentH = Math.Max(60, Math.Round(initSize.Height - overhead));
         Header.Width = initContentW;
         Body.Width = initContentW;
@@ -290,8 +290,8 @@ public partial class OverlayWindow
         targetIslandWidth = size.Width;
         targetIslandHeight = size.Height;
         bool belowClock = !string.Equals(settings.Current.TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase);
-        double overhead = belowClock ? 112.0 : 76.0;
-        double contentW = Math.Max(580 - 24, Math.Round(size.Width - 24));
+        double overhead = belowClock ? 116.0 : 80.0;
+        double contentW = Math.Max(580 - 28, Math.Round(size.Width - 28));
         double contentH = Math.Max(60, Math.Round(size.Height - overhead));
         if (Header.Width != contentW) Header.Width = contentW;
         if (Body.Width != contentW) Body.Width = contentW;
@@ -727,7 +727,7 @@ public partial class OverlayWindow
             Header.Height = 80;
             if (HeaderLeftCol != null) HeaderLeftCol.Width = new GridLength(72);
             if (HeaderRightCol != null) HeaderRightCol.Width = new GridLength(72);
-            Body.Margin = new Thickness(0, 100, 0, 0);
+            Body.Margin = new Thickness(0, 102, 0, 0);
             if (LegacyTabContainer != null) LegacyTabContainer.Visibility = Visibility.Collapsed;
             if (TabBarRow != null) TabBarRow.Visibility = Visibility.Visible;
             if (TabBarRow != null && TabBarContainer != null && TabBarRow.Children.Count == 0 && LegacyTabContainer?.Child != null)
@@ -744,7 +744,7 @@ public partial class OverlayWindow
             Header.Height = 44;
             if (HeaderLeftCol != null) HeaderLeftCol.Width = GridLength.Auto;
             if (HeaderRightCol != null) HeaderRightCol.Width = new GridLength(72);
-            Body.Margin = new Thickness(0, 64, 0, 0);
+            Body.Margin = new Thickness(0, 66, 0, 0);
             if (LegacyTabContainer != null) LegacyTabContainer.Visibility = Visibility.Visible;
             if (TabBarRow != null) TabBarRow.Visibility = Visibility.Collapsed;
             if (LegacyTabContainer != null && LegacyTabContainer.Child == null && TabBarRow != null && TabBarRow.Children.Count > 0)

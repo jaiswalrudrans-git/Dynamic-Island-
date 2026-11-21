@@ -135,3 +135,41 @@ This log tracks every defect identified during the Stage A audit, the exact chan
      - Updated `docs/AUDIT.md` with resolutions and commit references for all 12 defect areas.
      - Updated `README.md`, `SPEC.md`, and `PROGRESS.md`.
      - Verified end-to-end Release build pipeline via `build.ps1` with 172/172 passing tests.
+
+---
+
+## Milestone: Unified Flat Layout & Spacing Overhaul (`M-Unified-Flat-Layout-And-Spacing-Overhaul`)
+- **Status**: Completed
+- **Changes Implemented**:
+  1. **Single Root Padding Owner (`DesignTokens.xaml`, `OverlayWindow.xaml`, `OverlayWindow.Panel.cs`, `PanelNavigation.cs`)**:
+     - Established `Padding.Island` = `14,14,14,14` (all 4 sides uniform, bottom equal to sides).
+     - Removed per-view outer padding/margins from all 7 tabs (all root Grids set to `Margin="0"`).
+     - Content bounds align precisely 14 DIP from the island border on all four sides.
+     - Sizing calculations updated to 28 DIP horizontal overhead (`14 + 14`) and 116 DIP vertical overhead (`14 top + 80 header + 8 gap + 14 bottom`).
+  2. **Unified Gap & Divider Tokens (`DesignTokens.xaml`)**:
+     - `Spacing.Group` = 16 DIP, `Spacing.GroupWide` = 20 DIP, `Spacing.Item` = 8 DIP, `Spacing.Inline` = 6 DIP.
+     - `Divider.Brush` = `#0FFFFFFF` (6% white), `Divider.Height` = 1 DIP (`Style="{StaticResource FlatDivider}"`).
+     - `Row.Hover.Background` = `#0DFFFFFF` (5% white), `Row.Hover.Radius` = 10 DIP, `Row.Padding` = `8,6,8,6` (`Style="{StaticResource FlatListRow}"`).
+     - `Radius.Tile` = 14 DIP, `Padding.Tile` = 10 DIP (`Style="{StaticResource QuickControlsTile}"`).
+  3. **Card Chrome Removal Across All Tabs**:
+     - **System (`SystemPage.xaml`)**: Stripped card background fills (`Theme.SurfaceRaised`), outer borders, and inner card paddings from CPU, RAM, GPU, Power, Network/Storage, and Top Apps. Grouped sections cleanly with 16 DIP group gap and 1px 6% white dividers. Optimized CPU core grid into a clean horizontal strip (eliminating the orphan single core on its own row). Top Apps RAM rows use `FlatListRow` with fixed 20 DIP height (no layout shift).
+     - **Calendar & Weather (`CalendarWeatherPage.xaml`)**: Stripped card chrome from both Calendar and Weather column containers; separated with 1px 6% white vertical divider; kept interactive navigation and chip controls.
+     - **Music (`MusicPage.xaml`)**: Stripped card wrappers; track title marquee, metadata, spectrum scrubber, and transport controls lay directly on island background (~170 DIP height).
+     - **Focus (`FocusPage.xaml`)**: Stripped card container chrome around circular ring and timer; kept interactive segmented pills and high-contrast transport buttons; tabular numeric figures prevent digit jitter.
+     - **Clipboard (`ClipboardPage.xaml`)**: Stripped card chrome from both copies list and screenshots halves; list rows use `FlatListRow`; kept search box, snip button, and screenshot thumbnail cards.
+     - **Tasks (`TasksPage.xaml`)**: Removed card chrome from list rows (`FlatListRow`), removed empty card wrapper; kept interactive add/filter bar.
+     - **Quick Controls (`QuickControlsPage.xaml`)**: Sliders stretch to the 14 DIP content boundary without card wrappers; 8 toggle tiles standardized to tile fill, radius 14, and padding 10.
+  4. **Catalog of Removed Hardcoded Paddings & Margins**:
+     - `SystemPage.xaml`: Removed `Margin="12,4,12,14"`, removed 6x `Style="{StaticResource IslandCard}"` (12 DIP padding, 1px border, surface fill), removed `Padding="12,10,12,10"` from Top Apps.
+     - `CalendarWeatherPage.xaml`: Removed `Margin="12,4"`, removed 2x `Style="{StaticResource IslandCard}"` (12 DIP padding, 1px border, surface fill).
+     - `MusicPage.xaml`: Removed `Margin="14,4,14,8"`, removed `Margin="16,10"` from empty state.
+     - `FocusPage.xaml`: Removed `Margin="16,8,16,14"`, removed outer card chrome.
+     - `ClipboardPage.xaml`: Removed `Margin="12,2,12,10"`, removed resting border/fill and per-item margins from copies list.
+     - `TasksPage.xaml`: Removed `Margin="12,4"`, removed `Margin="{StaticResource Margin.Row}"`, removed `Style="{StaticResource IslandCard}"` and `Padding="12,8"` / `Margin="0,0,0,6"` from task rows.
+     - `QuickControlsPage.xaml`: Removed `Margin="12,4,12,8"`, removed 2x `Style="{StaticResource IslandCard}"` and `Padding="14,8"` / `Padding="14,10"` from sliders.
+  5. **Automated Spacing & Chrome Lint Test Suite (`SpacingAndChromeLintTests.cs`)**:
+     - Implemented lint-style unit test verifying all tab root Grids have zero margin, token definitions are exact, no flat tab contains non-interactive card chrome, and all list rows use `FlatListRow`.
+  6. **Visual Evidence**:
+     - Stored 16 "Before" screenshots in `docs/screens/spacing/before/`.
+     - Stored 16 "After" screenshots in `docs/screens/spacing/after/`.
+     - Total passing tests: 189/189 with 0 warnings and 0 errors.

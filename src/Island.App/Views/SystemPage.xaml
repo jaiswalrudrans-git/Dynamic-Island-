@@ -40,23 +40,32 @@
         </Style>
     </UserControl.Resources>
 
-    <!-- 3-COLUMN x 2-ROW BALANCED BENTO GRID -->
-    <Grid Margin="12,4,12,14">
+    <!-- 3-COLUMN x 2-ROW BALANCED BENTO GRID (Flat, no card chrome) -->
+    <Grid Margin="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="10"/>
+            <RowDefinition Height="16"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="16"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="10"/>
+            <ColumnDefinition Width="16"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- ROW 0, COLUMN 0: Card 1 - CPU -->
-        <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource IslandCard}" ToolTip="{Binding CpuTooltip}">
+        <!-- Vertical Dividers (1px 6% white) -->
+        <Border Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Width="1" Style="{StaticResource FlatDivider}" HorizontalAlignment="Center"/>
+        <Border Grid.Row="0" Grid.RowSpan="3" Grid.Column="3" Width="1" Style="{StaticResource FlatDivider}" HorizontalAlignment="Center"/>
+
+        <!-- Horizontal Dividers (1px 6% white) -->
+        <Border Grid.Row="1" Grid.Column="0" Height="1" Style="{StaticResource FlatDivider}" VerticalAlignment="Center"/>
+        <Border Grid.Row="1" Grid.Column="2" Height="1" Style="{StaticResource FlatDivider}" VerticalAlignment="Center"/>
+        <Border Grid.Row="1" Grid.Column="4" Height="1" Style="{StaticResource FlatDivider}" VerticalAlignment="Center"/>
+
+        <!-- ROW 0, COLUMN 0: Section 1 - CPU -->
+        <Border Grid.Row="0" Grid.Column="0" Background="Transparent" BorderThickness="0" Padding="0" ToolTip="{Binding CpuTooltip}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -123,8 +132,8 @@
             </Grid>
         </Border>
 
-        <!-- ROW 2, COLUMN 0: Card 2 - Memory -->
-        <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource IslandCard}" ToolTip="{Binding RamTooltip}">
+        <!-- ROW 2, COLUMN 0: Section 2 - Memory -->
+        <Border Grid.Row="2" Grid.Column="0" Background="Transparent" BorderThickness="0" Padding="0" ToolTip="{Binding RamTooltip}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -166,8 +175,8 @@
             </Grid>
         </Border>
 
-        <!-- ROW 0, COLUMN 2: Card 3 - GPU -->
-        <Border Grid.Row="0" Grid.Column="2" Style="{StaticResource IslandCard}" ToolTip="{Binding GpuTooltip}">
+        <!-- ROW 0, COLUMN 2: Section 3 - GPU -->
+        <Border Grid.Row="0" Grid.Column="2" Background="Transparent" BorderThickness="0" Padding="0" ToolTip="{Binding GpuTooltip}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -220,8 +229,8 @@
             </Grid>
         </Border>
 
-        <!-- ROW 2, COLUMN 2: Card 4 - Power & Battery -->
-        <Border Grid.Row="2" Grid.Column="2" Style="{StaticResource IslandCard}" ToolTip="{Binding PowerTooltip}">
+        <!-- ROW 2, COLUMN 2: Section 4 - Power & Battery -->
+        <Border Grid.Row="2" Grid.Column="2" Background="Transparent" BorderThickness="0" Padding="0" ToolTip="{Binding PowerTooltip}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -277,8 +286,8 @@
             </Grid>
         </Border>
 
-        <!-- ROW 0, COLUMN 4: Card 5 - Network & Storage -->
-        <Border Grid.Row="0" Grid.Column="4" Style="{StaticResource IslandCard}" ToolTip="{Binding NetworkTooltip}">
+        <!-- ROW 0, COLUMN 4: Section 5 - Network & Storage -->
+        <Border Grid.Row="0" Grid.Column="4" Background="Transparent" BorderThickness="0" Padding="0" ToolTip="{Binding NetworkTooltip}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -352,8 +361,8 @@
             </Grid>
         </Border>
 
-        <!-- ROW 2, COLUMN 4: Card 6 - Top Processes -->
-        <Border Grid.Row="2" Grid.Column="4" Style="{StaticResource IslandCard}" Padding="12,10,12,10">
+        <!-- ROW 2, COLUMN 4: Section 6 - Top Processes -->
+        <Border Grid.Row="2" Grid.Column="4" Background="Transparent" BorderThickness="0" Padding="0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -398,30 +407,32 @@
                     </StackPanel>
                 </Grid>
 
-                <!-- 5 Process Rows (Comfortable 19 DIP height, never clipped) -->
+                <!-- 5 Process Rows (Flat row hover, no layout shift, fixed 20 DIP height) -->
                 <ItemsControl Grid.Row="2" ItemsSource="{Binding TopProcesses}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid Height="19" Margin="0,1" ToolTip="{Binding Tooltip}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="8"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="&#xE71D;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
-                                           FontSize="11" Foreground="{DynamicResource Theme.TextSecondary}"
-                                           VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis"
-                                           FontFamily="{DynamicResource Typography.Family.Body}"
-                                           FontSize="{DynamicResource Typography.Size.Secondary}" Foreground="{DynamicResource Theme.TextPrimary}"
-                                           VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="3" Text="{Binding MetricText}"
-                                           FontFamily="{DynamicResource Typography.Family.Numeric}"
-                                           FontSize="{DynamicResource Typography.Size.Secondary}"
-                                           FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextSecondary}"
-                                           VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
-                            </Grid>
+                            <Border Style="{StaticResource FlatListRow}" Height="20" ToolTip="{Binding Tooltip}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="8"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="&#xE71D;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji"
+                                               FontSize="11" Foreground="{DynamicResource Theme.TextSecondary}"
+                                               VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis"
+                                               FontFamily="{DynamicResource Typography.Family.Body}"
+                                               FontSize="{DynamicResource Typography.Size.Secondary}" Foreground="{DynamicResource Theme.TextPrimary}"
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="3" Text="{Binding MetricText}"
+                                               FontFamily="{DynamicResource Typography.Family.Numeric}"
+                                               FontSize="{DynamicResource Typography.Size.Secondary}"
+                                               FontWeight="SemiBold" Foreground="{DynamicResource Theme.TextSecondary}"
+                                               VerticalAlignment="Center" Typography.NumeralAlignment="Tabular"/>
+                                </Grid>
+                            </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

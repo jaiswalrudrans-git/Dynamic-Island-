@@ -356,11 +356,11 @@ internal sealed class PanelNavigation
             _ => Math.Max(desiredContentW, 580)
         };
 
-        // Horizontal padding: 12 left + 12 right = 24 DIP
-        double targetContentW = Math.Clamp(desiredContentW, minIslandW - 24.0, maxIslandW - 24.0);
-        double targetIslandW = Math.Ceiling((targetContentW + 24.0) / 8.0) * 8.0;
+        // Horizontal padding: 14 left + 14 right = 28 DIP (Single Root Padding Owner)
+        double targetContentW = Math.Clamp(desiredContentW, minIslandW - 28.0, maxIslandW - 28.0);
+        double targetIslandW = Math.Ceiling((targetContentW + 28.0) / 8.0) * 8.0;
         targetIslandW = Math.Clamp(targetIslandW, minIslandW, maxIslandW);
-        targetContentW = targetIslandW - 24.0;
+        targetContentW = targetIslandW - 28.0;
 
         // Pass 2: Measure with the target content width so text wrapping & reflow compute exact height
         page.Measure(new Size(targetContentW, double.PositiveInfinity));
@@ -380,10 +380,10 @@ internal sealed class PanelNavigation
         };
 
         // Vertical overhead:
-        // When TabBarPosition is "BelowClock": 12 top + 80 header + 8 gap + 12 bottom = 112 DIP.
-        // When TabBarPosition is "LeftOfClock": 12 top + 44 header + 8 gap + 12 bottom = 76 DIP.
+        // When TabBarPosition is "BelowClock": 14 top + 80 header + 8 gap + 14 bottom = 116 DIP.
+        // When TabBarPosition is "LeftOfClock": 14 top + 44 header + 8 gap + 14 bottom = 80 DIP.
         bool belowClock = !string.Equals(settings().TabBarPosition, "LeftOfClock", StringComparison.OrdinalIgnoreCase);
-        double overhead = belowClock ? 112.0 : 76.0;
+        double overhead = belowClock ? 116.0 : 80.0;
 
         double targetIslandH = Math.Ceiling((desiredContentH + overhead) / 8.0) * 8.0;
         targetIslandH = Math.Clamp(targetIslandH, 120.0, maxIslandH);

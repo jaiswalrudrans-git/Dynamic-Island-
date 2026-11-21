@@ -118,7 +118,7 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="16,8,16,14">
+    <Grid Margin="0">
         <Grid.RowDefinitions>
             <!-- Row 0: Segment Control (Pomodoro | Timer | Stopwatch) -->
             <RowDefinition Height="Auto"/>

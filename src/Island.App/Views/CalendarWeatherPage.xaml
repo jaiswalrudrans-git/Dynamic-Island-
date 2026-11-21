@@ -62,18 +62,21 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid Margin="12,4">
+    <Grid Margin="0">
         <Grid.ColumnDefinitions>
             <!-- Left Column: Calendar & Agenda -->
             <ColumnDefinition Width="290"/>
-            <!-- 8 DIP Gap -->
-            <ColumnDefinition Width="8"/>
-            <!-- Right Column: Weather Card -->
+            <!-- 16 DIP Gap with 1px Divider -->
+            <ColumnDefinition Width="16"/>
+            <!-- Right Column: Weather -->
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- LEFT COLUMN: Calendar & Agenda inside an IslandCard -->
-        <Border Grid.Column="0" Style="{StaticResource IslandCard}" VerticalAlignment="Stretch">
+        <!-- Vertical Divider (1px 6% white) -->
+        <Border Grid.Column="1" Width="1" Style="{StaticResource FlatDivider}" HorizontalAlignment="Center"/>
+
+        <!-- LEFT COLUMN: Calendar & Agenda (Flat, no card chrome) -->
+        <Border Grid.Column="0" Background="Transparent" BorderThickness="0" Padding="0" VerticalAlignment="Stretch">
             <Grid>
                 <Grid.RowDefinitions>
                     <!-- Row 0: Month header & nav -->
@@ -234,8 +237,8 @@
             </Grid>
         </Border>
 
-        <!-- RIGHT COLUMN: Weather Card inside an IslandCard -->
-        <Border Grid.Column="2" Style="{StaticResource IslandCard}" VerticalAlignment="Stretch">
+        <!-- RIGHT COLUMN: Weather (Flat, no card chrome) -->
+        <Border Grid.Column="2" Background="Transparent" BorderThickness="0" Padding="0" VerticalAlignment="Stretch">
             <Grid>
                 <Grid.RowDefinitions>
                     <!-- Row 0: Weather Header (Temp, Condition Text, City Pill, Controls) -->

@@ -118,15 +118,15 @@ public sealed class LayoutTests : TestFolder
     }
 
     [Theory]
-    [InlineData(1920, 1080, 1.0, 112.0)] // BelowClock (default)
-    [InlineData(1920, 1080, 1.25, 112.0)]
-    [InlineData(1920, 1080, 1.5, 112.0)]
-    [InlineData(1920, 1080, 1.0, 76.0)]   // LeftOfClock (legacy)
-    [InlineData(2560, 1440, 1.0, 112.0)]
-    [InlineData(2560, 1440, 1.25, 112.0)]
-    [InlineData(3840, 2160, 1.5, 112.0)]
-    [InlineData(3840, 2160, 2.0, 112.0)]
-    [InlineData(1366, 768, 1.0, 112.0)]
+    [InlineData(1920, 1080, 1.0, 116.0)] // BelowClock (default)
+    [InlineData(1920, 1080, 1.25, 116.0)]
+    [InlineData(1920, 1080, 1.5, 116.0)]
+    [InlineData(1920, 1080, 1.0, 80.0)]   // LeftOfClock (legacy)
+    [InlineData(2560, 1440, 1.0, 116.0)]
+    [InlineData(2560, 1440, 1.25, 116.0)]
+    [InlineData(3840, 2160, 1.5, 116.0)]
+    [InlineData(3840, 2160, 2.0, 116.0)]
+    [InlineData(1366, 768, 1.0, 116.0)]
     public void TabDimensionsHaveNoMoreThan12DipUnusedSpaceOnAnySide(int screenW, int screenH, double scale, double overhead)
     {
         double effectiveW = screenW / scale;
@@ -137,7 +137,7 @@ public sealed class LayoutTests : TestFolder
 
         (double w, double h)[] tabs = [
             (580, 170), // Music
-            (680, 415), // System (ensures Top Apps has full headroom)
+            (680, 415), // System (guarantees Top Apps has full headroom)
             (580, 180), // Tasks
             (620, 260), // Quick Controls
             (580, 320), // Focus
@@ -149,24 +149,24 @@ public sealed class LayoutTests : TestFolder
         {
             var (contentW, contentH) = tabs[i];
 
-            double targetContentW = Math.Clamp(contentW, minIslandW - 24.0, maxIslandW - 24.0);
-            double islandW = Math.Ceiling((targetContentW + 24.0) / 8.0) * 8.0;
+            double targetContentW = Math.Clamp(contentW, minIslandW - 28.0, maxIslandW - 28.0);
+            double islandW = Math.Ceiling((targetContentW + 28.0) / 8.0) * 8.0;
             islandW = Math.Clamp(islandW, minIslandW, maxIslandW);
 
             double islandH = Math.Ceiling((contentH + overhead) / 8.0) * 8.0;
             islandH = Math.Clamp(islandH, 120.0, maxIslandH);
 
-            // Bounds calculations:
-            double leftUnused = 12.0;
-            double rightUnused = (islandW - 24.0) - targetContentW + 12.0;
-            double topUnused = 12.0;
-            double bottomUnused = (islandH - overhead) - contentH + 12.0;
+            // Bounds calculations: 14 DIP uniform outer padding
+            double leftUnused = 14.0;
+            double rightUnused = (islandW - 28.0) - targetContentW + 14.0;
+            double topUnused = 14.0;
+            double bottomUnused = (islandH - overhead) - contentH + 14.0;
 
-            // Extra slack beyond uniform 12 DIP padding must be <= 8 DIP (< 12 DIP)
-            Assert.True(Math.Abs(leftUnused - 12.0) <= 0.001, $"Tab {i} left padding must be exactly 12 DIP");
-            Assert.True(rightUnused - 12.0 <= 8.0, $"Tab {i} right unused slack {rightUnused - 12.0} > 8 DIP");
-            Assert.True(Math.Abs(topUnused - 12.0) <= 0.001, $"Tab {i} top padding must be exactly 12 DIP");
-            Assert.True(bottomUnused - 12.0 <= 8.0, $"Tab {i} bottom unused slack {bottomUnused - 12.0} > 8 DIP");
+            // Extra slack beyond uniform 14 DIP padding must be <= 8 DIP (< 12 DIP)
+            Assert.True(Math.Abs(leftUnused - 14.0) <= 0.001, $"Tab {i} left padding must be exactly 14 DIP");
+            Assert.True(rightUnused - 14.0 <= 8.0, $"Tab {i} right unused slack {rightUnused - 14.0} > 8 DIP");
+            Assert.True(Math.Abs(topUnused - 14.0) <= 0.001, $"Tab {i} top padding must be exactly 14 DIP");
+            Assert.True(bottomUnused - 14.0 <= 8.0, $"Tab {i} bottom unused slack {bottomUnused - 14.0} > 8 DIP");
 
             Assert.True(islandW >= 580.0, $"Tab {i} width {islandW} must be >= 580 DIP");
             Assert.True(islandW <= maxIslandW + 8.0, $"Tab {i} width {islandW} must be <= max width {maxIslandW}");
