@@ -120,4 +120,18 @@ This log tracks every defect identified during the Stage A audit, the exact chan
 ---
 
 ## Stage G: Packaging & Final Verification
-- **Status**: In Progress
+- **Status**: Completed
+- **Changes Implemented**:
+  1. **Inno Setup 6 Installer (`installer.iss`)**:
+     - Authored complete, production-ready Inno Setup 6 script packaging the compiled Release artifacts from `artifacts/`.
+     - Non-administrative per-user deployment targeting `{localappdata}\Programs\Island` (eliminating UAC elevation prompts).
+     - Clean uninstaller removing all installed application files while prompting to preserve user configuration in `%LOCALAPPDATA%\Island` by default.
+     - Optional desktop and startup shortcuts (`{userstartup}`).
+     - Bundled `ThirdPartyNotices.txt` and `README.md`.
+  2. **Final Verification Screenshot Suite (`AuditCaptureRunner.cs`)**:
+     - Added `GenerateStageGFinalScreenshots` rendering all 7 tabs (Music, System, Tasks, QuickControls, Focus, CalendarWeather, Clipboard) and Settings window at 100% and 125% DPI.
+     - Stored 16 high-resolution visual verification captures in `docs/screens/final/`.
+  3. **Documentation & Release Artifacts**:
+     - Updated `docs/AUDIT.md` with resolutions and commit references for all 12 defect areas.
+     - Updated `README.md`, `SPEC.md`, and `PROGRESS.md`.
+     - Verified end-to-end Release build pipeline via `build.ps1` with 172/172 passing tests.

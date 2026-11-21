@@ -1,5 +1,54 @@
 # Milestone progress
 
+## M-LeadEngineer-Production-Audit · 2026-11-21
+
+Comprehensive lead engineer audit, stabilization, and production overhaul resolving regressions and polishing all views across stages A through G:
+
+### Stage A: Audit & Defect Cataloging
+- Ran full regression diff against baseline and identified 12 defects across fonts, layout, tab structure, clipping, and robustness.
+- Generated 144 visual capture screenshots into `docs/screens/audit/`.
+- Authored `docs/AUDIT.md` and initiated `docs/FIXLOG.md`.
+
+### Stage B: Foundation Fixes
+- **Composite Font Fallbacks**: Reconstructed font families with explicit system fallbacks terminating in `Segoe UI Variable Text, Segoe UI, Arial`.
+- **Glyph Coverage Verification**: Added `GlyphCoverageChecker` using `GlyphTypeface.CharacterToGlyphMap` at startup.
+- **Legibility Guard**: Prohibited decorative fonts from applying to labels, buttons, counts, and settings.
+- **Header Pill Styling**: Replaced harsh saturated pill block with 20% opacity `AccentSoft` styling.
+- **Dynamic Layout Headroom**: Increased vertical overhead to 112 DIP for the centered tab bar, fixing bottom clipping.
+- **Thin Overlay Scrollbars**: Added floating 6px overlay scrollbars fading out on idle.
+
+### Stage C: Unified Clipboard & Screenshots Tab
+- Merged fragmented Clipboard and Screenshots tabs into a single unified dual-half tab (`\uE8C8`) in `ClipboardPage.xaml`.
+- Left half: Searchable recent copies with copy, paste, pin, and delete actions.
+- Right half: 3x2 proportional screenshot gallery with Snip tool button.
+- Top strip: Unified header with search, counts, pause capture toggle, and clear button.
+- Preserved 7-tab architecture across `PanelTab.cs`, `PanelNavigation.cs`, and `SPEC.md`.
+
+### Stage D: Tab Polish & Settings Overhaul
+- **Music**: Added horizontal marquee scrolling on overflow track titles and active player identity icons.
+- **System**: Bento Grid row heights balanced to `*` with `VerticalAlignment="Stretch"`; Top Apps RAM list displays process icons and fits 5 items with 12 DIP clearance.
+- **Focus**: Replaced blurry drop shadow with crisp Windows 11 accent styling and explicit icon fallbacks.
+- **Quick Controls**: 8-tile 4x2 uniform grid with concise, unclipped two-word labels.
+- **Settings**: Redesigned monolithic window into 780x620 2-column sidebar layout (Appearance, Clock, Typography, Tabs & Clipboard, Motion, System & Alerts, About) with per-page "Reset this page" action.
+
+### Stage E: Production Robustness & Lifecycle Resilience
+- **Single Instance**: Implemented named Mutex `Local\Island_App_SingleInstance_Mutex` with `ISLAND_ACTIVATE_NOTIFICATION` wakeup.
+- **Global Exception Handling**: Added handlers for `DispatcherUnhandledException` (`e.Handled = true`), domain unhandled exceptions, and unobserved task exceptions, with logging to `%LOCALAPPDATA%\Island\crash.log`.
+- **Lifecycle Resilience**: Handled `TaskbarCreated` message to restore tray icon on Explorer restarts.
+- **Performance Budget & Stress Tests**: Verified cold start <600 ms, settings corruption recovery, and zero leaks across 5,000 expand/collapse cycles.
+
+### Stage F: Automated Test Matrix & Build Pipeline
+- Added multi-DPI test cases (1.5x at 1080p, 2.0x at 4K) in `LayoutTests.cs` and resolved IEEE 754 precision clamping.
+- Authored root PowerShell build script `build.ps1` enforcing clean Release builds with `TreatWarningsAsErrors=true`.
+- Verified 100% pass rate across all 172 tests in the solution.
+
+### Stage G: Packaging & Final Verification
+- Authored Inno Setup 6 installer script `installer.iss` for per-user non-admin installation to `{localappdata}\Programs\Island`.
+- Captured 16 final verification screenshots into `docs/screens/final/` for all 7 tabs and Settings at 100% and 125% DPI.
+- Authored `README.md` and finalized `docs/AUDIT.md` and `docs/FIXLOG.md`.
+
+---
+
 ## M-Header-Clipboard-Screenshots · 2026-11-20
 
 ### Part 1: Tab Bar Below the Clock & Directional Sliding

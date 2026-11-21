@@ -29,120 +29,76 @@ All defects have been analyzed, classified by severity, traced to root causes, a
 
 ### High Severity Defects
 
-#### [DEFECT-01] Tofu Boxes (Missing Glyphs) in Tab Labels, Counts, and Headings
+#### [DEFECT-01] Tofu Boxes (Missing Glyphs) in Tab Labels, Counts, and Headings - [FIXED in cc9e1f6]
 - **Component**: `TypographyResources.cs`, `DesignTokens.xaml`, Header tab bar, Page headings
-- **Symptoms**:
-  - Tab labels and page headings render as square boxes (tofu) when `Dot Matrix` or other decorative presets are selected.
-  - Number counts and symbols show missing glyph squares.
-- **Root Cause**:
-  1. `TypographyResources.CreateFamily` initialized `FontFamily` with a base pack URI (`pack://application:,,,/Island.App;component/`) and identifier `./Assets/Fonts/#Doto, Segoe UI`. In WPF, passing a base URI makes all comma-separated font names relative to that pack URI, breaking fallback to system fonts.
-  2. `Dot Matrix` preset sets `Heading = DotoFamily`. Doto does not include standard lowercase Latin characters (`a-z`) or Latin-1 punctuation.
-  3. `LegibilityGuard` had an arbitrary check `(16.0 * scale) < 18.0` which failed to protect headings when UI scale was >1.12.
-- **Remediation Plan (Stage B)**:
-  - Reconstruct composite font families using valid WPF composite font syntax ending in `Segoe UI Variable Text, Segoe UI, Arial`.
-  - Introduce `GlyphCoverageChecker` using `GlyphTypeface.CharacterToGlyphMap` at startup.
-  - Strictly enforce that `Heading`, `Body`, and `Label` roles never use decorative fonts (Doto, Silkscreen, Bebas Neue, Caveat).
-  - Explicitly isolate icon glyphs to `Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji`.
+- **Resolution**:
+  - Reconstructed composite font families ending in `Segoe UI Variable Text, Segoe UI, Arial`.
+  - Added `GlyphCoverageChecker` using `GlyphTypeface.CharacterToGlyphMap` validating glyph coverage at startup.
+  - Enforced that decorative fonts are never applied to `Heading`, `Body`, or `Label` roles.
+  - Isolated icon glyphs to `Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji`.
 
-#### [DEFECT-02] Focus & Timer Controls Render Vertical Tofu Glyphs
+#### [DEFECT-02] Focus & Timer Controls Render Vertical Tofu Glyphs - [FIXED in cc9e1f6 & 8a45c0e]
 - **Component**: `FocusPage.xaml`, `FocusViewModel.cs`
-- **Symptoms**: Transport buttons (Play/Pause, Reset, Skip, Lap) display tall rectangular boxes containing dot patterns instead of standard icons (`\uE768`, `\uE777`, `\uE893`).
-- **Root Cause**:
-  - `FocusControlBtn` and `PlayBtn` in `FocusPage.xaml` inherited container fonts or lacked explicit font family fallbacks for Fluent/MDL2 icon sets.
-  - When Doto or Share Tech Mono was applied, the icon characters were resolved against the decorative font which lacks private use area (PUA) glyphs.
-- **Remediation Plan (Stage B & D)**:
-  - Set explicit `FontFamily="{DynamicResource SymbolThemeFontFamily}"` with fallback `Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji` on all icon glyph TextBlocks.
-  - Refactor Focus page into a clean, horizontal, content-fitted layout.
+- **Resolution**:
+  - Bound transport buttons explicitly to `Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Emoji` fallback chain.
+  - Replaced blurred drop-shadow styling with crisp Windows 11 accent styling and unclipped horizontal layout.
 
-#### [DEFECT-03] Split Clipboard and Screenshots Tabs (Spec Violation)
+#### [DEFECT-03] Split Clipboard and Screenshots Tabs (Spec Violation) - [FIXED in 68468e1]
 - **Component**: `PanelTab.cs`, `OverlayWindow.Panel.cs`, `ClipboardPage.xaml`, `ScreenshotsPage.xaml`
-- **Symptoms**: The island displays 8 separate tabs. Clipboard and Screenshots are fragmented into two different tabs.
-- **Root Cause**: Architectural choice made during milestone implementation violated the BrimDeck dual-half specification.
-- **Remediation Plan (Stage C)**:
-  - Merge Clipboard and Screenshots into a single 7-tab layout under the unified "Clipboard" tab (`\uE8C8`).
-  - Left half: "Recent copies" (up to 5 items, preview, hover actions).
-  - Right half: "Screenshots" (3x2 thumbnail grid filling width, Snip button, hover actions).
-  - Top header strip: "Clipboard", item counts ("X copied · Y screenshots"), search box, Pause toggle, Clear button.
-  - Delete `ScreenshotsPage.xaml` and migrate tab settings seamlessly.
+- **Resolution**:
+  - Merged Clipboard and Screenshots into single dual-half unified `ClipboardPage.xaml` (Tab `\uE8C8`).
+  - Left half: Recent copies (searchable, formatted cards, copy on click, pin, delete).
+  - Right half: Screenshots (3x2 thumbnail grid filling width, Snip tool, drag-and-drop, full image open).
+  - Deleted obsolete `ScreenshotsPage.xaml` and migrated configuration settings seamlessly.
 
-#### [DEFECT-04] System Tab Card Text Overflows and Truncation
-- **Component**: `SystemPage.xaml`, `SystemViewModel.cs`
-- **Symptoms**:
-  - Network card text truncates ("Today: 34.0 MB down · 141.5 KB...").
-  - Storage card text collides with card edge ("123.5 GB / 175.1 GB").
-  - GPU name truncates ("RTX 4050...").
-  - Top Apps RAM list clips the 5th item at the bottom edge.
-  - Top Apps lacks application icons.
-- **Root Cause**:
-  - System card containers use fixed sizes without elastic content measurement.
-  - Missing 5-step fallback resolution (Grow -> Shrink font -> Companion font -> Drop secondary text -> Tooltip ellipsis).
-- **Remediation Plan (Stage B & D)**:
-  - Implement 5-step overflow protection on all System cards.
-  - Implement uniform Bento Grid card row heights.
-  - Add process icons to Top Apps and ensure 5 items fit comfortably with 12 DIP bottom clearance.
+#### [DEFECT-04] System Tab Card Text Overflows and Truncation - [FIXED in cc9e1f6 & 8a45c0e]
+- **Component**: `SystemPage.xaml`, `SystemViewModel.cs`, `OverlayWindow.Panel.cs`
+- **Resolution**:
+  - Increased dynamic vertical overhead from 76 DIP to 112 DIP for the centered tab bar layout, preventing bottom clipping.
+  - Equalized Bento Grid row heights to `Height="*"` with `VerticalAlignment="Stretch"`.
+  - Added process icons and full 5-app visibility with comfortable bottom margin in Top Apps.
 
 ---
 
 ### Medium Severity Defects
 
-#### [DEFECT-05] Tab Bar Pill Indicator Styling & Layout Inconsistency
+#### [DEFECT-05] Tab Bar Pill Indicator Styling & Layout Inconsistency - [FIXED in cc9e1f6]
 - **Component**: `OverlayWindow.xaml`, `PanelNavigation.cs`
-- **Symptoms**:
-  - Active tab pill is a solid, saturated blue/cyan block with heavy shadow, jarring against subtle dark themes.
-  - When `TabBarPosition` is toggled to `LeftOfClock`, the tab bar is placed inside a 72 DIP column, clipping icons and hiding the tab bar.
-- **Root Cause**:
-  - `PillIndicator` used `Background="{DynamicResource Theme.Accent}"` instead of `accent-soft` (18-22% opacity background).
-  - Selected button set `Foreground` to `Theme.Background` rather than `Theme.Accent`.
-  - `HeaderLeftCol` in Row 0 was hardcoded to `Width="72"`.
-- **Remediation Plan (Stage B)**:
-  - Style pill indicator with theme `AccentSoft` brush (accent color at 20% opacity) and set foreground to `Theme.Accent`.
-  - Fix column definitions so `LeftOfClock` expands `HeaderLeftCol` to `Auto` and offsets clock properly.
+- **Resolution**:
+  - Restyled active tab pill with theme `AccentSoft` brush (accent color at 20% opacity) and set text/icon foreground to `Theme.Accent`.
+  - Updated header row column definitions to dynamically resize when `TabBarPosition` is toggled.
 
-#### [DEFECT-06] Screenshots Page Visual & Scrollbar Defects
-- **Component**: `ScreenshotsPage.xaml`
-- **Symptoms**:
-  - Container is oversized; thumbnail grid does not fill container width.
-  - Bottom thumbnails are clipped.
-  - Standard gray Windows scrollbar appears.
-- **Root Cause**:
-  - Grid columns use fixed pixel widths rather than proportional `*` units.
-  - Default WPF `ScrollViewer` uses system default scrollbars without custom theme styles.
-- **Remediation Plan (Stage B & C)**:
-  - Absorb screenshots into unified dual-half `ClipboardPage.xaml` with 3x2 proportional grid.
-  - Implement thin overlay scrollbars (4-6px, rounded pill thumb, fades out on idle).
+#### [DEFECT-06] Screenshots Page Visual & Scrollbar Defects - [FIXED in cc9e1f6 & 68468e1]
+- **Component**: `ScreenshotsPage.xaml`, `DesignTokens.xaml`, `ClipboardPage.xaml`
+- **Resolution**:
+  - Replaced default Windows scrollbars with thin 6px floating overlay scrollbars with rounded thumb pills that fade on idle.
+  - Proportional 3x2 grid filling available width inside unified Clipboard tab.
 
-#### [DEFECT-07] Quick Controls Tile Label Truncation
+#### [DEFECT-07] Quick Controls Tile Label Truncation - [FIXED in 8a45c0e]
 - **Component**: `QuickControlsPage.xaml`
-- **Symptoms**: Quick Controls toggle labels truncate ("Focus Assi...", "Workstatic...", "Screenshot...").
-- **Root Cause**: TextBlocks inside toggle buttons have constrained widths without font size scaling or clean wrapping.
-- **Remediation Plan (Stage B & D)**:
-  - Add text scaling and clean concise labels ("Focus", "Lock", "Snip", "Sleep").
+- **Resolution**:
+  - Configured balanced 4x2 uniform grid with concise, unclipped two-word labels (Mute Mic, Wi-Fi, Bluetooth, Focus, Snip Tool, Lock PC, Sleep, Task Mgr).
 
-#### [DEFECT-08] Music Tab Lacks Marquee Scrolling and Player Identity
+#### [DEFECT-08] Music Tab Lacks Marquee Scrolling and Player Identity - [FIXED in 8a45c0e]
 - **Component**: `MusicPage.xaml`, `MusicViewModel.cs`
-- **Symptoms**:
-  - Long song titles cause the island to widen unnecessarily.
-  - Player name and player icon are missing.
-  - Unnecessary vertical gap between lyrics and progress bar.
-- **Remediation Plan (Stage D)**:
-  - Implement slow marquee text animation for overflowing titles.
-  - Display active media player name and icon (Spotify, Chrome, Edge, etc.).
-  - Tighten layout to ~170 DIP target height.
+- **Resolution**:
+  - Added horizontal marquee scrolling animation for long track titles via `Canvas` and `RenderTransform`.
+  - Added media player app identity icon and source text.
+  - Streamlined vertical spacing to fit comfortable ~170 DIP target height.
 
-#### [DEFECT-09] Settings Window Lacks Left Sidebar Navigation and Per-Page Reset
+#### [DEFECT-09] Settings Window Lacks Left Sidebar Navigation and Per-Page Reset - [FIXED in 8a45c0e]
 - **Component**: `MotionSettingsWindow.xaml`, `MotionSettingsWindow.xaml.cs`
-- **Symptoms**: Monolithic vertical scrolling window is difficult to navigate; users cannot reset settings for a single section.
-- **Remediation Plan (Stage D)**:
-  - Restructure into a left sidebar navigation layout (Appearance, Clock, Typography, Motion, Tabs & Clipboard, System & Alerts, About).
-  - Add "Reset this page" button to every settings section.
+- **Resolution**:
+  - Overhauled 780x620 2-column layout with 200 DIP left navigation sidebar (Appearance, Clock, Typography, Tabs & Clipboard, Motion, System & Alerts, About).
+  - Added per-page "Reset this page" action to restore defaults for specific sections without affecting others.
 
 ---
 
-## 4. Production Robustness & Architecture Defects (Stage E)
-- **Single Instance**: Missing named Mutex check; multiple instances can run simultaneously and conflict on hotkeys and hardware sensors.
-- **Global Exception Handling**: Unhandled exceptions in background threads (`TaskScheduler.UnobservedTaskException`, `DispatcherUnhandledException`) can silently crash or freeze the app.
-- **Atomic Settings Persistence**: Settings are written directly to `settings.json`; power cuts or crashes during write can corrupt the file.
-- **System Events**: Explorer crashes do not restore tray icon (`TaskbarCreated` unhandled); monitor DPI hotplug and power resume need verified re-anchoring.
+## 4. Production Robustness & Architecture Defects (Stage E) - [FIXED in 8e98345]
+- **Single Instance**: Implemented named Mutex `Local\Island_App_SingleInstance_Mutex` with registered window message `ISLAND_ACTIVATE_NOTIFICATION` to wake and focus the existing instance on secondary launch.
+- **Global Exception Handling**: Added handlers for `DispatcherUnhandledException`, `AppDomain.CurrentDomain.UnhandledException`, and `TaskScheduler.UnobservedTaskException` with automatic atomic disk logging to `%LOCALAPPDATA%\Island\crash.log`.
+- **Atomic Settings Persistence**: Implemented safe two-phase atomic write (`settings.tmp` -> rename) with corrupted settings recovery to `settings.invalid-*.json`.
+- **System Events**: Handled `TaskbarCreated` registered window message to seamlessly recreate tray icon on Explorer restarts; registered power and display change notifications.
 
 ---
 
