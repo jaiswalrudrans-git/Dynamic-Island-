@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using Island.App.Header.ViewModels;
 using Island.App.Interop;
 using Island.App.ViewModels;
 using Island.Core.Clipboard;

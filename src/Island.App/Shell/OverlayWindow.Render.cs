@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Island.App.Header.ViewModels;
 using Island.App.ViewModels;
 
 namespace Island.App.Shell;

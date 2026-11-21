@@ -5,11 +5,13 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using Island.App.Header.ViewModels;
 using Island.App.ViewModels;
+using Island.App.Views;
 using Island.Core.Motion;
 using Island.Core.Settings;
 
-namespace Island.App.Views;
+namespace Island.App.Header.Views;
 
 internal sealed class PanelNavigation
 {

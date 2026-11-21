@@ -1,4 +1,4 @@
-namespace Island.App.ViewModels;
+namespace Island.App.Header.ViewModels;
 
 internal sealed record PanelTab(string Id, string Name, string Glyph, string Description)
 {

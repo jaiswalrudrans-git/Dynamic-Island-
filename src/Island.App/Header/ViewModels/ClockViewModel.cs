@@ -2,7 +2,7 @@ using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Island.Core.Settings;
 
-namespace Island.App.ViewModels;
+namespace Island.App.Header.ViewModels;
 
 public sealed class ClockViewModel : ObservableObject
 {

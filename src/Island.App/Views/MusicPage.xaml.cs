@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using Island.App.Header.Views;
 using Island.App.Services;
 using Island.App.ViewModels;
 using Island.Core.Settings;

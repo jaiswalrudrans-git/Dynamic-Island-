@@ -3,6 +3,8 @@ using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using Island.App.Header.ViewModels;
+using Island.App.Header.Views;
 using Island.App.Interop;
 using Island.App.Services.Alerts;
 using Island.App.Services.Controls;

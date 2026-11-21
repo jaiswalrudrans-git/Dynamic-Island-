@@ -4,6 +4,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using Island.App.Design;
+using Island.App.Header.Views;
 using Island.Core;
 using Island.Core.Settings;
 

@@ -1,3 +1,4 @@
+using Island.App.Header.ViewModels;
 using Island.App.ViewModels;
 using Island.Core.Settings;
 using Xunit;
