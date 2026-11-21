@@ -6,7 +6,7 @@ using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
 using Windows.Devices.Radios;
 
-namespace Island.App.Services.Controls;
+namespace Island.App.Features.Controls.Services;
 
 public sealed class QuickControlsManager : IMMNotificationClient, IDisposable
 {

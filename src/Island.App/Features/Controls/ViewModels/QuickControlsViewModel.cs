@@ -1,8 +1,8 @@
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Island.App.Services.Controls;
+using Island.App.Features.Controls.Services;
 
-namespace Island.App.ViewModels;
+namespace Island.App.Features.Controls.ViewModels;
 
 public sealed class QuickControlsViewModel : ObservableObject, IDisposable
 {

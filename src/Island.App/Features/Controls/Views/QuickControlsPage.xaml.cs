@@ -1,8 +1,8 @@
 using System.Windows;
 using System.Windows.Controls;
-using Island.App.ViewModels;
+using Island.App.Features.Controls.ViewModels;
 
-namespace Island.App.Views;
+namespace Island.App.Features.Controls.Views;
 
 public partial class QuickControlsPage : UserControl
 {
