@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Island.App.Themes;
+using Island.App.Design;
 using Island.App.Views;
 using Island.Core.Settings;
 using Xunit;
@@ -364,7 +364,7 @@ public sealed class TypographyTests
         string? projectRoot = FindProjectRoot();
         Assert.NotNull(projectRoot);
 
-        string xamlPath = Path.Combine(projectRoot, "src", "Island.App", "Themes", "DesignTokens.xaml");
+        string xamlPath = Path.Combine(projectRoot, "src", "Island.App", "Design", "DesignTokens.xaml");
         string xaml = File.ReadAllText(xamlPath);
 
         // An implicit style <Style TargetType="TextBlock"> overrides button icon textblocks and breaks glyphs!

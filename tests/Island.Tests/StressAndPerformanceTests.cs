@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Windows;
-using Island.App.Themes;
+using Island.App.Design;
 using Island.Core.Motion;
 using Island.Core.Settings;
 using Island.Core.Themes;

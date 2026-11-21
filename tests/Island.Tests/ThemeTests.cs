@@ -1,7 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
-using Island.App.Themes;
+using Island.App.Design;
 using Island.Core.Themes;
 using Xunit;
 

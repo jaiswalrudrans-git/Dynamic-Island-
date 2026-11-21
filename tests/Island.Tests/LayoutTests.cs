@@ -1,7 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Markup;
-using Island.App.Themes;
+using Island.App.Design;
 using Island.Core.Settings;
 using Island.Core.Themes;
 using Xunit;
@@ -182,7 +182,7 @@ public sealed class LayoutTests : TestFolder
         string? projectRoot = FindProjectRoot();
         Assert.NotNull(projectRoot);
 
-        string xamlPath = Path.Combine(projectRoot, "src", "Island.App", "Themes", "DesignTokens.xaml");
+        string xamlPath = Path.Combine(projectRoot, "src", "Island.App", "Design", "DesignTokens.xaml");
         Assert.True(File.Exists(xamlPath), $"DesignTokens.xaml should exist at {xamlPath}");
 
         using var stream = File.OpenRead(xamlPath);

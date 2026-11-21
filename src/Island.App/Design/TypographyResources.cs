@@ -4,7 +4,7 @@ using System.Windows.Media;
 using System.Windows.Media.Effects;
 using Island.Core.Settings;
 
-namespace Island.App.Themes;
+namespace Island.App.Design;
 
 public sealed class TypographyResources(ResourceDictionary applicationResources)
 {

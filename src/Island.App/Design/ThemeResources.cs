@@ -2,7 +2,7 @@ using System.Windows;
 using System.Windows.Media;
 using Island.Core.Themes;
 
-namespace Island.App.Themes;
+namespace Island.App.Design;
 
 public sealed class ThemeResources(ResourceDictionary applicationResources, ThemeCatalog catalog)
 {

@@ -2,7 +2,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media;
-using Island.App.Themes;
+using Island.App.Design;
 using Island.App.Views;
 using Island.App.Interop;
 using Island.Core;

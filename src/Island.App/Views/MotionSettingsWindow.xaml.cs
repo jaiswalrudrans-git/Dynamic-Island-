@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using Island.App.Themes;
+using Island.App.Design;
 using Island.Core;
 using Island.Core.Settings;
 

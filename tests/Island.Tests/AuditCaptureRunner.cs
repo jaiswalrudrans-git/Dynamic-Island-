@@ -6,7 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Island.App.Themes;
+using Island.App.Design;
 using Island.App.Views;
 using Island.Core.Settings;
 using Xunit;
